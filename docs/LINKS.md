@@ -1,34 +1,37 @@
-# Wichtige Links
+# Useful links
 
-Links sind eine **Linksammlung**, keine Aussage über aktuelle Preise, Lieferbarkeit oder geprüfte Kompatibilität.
+A short reference list for the build. Product listings are examples, not confirmed purchases.
 
-## Betriebssystem und Software
-| Thema | Link | Zweck |
+## Linux and development
+
+| Resource | Link |
+|---|---|
+| Debian download | https://www.debian.org/distrib/ |
+| Debian installation guide | https://www.debian.org/releases/stable/installmanual |
+| Debian Wiki | https://wiki.debian.org/ |
+| Debian package search | https://packages.debian.org/stable/ |
+| CircuitPython for Pico | https://circuitpython.org/board/raspberry_pi_pico/ |
+| Adafruit HID library | https://github.com/adafruit/Adafruit_CircuitPython_HID |
+| Raspberry Pi Pico documentation | https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html |
+| Python | https://www.python.org/ |
+| OpenCV documentation | https://docs.opencv.org/ |
+| Linux Video4Linux2 documentation | https://www.kernel.org/doc/html/latest/userspace-api/media/v4l/v4l2.html |
+
+## Darts and printed parts
+
+| Resource | Link | Notes |
 |---|---|---|
-| Debian | https://www.debian.org/distrib/ | Offizieller Linux-Download |
-| Debian Installationshandbuch | https://www.debian.org/releases/stable/installmanual | Installationsschritte |
-| Debian Wiki | https://wiki.debian.org/ | Linux-Konfiguration |
-| Debian-Pakete | https://packages.debian.org/stable/ | Paketnamen und Versionen |
-| CircuitPython Pico | https://circuitpython.org/board/raspberry_pi_pico/ | Pico-Firmware |
-| CircuitPython HID | https://github.com/adafruit/Adafruit_CircuitPython_HID | Tastatureingaben über USB |
-| Raspberry Pi Pico Dokumentation | https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html | GPIO und Hardware |
-| Python | https://www.python.org/ | Optionale Softwareentwicklung |
-| OpenCV | https://docs.opencv.org/ | Bildverarbeitung, noch nicht als Engine festgelegt |
-| Video4Linux | https://www.kernel.org/doc/html/latest/userspace-api/media/v4l/v4l2.html | Linux-Kameraschnittstelle |
+| Autodarts | https://autodarts.io/ | Reference project; offline use and integration not checked |
+| B3D Autodarts DIY V2 | https://www.printables.com/model/1243079-b3d-autodarts-diy-automatische-punkteerfassung-fur | Camera mounts; check hole spacing |
+| B3D alternative listing | https://cults3d.com/de/modell-3d/spiel/b3d-autodarts-diy-automatic-score-steeldart-v2 | Alternate source for printed parts |
+| Darts Console repository | https://github.com/Arber28/Darts-Console | Project files |
 
-## Darts und 3D-Druck
-| Thema | Link | Hinweis |
+## Hardware examples
+
+| Part | Link | Notes |
 |---|---|---|
-| Autodarts | https://autodarts.io/ | Möglicher Referenzpunkt für automatische Dart-Erkennung; Offline-Tauglichkeit/Integration **ungeprüft** |
-| B3D Autodarts DIY V2 | https://www.printables.com/model/1243079-b3d-autodarts-diy-automatische-punkteerfassung-fur | 3D-Druck-Halterungen; Lochabstände vorab messen |
-| B3D Alternative | https://cults3d.com/de/modell-3d/spiel/b3d-autodarts-diy-automatic-score-steeldart-v2 | Alternativer Projekteintrag |
-| Projekt-Repository | https://github.com/Arber28/Darts-Console | Unsere Dateien |
+| GXIVISION OV9732 camera candidate | https://www.ebay.at/itm/356589930771 | Dimensions and compatibility not confirmed |
+| KY-040 rotary encoder | https://funduinoshop.com/elektronische-module/keypads-und-buttons/rotary-encoder/ky-040-drehimpulsgeber-rotary-encoder | Example listing |
+| 12 mm push button | https://www.berrybase.at/mikro-drucktaster-12mm-rund-printmontage-schliesser-farbe-schwarz | Check mounting style |
 
-## Bauteil-Referenzen (keine Kaufempfehlung)
-| Teil | Link | Hinweis |
-|---|---|---|
-| GXIVISION-Kamerakandidat | https://www.ebay.at/itm/356589930771 | Noch nicht auf Maße/Software geprüft |
-| KY-040 Beispiel | https://funduinoshop.com/elektronische-module/keypads-und-buttons/rotary-encoder/ky-040-drehimpulsgeber-rotary-encoder | Druckbarer Drehregler |
-| Taster-Beispiel | https://www.berrybase.at/mikro-drucktaster-12mm-rund-printmontage-schliesser-farbe-schwarz | Abmessungen und Einbau prüfen |
-
-Für den **LED-Drehdimmer und das Laufwerk bewusst kein konkreter Produktlink**, da noch nichts ausgewählt wurde.
+No specific storage drive or LED dimmer has been selected.
