@@ -1,41 +1,58 @@
-# Darts Console 🎯
+# Darts Console
 
-Offline-first DIY dart scoring console based on an old laptop, three USB cameras, a Raspberry Pi Pico, a KY-040 push encoder and four buttons.
+A standalone darts scoring console built from an old laptop, three USB cameras and a Raspberry Pi Pico.
 
-## Status
-**Early prototype.** The web UI is a keyboard-controlled offline demo; automatic camera detection and complete scoring/correction logic are **not yet implemented**. Camera compatibility and mounting dimensions remain unverified.
+The laptop runs the interface on a portrait-mounted screen. Four buttons and a push-button rotary encoder handle navigation. A separate dimmer controls the dartboard light.
 
-## Dokumentation und Schaltpläne
-- [Architektur und Grafiken](docs/ARCHITECTURE.md): Systemdiagramm, Gehäuseanordnung, GPIO- und Stromversorgungsübersicht
-- [Linux installieren](docs/INSTALL_LINUX.md): Debian, Hochformat, Kiosk-Plan und Offline-Tests
-- [Wichtige Links](docs/LINKS.md): offizielle Downloads, Dokumentation und 3D-Druck-Projekte
-- [Bauplan und Testliste](docs/BUILD_PLAN.md): Schritte, offene Entscheidungen und Prüfpunkte
+## Project status
 
-## Files
-- [Materialliste / BOM](docs/BOM.md): quantities, provisional prices and reference links
-- [Game modes](docs/GAME_MODES.md): planned rules for X01 and additional beginner-friendly games
-- [Wiring](docs/WIRING.md): Pico pinout and safety notes
-- [Pico firmware](firmware/code.py): CircuitPython USB keyboard controller
-- [Offline UI demo](web/index.html): game mode, checkout choice, player selection, random order, menu and correction placeholder
+The hardware layout is settled, and there is a working keyboard-controlled interface demo. Camera-based hit detection and the full scoring engine still need to be built and tested.
+
+## Documentation
+
+| Document | Contents |
+|---|---|
+| [System layout](docs/ARCHITECTURE.md) | Hardware diagram, front panel, signal flow and power |
+| [Parts list](docs/BOM.md) | Components, estimated costs and purchase notes |
+| [Wiring](docs/WIRING.md) | Pico pinout and button connections |
+| [Linux setup](docs/INSTALL_LINUX.md) | Debian installation and offline kiosk plan |
+| [Game rules](docs/GAME_MODES.md) | Rules for planned game modes |
+| [Build checklist](docs/BUILD_PLAN.md) | Remaining jobs and tests |
+| [Links](docs/LINKS.md) | Downloads, documentation and printable mounts |
 
 ## Controls
-Rotate KY-040 = Up/Down; press = Enter; BACK = Escape; UNDO = F4; CORRECT = F2; NEXT = F5. The encoder press is Enter.
 
-## Enclosure / controls
-Portrait-oriented laptop display with **four buttons below it**, arranged **BACK – UNDO – [rotary encoder] – CORRECT – NEXT**. No top-row buttons. The encoder rotates to navigate and presses to confirm. Game menu, rules, statistics and settings are accessed on-screen via encoder; dedicated MENU button removed. LED ring has independent rotary dimmer and power supply, not Pico-controlled.
+All controls sit **below** the portrait screen:
+
+```text
+[BACK]  [UNDO]  (ROTARY / OK)  [CORRECT]  [NEXT]
+```
+
+- Turn the encoder to move through a menu; press it to confirm.
+- Back returns to the previous screen.
+- Undo reverses the last throw once scoring history is implemented.
+- Correct opens manual hit correction.
+- Next ends a turn or moves to the next player once game logic is implemented.
+
+The Pico sends standard USB keyboard events. See [Wiring](docs/WIRING.md) for the key mapping.
+
+## Try the interface
+
+Open `web/index.html` in a browser. No server or internet connection is needed.
+
+Keyboard controls: Up/Down, Enter, Escape, F4 (Undo), F2 (Correct), F5 (Next). The Undo and Next shortcuts currently show placeholders; they do not alter scores.
+
+## Pico firmware
+
+1. Install [CircuitPython for Raspberry Pi Pico](https://circuitpython.org/board/raspberry_pi_pico/).
+2. Copy Adafruit's `adafruit_hid` library into `CIRCUITPY/lib/`.
+3. Copy `firmware/code.py` to `CIRCUITPY/code.py`.
+4. Connect the encoder and buttons according to [Wiring](docs/WIRING.md).
 
 ## Players
-Emre, Arber, Adnan, Atakan, Amir, Ali; optional guest players.
 
-## Try the prototype
-Open `web/index.html` locally in a desktop browser. Use Up/Down, Enter, Escape, F4, F2, F5. It requires no internet.
+Default names: Emre, Arber, Adnan, Atakan, Amir and Ali. Guest players can be added. Player order is randomized when a game starts.
 
-## Pico setup
-Install CircuitPython on a Pico with native USB, copy Adafruit's `adafruit_hid` library into `CIRCUITPY/lib/`, then copy `firmware/code.py` as `CIRCUITPY/code.py`. Wire it according to [WIRING](docs/WIRING.md).
+## Next jobs
 
-## Next steps
-1. Verify 3-camera UVC support, mounting dimensions, and lens view.
-2. Select and test an offline scoring engine.
-3. Integrate actual throws, X01 bust/checkout rules and historical corrections.
-4. Design/print camera mounts and laptop display/control housing.
-5. Configure automatic boot to full-screen app.
+Test the cameras on Linux, choose an offline detection method, implement scoring and corrections, then build the enclosure and configure automatic startup.
