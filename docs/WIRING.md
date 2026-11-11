@@ -2,20 +2,24 @@
 
 **All GPIO signals are 3.3 V. Never feed 5 V into GPIO.**
 
-| Device | Pin | Pico GPIO |
-|---|---|---|
-| KY-040 | CLK | GP2 |
-| KY-040 | DT | GP3 |
-| KY-040 | SW | GP4 |
-| KY-040 | + | 3V3 OUT |
-| KY-040 | GND | GND |
-| BACK button | one contact | GP5 |
-| CORRECT button | one contact | GP6 |
-| MENU button | one contact | GP7 |
-| All 3 buttons | other contact | GND |
+## Portrait console control layout
+Below the portrait display, from left to right: **BACK | UNDO | [KY-040 rotary encoder] | CORRECT | NEXT**. The KY-040 is also a pushbutton (OK/Enter). No upper row or separate MENU button.
 
-Firmware uses internal pull-ups for all inputs; a pressed button connects its GPIO to GND.
+| Device | Pin | Pico GPIO | USB HID key |
+|---|---|---|---|
+| KY-040 | CLK | GP2 | Arrow up/down with DT |
+| KY-040 | DT | GP3 | Direction input |
+| KY-040 | SW | GP4 | Enter |
+| KY-040 | + | 3V3 OUT | — |
+| KY-040 | GND | GND | — |
+| BACK button | one contact | GP5 | Escape |
+| UNDO button | one contact | GP6 | F4 |
+| CORRECT button | one contact | GP7 | F2 |
+| NEXT button | one contact | GP8 | F5 |
+| All four buttons | other contact | GND | — |
 
-Connect the Pico to the laptop using USB. The computer recognizes it as a standard HID keyboard once CircuitPython and the HID library are installed.
+All button inputs use internal pull-ups: pressed = GPIO connected to GND. Connect Pico via USB; CircuitPython and Adafruit HID library are required. KY-040 pin order varies: check board labels. Swap CLK/DT or firmware direction mapping if rotation is reversed.
 
-Some KY-040 boards have resistors and a different pin order: check silk-screen labels, not physical positions. If rotation is reversed, swap CLK/DT or change the firmware mapping. Test the circuit before soldering or printing the enclosure.
+The LED ring is **independent**: standalone rotary PWM dimmer and appropriately rated LED supply, with no Pico GPIO connection.
+
+**Current demo limitation:** The web UI handles F4/F5 as control shortcuts, but true scoring history and player advancement require the future scoring engine; do not interpret a demo message as an actual score change.
