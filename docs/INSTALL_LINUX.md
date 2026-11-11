@@ -1,61 +1,69 @@
-# Linux installieren – geplanter Offline-Kiosk
+# Linux setup
 
-## Ziel
-Alten Laptop ohne Touchpad/Tastaturgehäuse als Recheneinheit nutzen; Display im **Hochformat**, automatische Anmeldung und Start der Darts Console. Die Anwendung soll **ohne Internet am Aufstellort** funktionieren.
+The old laptop will run Debian with a portrait display and start the Darts Console automatically. Wi-Fi won't be available where the board is installed, so everything must work offline after setup.
 
-## Wichtige Downloads (offiziell)
-- [Debian herunterladen](https://www.debian.org/distrib/)
-- [Debian Installationshandbuch](https://www.debian.org/releases/stable/installmanual)
+## Downloads
+
+- [Debian installer](https://www.debian.org/distrib/)
+- [Debian installation guide](https://www.debian.org/releases/stable/installmanual)
 - [Debian Wiki](https://wiki.debian.org/)
-- [Debian-Paketübersicht](https://packages.debian.org/stable/)
-- [Raspberry Pi Pico – CircuitPython](https://circuitpython.org/board/raspberry_pi_pico/)
-- [Adafruit CircuitPython HID Library](https://github.com/adafruit/Adafruit_CircuitPython_HID)
+- [Debian packages](https://packages.debian.org/stable/)
+- [CircuitPython for Raspberry Pi Pico](https://circuitpython.org/board/raspberry_pi_pico/)
+- [Adafruit USB HID library](https://github.com/adafruit/Adafruit_CircuitPython_HID)
 
-## Voraussetzungen
-1. Laptop-Modell, CPU und Anschlüsse prüfen.
-2. Passendes internes Laufwerk auswählen (Modell und Größe **noch offen**).
-3. Installations-USB-Stick und ggf. USB-Tastatur vorbereiten.
-4. Für Installation und Softwarepakete vorübergehend Internet einplanen; später offline testen.
-5. Kamera-UVC-Unterstützung und Performance **vor** endgültigem Gehäusebau testen.
+## Before installation
 
-## Vorgeschlagener Ablauf
-1. Aktuelles Debian-Stable-Installationsmedium von der offiziellen Seite laden und auf USB-Stick schreiben.
-2. Debian installieren; möglichst schlank, ohne unnötige Desktop-Dienste. Für die Browser-UI wird dennoch eine grafische Sitzung benötigt.
-3. Benutzer für die Console anlegen und Grafik-/Browser-Kiosk einrichten. Konkrete Pakete erst nach Hardwaretest festlegen.
-4. Display unter der gewählten Grafik-Sitzung um **90°** drehen; richtige Richtung und Auflösung prüfen.
-5. `web/index.html` im Browser als lokale Datei testen. Aktuell ist das **nur eine Bedienungsdemo**, keine echte Treffererkennung.
-6. Pico mit CircuitPython und `firmware/code.py` einrichten; Tasten und Drehregler testen.
-7. Drei Kameras einzeln und gleichzeitig prüfen. Bei USB-Strom- oder Bandbreitenproblemen aktiven Hub vorsehen.
-8. Später Offline-Scoring-Engine anbinden, Autostart und automatische Wiederherstellung nach Neustart einrichten.
-9. WLAN/Internet trennen und einen vollständigen Offline-Test durchführen.
+Check the laptop model and USB ports, choose a compatible internal drive and prepare a bootable Debian USB stick. Keep a keyboard available for setup. Internet access is useful during installation; it shouldn't be required afterward.
 
-## Hilfreiche Prüfkommandos (Debian)
+## Setup order
+
+1. Install the current Debian stable release from the official installer.
+2. Set up a lightweight graphical session and a browser for the interface. Exact packages will depend on the laptop.
+3. Rotate the display by 90 degrees in the graphical settings and check the resolution.
+4. Open `web/index.html` locally to test the interface.
+5. Install CircuitPython and the HID library on the Pico, then copy over `firmware/code.py`.
+6. Test the encoder and all four buttons with the laptop.
+7. Check the USB cameras one by one, then all three at once. Add a powered hub if USB power or bandwidth becomes a problem.
+8. Once camera detection and scoring work, configure the interface to start automatically after boot.
+9. Disconnect from the network and test a full restart.
+
+There is no final kiosk service configuration yet. Choose the startup method after confirming whether the system uses X11 or Wayland.
+
+## Useful commands
 
 ```bash
+# CPU architecture
 uname -m
+
+# Connected USB devices
 lsusb
+
+# Available drives
 lsblk
-# Kamerageräte, falls v4l-utils installiert:
+
+# Video devices (requires v4l-utils)
 v4l2-ctl --list-devices
-# USB-/Kernelmeldungen:
+
+# Recent kernel messages
 dmesg | tail -n 50
 ```
 
-**Nicht blind ausführen:** Displayrotation und Kiosk-Autostart hängen davon ab, ob X11 oder Wayland läuft und welcher Grafiktreiber verfügbar ist. Keine feste Boot-Konfiguration vor dem Test übernehmen.
+## Button mapping
 
-## Pico-Tasten
-- Drehen: Pfeil hoch/runter
-- Drücken: Enter
-- BACK: Escape
-- UNDO: F4
-- CORRECT: F2
-- NEXT: F5
+| Control | Keyboard input |
+|---|---|
+| Encoder clockwise / counterclockwise | Arrow Down / Arrow Up |
+| Encoder press | Enter |
+| Back | Escape |
+| Undo | F4 |
+| Correct | F2 |
+| Next | F5 |
 
-Die Tasten senden bereits HID-Eingaben. Vollständige Undo-/Weiter-Funktionen benötigen die spätere Spiellogik.
+The interface demo reacts to these inputs. Actual scoring, Undo and turn advancement still need to be implemented.
 
-## Was noch fehlt
-- Verifiziertes Laptop-Modell und Displayanschluss
-- Ausgewähltes Laufwerk
-- Verifizierte Kamera-Module und Halterungsmaße
-- Offline-Erkennungssoftware und echte Scoring-Engine
-- Finaler Kiosk-Service, Persistenz, Backup/Restore
+## Open hardware details
+
+- Laptop display connection and graphics driver
+- Storage drive model and capacity
+- Camera module dimensions and Linux compatibility
+- Detection engine and its performance with three cameras
