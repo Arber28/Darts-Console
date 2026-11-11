@@ -1,101 +1,123 @@
-# Spielmodi – Spezifikation (geplant)
+# Game rules
 
-Jeder aktive Spieler wirft bis zu drei Darts pro Zug. Automatische Treffererkennung und Spiel-Engines sind noch **nicht implementiert**. Manuelle Korrektur erkannter Treffer muss in jedem Modus möglich sein.
+These are the rules planned for the console. They're written down here so the scoring logic has a clear reference. Game modes are not playable in the current interface demo.
 
-## 301 / 501 / 701 (X01)
-- Startwert je nach Modus; Trefferpunkte abziehen.
-- Exakt 0 zum Sieg; Checkout konfigurierbar (insbesondere Straight Out oder Double Out).
-- Bust: Überwerfen; bei Double Out auch Rest 1 oder Null ohne gültiges Doppel. Der **gesamte Zug** wird auf den Punktestand vor Zugbeginn zurückgesetzt und beendet.
-- Optional weitere Checkout-Regeln später.
+Each player gets up to three darts per turn. Every game will need a way to correct a missed or incorrectly detected hit, including corrections to earlier turns.
+
+## X01: 301, 501 and 701
+
+- Each player starts with the selected score.
+- Dart points are subtracted after each hit.
+- The player must reach exactly zero to win.
+- Checkout options: Straight Out (any scoring segment), Double Out (a double or inner bull) and Master Out (double or triple).
+- A bust ends the turn and restores the score from before that turn. A bust occurs when the player goes below zero or cannot finish legally with the remaining score.
 
 ## Cricket
-- Ziele: 15, 16, 17, 18, 19, 20, Bull.
-- Pro Ziel 3 Marks zum Schließen. Single/Double/Triple zählen 1/2/3 Marks; Outer Bull 1, Inner Bull 2.
-- Überzählige Marks nach dem Schließen erzielen Punkte nur, solange mindestens ein Gegner das Ziel noch offen hat. Punkte entsprechen Zielwert × überschüssige Marks (Bull: 25 je Mark).
-- Ist ein Ziel bei allen geschlossen, gibt es dort keine Punkte mehr.
-- Sieg: alle Ziele geschlossen und Punktestand mindestens so hoch wie bei jedem Gegner.
-- Teammodus später optional.
+
+Targets: 15, 16, 17, 18, 19, 20 and bull.
+
+- A target closes after three marks: single = 1, double = 2, triple = 3.
+- Outer bull counts as one mark; inner bull counts as two.
+- Marks beyond the third score points if at least one opponent still has that target open.
+- Extra marks score the target value each (25 for each bull mark).
+- When everyone has closed a target, it no longer scores.
+- To win, close every target and have at least as many points as every opponent.
 
 ## Around the Clock
-- Jeder startet bei Ziel 1 und arbeitet sich aufsteigend bis 20 vor.
-- Single, Double und Triple zählen jeweils als **ein** erfolgreiches Ziel.
-- Nach Treffer sofort zum nächsten Ziel, auch innerhalb desselben Zuges.
-- Optional Bull als letztes Ziel.
-- Sieg: zuerst alle geforderten Ziele getroffen.
 
-## Killer (Handout-Variante)
-- Jedem Spieler wird eine **eindeutige** Zahl von 1 bis 20 zugewiesen; ideal 3–8 Spieler.
-- Start mit 3 Leben. Eigene Zahl zunächst mit 3 Marks aktivieren (Single 1, Double 2, Triple 3), um Killer zu werden.
-- Als Killer entzieht man mit Treffern auf die Zahl eines Gegners 1/2/3 Leben (Single/Double/Triple).
-- Bei 0 Leben ausgeschieden; letzter aktiver Spieler gewinnt.
-- **Noch zu klären:** Zahlzuweisung (zufällig/manuell), Verhalten bei Treffern auf eigene Zahl nach Aktivierung, ob ausgeschiedene Spieler weiter Ziele darstellen und ob ein Treffer mehr als verbleibende Leben abziehen darf (vorgeschlagen: auf 0 begrenzen).
+- Hit 1 through 20 in order.
+- Any single, double or triple of the current number counts as one successful target.
+- After a hit, move to the next number immediately, even within the same turn.
+- Optional final target: bull.
+- First player to finish wins.
 
-## Shanghai (7 Runden)
-- In Runde 1 zählt nur die 1, in Runde 2 nur die 2 usw. bis Runde 7.
-- Je Spieler 3 Darts pro Runde; gültige Treffer geben Single ×1, Double ×2, Triple ×3 Punkte.
-- Single + Double + Triple der aktuellen Zahl innerhalb **eines Zuges**: sofortiger Shanghai-Sieg, unabhängig von Reihenfolge.
-- Sonst gewinnt nach Runde 7 der Spieler mit den meisten Punkten.
-- **Noch zu klären:** Gleichstand (gemeinsamer Sieg oder Stechen).
+## Killer
 
-## Gemeinsame Bedienung
-- Bestehende feste Spieler: Emre, Arber, Adnan, Atakan, Amir, Ali; Gäste optional.
-- Spielerreihenfolge beim Spielstart zufällig mischen (ohne Animation).
-- Jeder Modus benötigt eine eigene Ergebnis-/Statusanzeige und Korrekturmöglichkeit.
-- Korrektur muss auch nach Bust, Eliminierung und einem möglichen Sieg korrekt rückgängig machen können.
+House rules for the console:
 
-## Geplanter Spieleabend
-Around the Clock → 501 → Cricket → Shanghai → Killer.
+- Assign each player a unique number from 1 to 20.
+- Everyone starts with three lives.
+- Hit your own number for three marks to become a killer: single = 1, double = 2, triple = 3 marks.
+- Once active, hit an opponent's number to remove one, two or three lives respectively.
+- A player is out at zero lives. Last player remaining wins.
 
-## Weitere anfängerfreundliche Spielmodi (geplant)
+Still to decide: random or manual number assignment, hits on your own number after activation, and how to handle eliminated targets.
 
-Diese Modi ergänzen die fünf Grundspiele. Die Spielregeln sind als **konkrete Hausregel-Varianten** für die Console definiert; bei einigen Spielen gibt es andere verbreitete Varianten.
+## Shanghai
 
-### High Score — leicht
-- 1–6 Spieler, 10 Runden à maximal 3 Darts (Rundenzahl konfigurierbar).
-- Jeder gültige Treffer zählt seinen normalen Punktewert; Fehlwürfe 0.
-- Nach der letzten Runde gewinnt der höchste Gesamtwert; Gleichstand wird angezeigt.
+Seven rounds, one target per round: 1 in round one, 2 in round two, through 7 in round seven.
 
-### Baseball — leicht
-- 1–6 Spieler, 9 Innings/Runden.
-- In Runde 1 zählt nur die 1, in Runde 2 die 2 usw. bis zur 9.
-- Single = 1 Run, Double = 2 Runs, Triple = 3 Runs; andere Felder 0.
-- Nach neun Runden gewinnt die höchste Run-Zahl.
+- Only hits on the round's number score.
+- Single, double and triple award their normal dart points.
+- Hit a single, double and triple of the current number within one turn to win immediately (Shanghai).
+- Otherwise, the highest total after round seven wins.
+- Tie-break rules still need to be decided.
 
-### Gotcha! — leicht bis mittel
-- 2–6 Spieler; alle starten bei 0 und versuchen **exakt 301** zu erreichen.
-- Treffer erhöhen den Punktestand; wer über 301 kommt, behält den Stand vor dem Zug (Bust).
-- Erreicht man **am Ende des eigenen Zuges** exakt den Punktestand eines anderen aktiven Spielers, wird dieser auf 0 zurückgesetzt. Bei mehreren Gleichständen werden alle betroffenen Gegner zurückgesetzt.
-- Erreicht man exakt 301, gewinnt man sofort (vor Gotcha-Vergleich).
-- Hinweis: Dies ist eine bewusst festgelegte Console-Hausregel, weil Gotcha-Regeln variieren.
+## High Score
 
-### Knockout — leicht bis mittel
-- 3–6 Spieler, 3 Leben pro Person.
-- Pro Zug werden die Punkte aus bis zu drei Darts addiert.
-- Ab dem zweiten Zug im Spiel muss die Zugsumme **strikt höher** sein als die Zugsumme des unmittelbar vorherigen Spielers in der festen Reihenfolge; andernfalls verliert man ein Leben.
-- Ausgeschiedene Spieler werden übersprungen; als Vergleich gilt die letzte Zugsumme des vorherigen noch aktiven Spielers.
-- Letzter Spieler mit Leben gewinnt. Für den allerersten Spieler gibt es im ersten Durchgang keinen Vergleich.
-- Hinweis: Eine vereinfachte Hausregel; Knockout wird auch anders gespielt.
+- Ten rounds by default, three darts per player per round.
+- All hits count their normal points; misses score zero.
+- Highest total after the final round wins.
+- Round count can be made configurable.
 
-### Halve-It — mittel
-- 2–6 Spieler; Zielabfolge standardmäßig: 20, 19, 18, 17, 16, 15, Bull (konfigurierbar).
-- In jeder Runde zählen nur Treffer auf das Ziel; Singles/Doubles/Triples zählen ihre normalen Punkte, Outer Bull 25 und Inner Bull 50.
-- Trifft ein Spieler in seinen drei Darts kein gültiges Ziel, wird der **bisherige Gesamtpunktestand halbiert**, abgerundet.
-- Nach allen Runden gewinnt die höchste Punktzahl.
+## Baseball
 
-### Bermuda Triangle — mittel, optional später
-- 2–6 Spieler; Variante mit wechselnden Zielen und besonderen Double-/Triple-Aufgaben.
-- Wie bei Halve-It wird bei einem Zug ohne gültigen Treffer der Gesamtpunktestand halbiert.
-- **Exakte Rundenfolge noch festlegen**, bevor die Spiellogik implementiert wird. Als zusätzliche Variante markieren, nicht als sofort spielbar darstellen.
+- Nine innings, one target number per inning: 1 through 9.
+- Only the current inning's number counts.
+- Single = one run, double = two, triple = three.
+- Most runs after nine innings wins.
 
-### Tic-Tac-Toe Darts — mittel, optional später
-- 2 Spieler oder zwei Teams.
-- Neun festgelegte Zielzahlen werden einem 3×3-Raster zugeordnet.
-- Ein Feld wird nach 3 Marks (Single 1, Double 2, Triple 3) besetzt; besetzte Felder sind für den Gegner gesperrt.
-- Drei eigene Felder waagrecht, senkrecht oder diagonal gewinnen.
-- Zielzahlen und Teamzuordnung vor der Implementierung festlegen.
+## Gotcha!
 
-## Menü-Empfehlung für Anfänger
-- **Einfach starten:** High Score, Around the Clock, Baseball, 301 (Straight Out).
-- **Etwas mehr Wettbewerb:** 501, Gotcha!, Knockout, Shanghai.
-- **Später ausprobieren:** Halve-It, Cricket, Killer, Bermuda Triangle, Tic-Tac-Toe.
-- Alle Modi sind aktuell **Spezifikation, nicht implementierte Spielfunktionen**.
+The console uses the following house rules:
+
+- Everyone starts at zero and aims for exactly 301.
+- Dart points are added to the score.
+- Going above 301 is a bust; restore the score from the start of the turn.
+- If your score at the end of your turn exactly matches an opponent's score, reset that opponent to zero. If several opponents match, reset all of them.
+- Reaching exactly 301 wins immediately.
+
+## Knockout
+
+Simplified house rules:
+
+- Everyone starts with three lives.
+- Add up the three darts in each turn.
+- From the second turn of the match onward, compare the current turn's points with the preceding active player's last turn. You must score strictly more or lose one life.
+- Skip eliminated players in the comparison.
+- The last remaining player wins.
+
+## Halve-It
+
+Targets: 20, 19, 18, 17, 16, 15, bull.
+
+- Each round uses only its target.
+- Matching hits score their normal points, including 25/50 for bull.
+- If none of a player's three darts hits the target, halve that player's running total, rounded down.
+- Highest score after the final target wins.
+
+## Bermuda Triangle
+
+A later addition based on changing targets and specific double/triple rounds. A turn with no valid hit halves the player's total. The exact round sequence still needs to be chosen before implementation.
+
+## Tic-Tac-Toe Darts
+
+For two players or two teams.
+
+- Map nine dartboard numbers to a 3×3 grid.
+- Claim a square by scoring three marks on its number (single = 1, double = 2, triple = 3).
+- A claimed square cannot be taken by the opponent.
+- Three squares in a row, column or diagonal wins.
+
+The nine target numbers still need to be fixed.
+
+## Shared game features
+
+- Saved players: Emre, Arber, Adnan, Atakan, Amir and Ali; guests can be added.
+- Random player order at the beginning of a match.
+- Each game has its own scoring view.
+- Undo and manual correction must work across busts, eliminations and game-ending throws.
+
+## Games to build first
+
+Start with 301/501/701, High Score and Around the Clock. Add Cricket, Shanghai and the remaining modes once throw history and corrections work.
