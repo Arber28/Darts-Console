@@ -8,7 +8,6 @@ Prices below are **previously discussed estimates, not live-verified offers**. D
 | 1 | KY-040 rotary encoder, preferably threaded shaft | €1.84 | Previous estimate, shipping extra |
 | 3 | Normally-open momentary pushbuttons, black | €1.80 | Previous estimate, ensure mount fits printed panel |
 | 1 | Raspberry Pi Pico / compatible RP2040 board | €3–5 | Must support native USB HID |
-| 1 set | Jumper wires / hookup wire | €1–2 | Prefer soldered final connections |
 | 1 | USB cable for Pico | unknown | Check connectors on selected Pico |
 | 1 | Powered USB hub, if laptop ports/power are insufficient | unknown | May be needed for 3 cameras + Pico |
 | 3 | USB camera extension cables | unknown | Length depends on dartboard mounting |
@@ -17,7 +16,7 @@ Prices below are **previously discussed estimates, not live-verified offers**. D
 | 1 | Dartboard light | already owned | Check camera image quality |
 | printed | Camera mounts, enclosure, button caps | existing printer | Printing costs excluded by preference |
 
-**Known partial subtotal including target SSD: €49.90–€56.90**, excluding unknown items and any additional shipping. This is **not a complete project total**.
+**Known partial subtotal including target SSD: €48.90–€54.90**, excluding unknown items and any additional shipping. This is **not a complete project total**.
 
 ## References
 - B3D Autodarts DIY V2 printable mounts: https://www.printables.com/model/1243079-b3d-autodarts-diy-automatische-punkteerfassung-fur
