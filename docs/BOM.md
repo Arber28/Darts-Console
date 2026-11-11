@@ -13,11 +13,11 @@ Prices below are **previously discussed estimates, not live-verified offers**. D
 | 1 | Powered USB hub, if laptop ports/power are insufficient | unknown | May be needed for 3 cameras + Pico |
 | 3 | USB camera extension cables | unknown | Length depends on dartboard mounting |
 | as needed | Screws, nuts, inserts, cable ties | unknown | Measure from selected STL files |
-| 1 | Laptop and screen | already owned | Reuse existing device |
+| 1 | Used 2.5-inch SATA SSD, ideally 120/128 GB | €5–10 target | Storage missing from laptop; 64 GB minimum with lightweight Linux; verify laptop SATA compatibility and SSD SMART health before purchase |\n| 1 | Laptop and screen | already owned | Reuse existing device |
 | 1 | Dartboard light | already owned | Check camera image quality |
 | printed | Camera mounts, enclosure, button caps | existing printer | Printing costs excluded by preference |
 
-**Known partial subtotal: €44.90–€46.90**, excluding unknown items and any additional shipping. This is **not a complete project total**.
+**Known partial subtotal including target SSD: €49.90–€56.90**, excluding unknown items and any additional shipping. This is **not a complete project total**.
 
 ## References
 - B3D Autodarts DIY V2 printable mounts: https://www.printables.com/model/1243079-b3d-autodarts-diy-automatische-punkteerfassung-fur
