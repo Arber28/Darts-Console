@@ -13,10 +13,10 @@ Prices below are **previously discussed estimates, not live-verified offers**. D
 | 3 | USB camera extension cables | unknown | Length depends on dartboard mounting |
 | as needed | Screws, nuts, inserts, cable ties | unknown | Measure from selected STL files |
 | 1 | Storage drive (2.5-inch SATA HDD or SSD) | TBD | No specific model, capacity, or price selected yet; verify laptop compatibility before purchase |
-| 1 | Dartboard light | already owned | Check camera image quality |
+| 1 | LED strip for dartboard lighting ring | TBD | Required for planned printed ring; determine ring circumference, LED density, voltage, power supply and diffuser before buying |\n| 1 | LED strip power supply / controller (if needed) | TBD | Match selected strip voltage and total wattage; check whether existing lighting power supply can be reused |\n| 1 | Existing dartboard light | already owned | May be reused or replaced by the planned LED ring |
 | printed | Camera mounts, enclosure, button caps | existing printer | Printing costs excluded by preference |
 
-**Known partial subtotal excluding storage: €43.90–€45.90**, excluding unknown items and any additional shipping. This is **not a complete project total**.
+**Known partial subtotal excluding storage, LED strip and any required LED power supply: €43.90–€45.90**, excluding unknown items and any additional shipping. This is **not a complete project total**.
 
 ## Storage and OS plan\n- Debian minimal with automatic launch into a full-screen offline darts UI (kiosk mode).\n- No permanent camera video recording planned.\n- 8 GB laptop RAM expected to be adequate, subject to scoring-engine tests.\n- A 2.5-inch SATA HDD works, but boots and loads more slowly than an SSD.\n- The Hitachi HDD is a **candidate, not an ordered or confirmed component**; SMART screenshot is not a complete health guarantee.\n\n## References
 - B3D Autodarts DIY V2 printable mounts: https://www.printables.com/model/1243079-b3d-autodarts-diy-automatische-punkteerfassung-fur
