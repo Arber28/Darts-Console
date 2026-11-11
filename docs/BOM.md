@@ -6,7 +6,7 @@ Prices below are **previously discussed estimates, not live-verified offers**. D
 |---:|---|---:|---|
 | 3 | USB UVC OV9732 camera modules (DECXIN candidate) | €38.26 | Previous eBay 3-pack quote including €2.27 shipping; not verified; 38×38 mm PCB, claimed 28×28 mm hole spacing; verify before ordering |
 | 1 | KY-040 rotary encoder, preferably threaded shaft | €1.84 | Previous estimate, shipping extra |
-| 3 | Normally-open momentary pushbuttons, black | €1.80 | Previous estimate, ensure mount fits printed panel |
+| 4 | Normally-open momentary pushbuttons, black | €2.40 | Estimated at €0.60 each based on previous estimate; verify price and panel fit |
 | 1 | Raspberry Pi Pico / compatible RP2040 board | €3–5 | Must support native USB HID |
 | 1 | USB cable for Pico | unknown | Check connectors on selected Pico |
 | 1 | Powered USB hub, if laptop ports/power are insufficient | unknown | May be needed for 3 cameras + Pico |
@@ -19,7 +19,11 @@ Prices below are **previously discussed estimates, not live-verified offers**. D
 | 1 | Existing dartboard light | already owned | May be reused or replaced by the planned LED ring |
 | printed | Camera mounts, enclosure, button caps | existing printer | Printing costs excluded by preference |
 
-**Known partial subtotal excluding storage, LED strip, LED dimmer and any required LED power supply: €43.90–€45.90**, excluding unknown items and any additional shipping. This is **not a complete project total**.
+**Known partial subtotal excluding storage, LED strip, LED dimmer and any required LED power supply: €44.50–€46.50**, excluding unknown items and any additional shipping. This is **not a complete project total**.
+
+## Physical controls
+- Portrait display; four buttons **below** the display, left to right: BACK, UNDO, rotary encoder (press = OK), CORRECT, NEXT.
+- No buttons above the display; no separate MENU button. Other actions via on-screen menu.
 
 ## LED control plan
 - LED ring is powered and controlled **independently of the Darts Console and Pico**.
