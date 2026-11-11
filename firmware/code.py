@@ -1,4 +1,4 @@
-# CircuitPython / Raspberry Pi Pico: rotary encoder + 3 buttons -> USB keyboard
+# CircuitPython / Raspberry Pi Pico: rotary encoder + 4 buttons -> USB keyboard
 # Install adafruit_hid library in CIRCUITPY/lib/adafruit_hid first.
 import time
 import board
@@ -20,8 +20,9 @@ dt = input_pin(board.GP3)
 buttons = [
     (input_pin(board.GP4), Keycode.ENTER),
     (input_pin(board.GP5), Keycode.ESCAPE),
-    (input_pin(board.GP6), Keycode.F2),
-    (input_pin(board.GP7), Keycode.F3),
+    (input_pin(board.GP6), Keycode.F4),  # UNDO
+    (input_pin(board.GP7), Keycode.F2),  # CORRECT
+    (input_pin(board.GP8), Keycode.F5),  # NEXT
 ]
 last_clk = clk.value
 last_button_states = [pin.value for pin, _ in buttons]
