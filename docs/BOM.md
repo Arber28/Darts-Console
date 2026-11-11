@@ -12,11 +12,11 @@ Prices below are **previously discussed estimates, not live-verified offers**. D
 | 1 | Powered USB hub, if laptop ports/power are insufficient | unknown | May be needed for 3 cameras + Pico |
 | 3 | USB camera extension cables | unknown | Length depends on dartboard mounting |
 | as needed | Screws, nuts, inserts, cable ties | unknown | Measure from selected STL files |
-| 1 | Used 2.5-inch SATA HDD **or** SSD | €6.99 HDD candidate incl. stated shipping; SSD €5–10 target | Candidate: Hitachi HTS541616J9SA00 160 GB HDD, €4 + €2.99 shipping, SMART screenshot says Good, 5,332 hours, 0 reallocated sectors; **not yet purchased**. Confirm laptop SATA fit, current SMART attributes 05/C5/C6, and seller availability. SSD preferable for speed; 32 GB may suffice with minimal Debian after software validation. |\n| 1 | Laptop and screen | already owned | Reuse existing device |
+| 1 | Storage drive (2.5-inch SATA HDD or SSD) | TBD | No specific model, capacity, or price selected yet; verify laptop compatibility before purchase |
 | 1 | Dartboard light | already owned | Check camera image quality |
 | printed | Camera mounts, enclosure, button caps | existing printer | Printing costs excluded by preference |
 
-**Known partial subtotal with candidate HDD: €50.89–€52.89**, excluding unknown items and any additional shipping. This is **not a complete project total**.
+**Known partial subtotal excluding storage: €43.90–€45.90**, excluding unknown items and any additional shipping. This is **not a complete project total**.
 
 ## Storage and OS plan\n- Debian minimal with automatic launch into a full-screen offline darts UI (kiosk mode).\n- No permanent camera video recording planned.\n- 8 GB laptop RAM expected to be adequate, subject to scoring-engine tests.\n- A 2.5-inch SATA HDD works, but boots and loads more slowly than an SSD.\n- The Hitachi HDD is a **candidate, not an ordered or confirmed component**; SMART screenshot is not a complete health guarantee.\n\n## References
 - B3D Autodarts DIY V2 printable mounts: https://www.printables.com/model/1243079-b3d-autodarts-diy-automatische-punkteerfassung-fur
