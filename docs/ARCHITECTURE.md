@@ -1,87 +1,81 @@
-# Architektur und Grafiken
+# System layout
 
-> Planungsstand, **kein Nachweis einer fertigen automatischen Punkteerkennung**. Mermaid-Diagramme werden direkt auf GitHub gerendert.
-
-## 1. Gesamtsystem
+## Hardware
 
 ```mermaid
 flowchart TD
-  D["Dartscheibe"] --> C1["USB-Kamera 1"]
-  D --> C2["USB-Kamera 2"]
-  D --> C3["USB-Kamera 3"]
-  C1 --> L["Alter Laptop / Debian Linux"]
-  C2 --> L
-  C3 --> L
-  P["Pico RP2040<br/>4 Tasten + KY-040"] -->|"USB HID: Tastaturbefehle"| L
-  L -->|"Bildausgabe, 90° gedreht"| S["Laptop-Display hochkant"]
-  L --> V["Offline-Treffererkennung<br/>(noch auszuwählen)"]
-  V --> G["Scoring-Engine<br/>(noch zu implementieren)"]
-  G --> UI["Darts Console UI"]
-  UI --> S
-  PS["Passendes LED-Netzteil"] --> DIM["Separater PWM-Drehdimmer<br/>Ein/Aus + Helligkeit"]
-  DIM --> LED["LED-Ring"]
-  LED -.-> D
+    D["Dartboard"] --> A["USB camera 1"]
+    D --> B["USB camera 2"]
+    D --> C["USB camera 3"]
+    A --> PC["Laptop running Debian"]
+    B --> PC
+    C --> PC
+    BUTTONS["4 buttons + KY-040"] --> PICO["Raspberry Pi Pico"]
+    PICO -->|"USB keyboard input"| PC
+    PC -->|"Portrait output"| SCREEN["Laptop display"]
+    SUPPLY["LED power supply"] --> DIMMER["Rotary LED dimmer"]
+    DIMMER --> RING["Dartboard LED ring"]
 ```
 
-**Wichtig:** Die LED-Beleuchtung ist elektrisch unabhängig von Pico und Laptop. Kein LED-Strom über GPIO.
+The lighting circuit is independent from the laptop and Pico.
 
-## 2. Gehäuseansicht – Vorderseite, schematisch
+## Front panel
 
 ```text
        ┌────────────────────────────┐
-       │         DISPLAY            │
-       │          HOCHKANT          │
        │                            │
-       │     Punkte / Spieler       │
-       │     Menüs / Spielmodi      │
+       │       DARTS CONSOLE        │
+       │                            │
+       │      Portrait screen       │
+       │                            │
        │                            │
        └────────────────────────────┘
-       [ZURÜCK] [UNDO]  (◉)  [KORR.] [WEITER]
-                         KY-040
-                      drehen + drücken
+        [BACK] [UNDO]  (●)  [CORRECT] [NEXT]
+                        KY-040
+                      turn / press
 ```
 
-Die Darstellung ist **nicht maßstabsgetreu**. Tasten und Drehregler befinden sich **alle unter dem Display**.
+The drawing shows placement only; it is not to scale.
 
-## 3. GPIO-Zuordnung
+## Controls
 
 ```mermaid
 flowchart LR
-  E["KY-040<br/>CLK / DT / SW"] -->|"GP2 / GP3 / GP4"| P["Raspberry Pi Pico"]
-  B["ZURÜCK"] -->|"GP5"| P
-  U["UNDO"] -->|"GP6"| P
-  K["KORREKTUR"] -->|"GP7"| P
-  N["WEITER"] -->|"GP8"| P
-  P -->|"USB"| PC["Laptop"]
+    ENC["KY-040: CLK / DT / SW"] -->|"GP2 / GP3 / GP4"| PICO["Raspberry Pi Pico"]
+    BACK["Back"] -->|"GP5"| PICO
+    UNDO["Undo"] -->|"GP6"| PICO
+    CORR["Correct"] -->|"GP7"| PICO
+    NEXT["Next"] -->|"GP8"| PICO
+    PICO -->|"USB HID"| PC["Laptop"]
 ```
 
-Taster jeweils zwischen GPIO und GND; interne Pull-ups aktiviert. KY-040 nur mit 3,3 V betreiben. Detaillierte Tabelle: [WIRING.md](WIRING.md).
+[Full wiring table](WIRING.md)
 
-## 4. Geplanter Softwarefluss
+## Scoring pipeline
 
 ```mermaid
 flowchart LR
-  CAM["3 Kamera-Streams"] --> DET["Trefferlokalisierung"]
-  DET --> MAP["Segment + Multiplikator<br/>z. B. T20"]
-  MAP --> RULE["Spielmodus-Regeln"]
-  RULE --> STATE["Spielstand / Zug-Historie"]
-  STATE --> DISPLAY["Vollbild-UI"]
-  HID["Pico HID"] --> DISPLAY
-  DISPLAY -->|"Korrektur / Undo"| STATE
+    CAM["Three camera feeds"] --> DET["Hit detection"]
+    DET --> SEG["Board segment"]
+    SEG --> RULES["Game rules"]
+    RULES --> STATE["Scores and throw history"]
+    STATE --> UI["Console interface"]
+    KEYS["Pico controls"] --> UI
+    UI -->|"Corrections"| STATE
 ```
 
-**Noch offen:** Auswahl und Test einer lokal lauffähigen Kamera-/Scoring-Lösung, Kalibrierung, Synchronisierung der Kameras, zuverlässige Korrekturen und persistente Speicherung.
+This is the intended software flow, not a working camera pipeline. The detection engine, camera calibration, scoring history and correction logic still need to be implemented.
 
-## 5. Stromversorgung (Blockschaltbild, kein Netzschaltplan)
+## Power
 
 ```mermaid
 flowchart TD
-  MAINS["230 V Steckdose"] --> LAP["Original-Laptop-Netzteil"]
-  LAP --> LAPTOP["Laptop"]
-  LAPTOP --> USB["USB: Pico + Kameras<br/>ggf. aktiver Hub"]
-  MAINS --> SUPPLY["Geeignetes, geprüftes LED-Netzteil"]
-  SUPPLY --> DIMMER["PWM-Drehdimmer"]
-  DIMMER --> STRIP["LED-Streifen"]
+    MAINS["Wall outlet"] --> LAPPSU["Original laptop power adapter"]
+    LAPPSU --> LAP["Laptop"]
+    LAP --> USB["USB cameras and Pico<br/>powered hub if needed"]
+    MAINS --> LEDPSU["Suitable LED power supply"]
+    LEDPSU --> DIM["PWM dimmer"]
+    DIM --> STRIP["LED strip"]
 ```
 
-230-V-Seite **nicht selbst offen verdrahten**. Fertiges, passendes Netzteil verwenden; LED-Spannung, Stromaufnahme, Kabelquerschnitt und Dimmerbelastbarkeit vor dem Kauf abgleichen.
+Use a suitable enclosed LED power supply. Do not expose or modify mains wiring. Check voltage, current draw and dimmer ratings before assembling the LED circuit.
