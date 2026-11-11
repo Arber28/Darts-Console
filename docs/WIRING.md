@@ -1,25 +1,50 @@
-# Wiring: Raspberry Pi Pico (RP2040)
+# Pico wiring
 
-**All GPIO signals are 3.3 V. Never feed 5 V into GPIO.**
+The Raspberry Pi Pico reads the four buttons and KY-040 encoder, then sends keyboard events to the laptop over USB.
 
-## Portrait console control layout
-Below the portrait display, from left to right: **BACK | UNDO | [KY-040 rotary encoder] | CORRECT | NEXT**. The KY-040 is also a pushbutton (OK/Enter). No upper row or separate MENU button.
+## Front panel
 
-| Device | Pin | Pico GPIO | USB HID key |
+```text
+             PORTRAIT DISPLAY
+          ┌────────────────────┐
+          │                    │
+          │                    │
+          └────────────────────┘
+     [BACK] [UNDO] (ENCODER) [CORRECT] [NEXT]
+```
+
+## Pinout
+
+| Control | Component pin | Pico connection | Keyboard event |
 |---|---|---|---|
-| KY-040 | CLK | GP2 | Arrow up/down with DT |
-| KY-040 | DT | GP3 | Direction input |
-| KY-040 | SW | GP4 | Enter |
-| KY-040 | + | 3V3 OUT | — |
-| KY-040 | GND | GND | — |
-| BACK button | one contact | GP5 | Escape |
-| UNDO button | one contact | GP6 | F4 |
-| CORRECT button | one contact | GP7 | F2 |
-| NEXT button | one contact | GP8 | F5 |
-| All four buttons | other contact | GND | — |
+| Encoder | CLK | GP2 | Up/Down rotation |
+| Encoder | DT | GP3 | Rotation direction |
+| Encoder | SW | GP4 | Enter |
+| Encoder | + | 3V3 OUT | Power |
+| Encoder | GND | GND | Ground |
+| Back | One contact | GP5 | Escape |
+| Undo | One contact | GP6 | F4 |
+| Correct | One contact | GP7 | F2 |
+| Next | One contact | GP8 | F5 |
+| All four buttons | Other contact | GND | Ground |
 
-All button inputs use internal pull-ups: pressed = GPIO connected to GND. Connect Pico via USB; CircuitPython and Adafruit HID library are required. KY-040 pin order varies: check board labels. Swap CLK/DT or firmware direction mapping if rotation is reversed.
+## Button circuit
 
-The LED ring is **independent**: standalone rotary PWM dimmer and appropriately rated LED supply, with no Pico GPIO connection.
+Each button uses the Pico's internal pull-up resistor:
 
-**Current demo limitation:** The web UI handles F4/F5 as control shortcuts, but true scoring history and player advancement require the future scoring engine; do not interpret a demo message as an actual score change.
+```text
+Pico GP5 ──────[ BACK button ]────── GND
+Pico GP6 ──────[ UNDO button ]────── GND
+Pico GP7 ──────[ CORRECT button ]─── GND
+Pico GP8 ──────[ NEXT button ]────── GND
+```
+
+The encoder's push switch works the same way on GP4. CLK and DT connect to GP2 and GP3.
+
+Use **3.3 V only** for GPIO signals. Do not connect 5 V to a Pico GPIO pin. Check the labels printed on the KY-040 board; pin order varies. If rotation is reversed, swap CLK and DT or change the direction in the firmware.
+
+The Pico connects to the laptop using USB. The LED strip and its separate dimmer have **no connection** to the Pico.
+
+## Software mapping
+
+The key codes are defined in [firmware/code.py](../firmware/code.py) and handled by [web/index.html](../web/index.html). Undo and Next are wired and recognized, but the scoring actions behind them are not implemented yet.
