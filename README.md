@@ -5,6 +5,12 @@ Offline-first DIY dart scoring console based on an old laptop, three USB cameras
 ## Status
 **Early prototype.** The web UI is a keyboard-controlled offline demo; automatic camera detection and complete scoring/correction logic are **not yet implemented**. Camera compatibility and mounting dimensions remain unverified.
 
+## Dokumentation und Schaltpläne
+- [Architektur und Grafiken](docs/ARCHITECTURE.md): Systemdiagramm, Gehäuseanordnung, GPIO- und Stromversorgungsübersicht
+- [Linux installieren](docs/INSTALL_LINUX.md): Debian, Hochformat, Kiosk-Plan und Offline-Tests
+- [Wichtige Links](docs/LINKS.md): offizielle Downloads, Dokumentation und 3D-Druck-Projekte
+- [Bauplan und Testliste](docs/BUILD_PLAN.md): Schritte, offene Entscheidungen und Prüfpunkte
+
 ## Files
 - [Materialliste / BOM](docs/BOM.md): quantities, provisional prices and reference links
 - [Game modes](docs/GAME_MODES.md): planned rules for X01 and additional beginner-friendly games
