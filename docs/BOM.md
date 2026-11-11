@@ -1,48 +1,51 @@
-# Einkaufsliste / Bill of Materials
+# Parts list
 
-Prices below are **previously discussed estimates, not live-verified offers**. Delivery to Austria, taxes and shipping must be checked at checkout.
+Prices are notes from earlier shopping, not current quotes. Check availability, shipping and mounting dimensions before ordering.
 
-| Qty | Part | Approx. total | Status / notes |
+| Qty. | Part | Estimated cost | Notes |
 |---:|---|---:|---|
-| 3 | USB UVC OV9732 camera modules (DECXIN candidate) | €38.26 | Previous eBay 3-pack quote including €2.27 shipping; not verified; 38×38 mm PCB, claimed 28×28 mm hole spacing; verify before ordering |
-| 1 | KY-040 rotary encoder, preferably threaded shaft | €1.84 | Previous estimate, shipping extra |
-| 4 | Normally-open momentary pushbuttons, black | €2.40 | Estimated at €0.60 each based on previous estimate; verify price and panel fit |
-| 1 | Raspberry Pi Pico / compatible RP2040 board | €3–5 | Must support native USB HID |
-| 1 | USB cable for Pico | unknown | Check connectors on selected Pico |
-| 1 | Powered USB hub, if laptop ports/power are insufficient | unknown | May be needed for 3 cameras + Pico |
-| 3 | USB camera extension cables | unknown | Length depends on dartboard mounting |
-| as needed | Screws, nuts, inserts, cable ties | unknown | Measure from selected STL files |
-| 1 | Storage drive (2.5-inch SATA HDD or SSD) | TBD | No specific model, capacity, or price selected yet; verify laptop compatibility before purchase |
-| 1 | LED strip for dartboard lighting ring | TBD | Required for planned printed ring; determine ring circumference, LED density, voltage, power supply and diffuser before buying |
-| 1 | LED strip power supply (if needed) | TBD | Match selected strip voltage and total wattage; check whether existing supply can be reused |
-| 1 | Standalone LED rotary PWM dimmer with on/off switch | TBD | Independent of PC and Pico; match LED strip voltage and current; mounting location TBD; no product link selected |
-| 1 | Existing dartboard light | already owned | May be reused or replaced by the planned LED ring |
-| printed | Camera mounts, enclosure, button caps | existing printer | Printing costs excluded by preference |
+| 3 | OV9732 USB UVC camera modules | €38.26 total | Earlier three-camera listing, including €2.27 shipping; module and hole dimensions still need checking |
+| 1 | KY-040 rotary encoder with push button | €1.84 | Check shaft length and panel mounting |
+| 4 | Normally open push buttons | €2.40 total | Estimate based on €0.60 each |
+| 1 | Raspberry Pi Pico (RP2040) | €3–5 | Native USB HID support required |
+| 1 | USB cable for Pico | Open | Match the Pico connector |
+| 1 | Powered USB hub, if needed | Open | Depends on laptop USB power and bandwidth |
+| 3 | USB camera extension cables | Open | Length depends on camera positions |
+| As needed | Screws, nuts, inserts and cable ties | Open | Measure against the printed parts |
+| 1 | Internal storage drive | Open | 2.5-inch SATA HDD or SSD; model and capacity undecided |
+| 1 | LED strip for dartboard ring | Open | Choose voltage, length and density |
+| 1 | LED power supply, if needed | Open | Match the LED strip's total load |
+| 1 | Standalone rotary PWM LED dimmer with on/off | Open | No Pico connection; model undecided |
+| 1 | Existing dartboard light | Already owned | May be reused or replaced |
+| As needed | Printed camera mounts and enclosure parts | Already have printer | Printing cost excluded |
 
-**Known partial subtotal excluding storage, LED strip, LED dimmer and any required LED power supply: €44.50–€46.50**, excluding unknown items and any additional shipping. This is **not a complete project total**.
+**Known parts subtotal: €45.50–€47.50.** This covers only the camera estimate, encoder, four buttons and Pico. It does not include the drive, LED parts, USB accessories, mounting hardware or additional shipping.
 
-## Physical controls
-- Portrait display; four buttons **below** the display, left to right: BACK, UNDO, rotary encoder (press = OK), CORRECT, NEXT.
-- No buttons above the display; no separate MENU button. Other actions via on-screen menu.
+## Layout
 
-## LED control plan
-- LED ring is powered and controlled **independently of the Darts Console and Pico**.
-- A standalone rotary PWM LED dimmer provides brightness adjustment and on/off switching.
-- Choose compatible LED strip, dimmer, and appropriately rated power supply together; no specific model or link selected yet.
-- Dimmer mounting location remains open (console housing or near board).
+Portrait display with four buttons below it:
 
-## Storage and OS plan
-- Debian minimal with automatic launch into a full-screen offline darts UI (kiosk mode).
-- No permanent camera video recording planned.
-- 8 GB laptop RAM expected to be adequate, subject to scoring-engine tests.
-- A 2.5-inch SATA HDD works, but boots and loads more slowly than an SSD.
+```text
+BACK    UNDO     [ENCODER]     CORRECT    NEXT
+                  press = OK
+```
+
+There are no buttons above the screen and no dedicated Menu button.
+
+## Lighting
+
+The LED ring has its own power supply and rotary dimmer. It must not draw power from Pico GPIO pins. Choose the strip, supply and dimmer together so their voltage and current ratings match. Dimmer location is not decided.
+
+## Laptop
+
+The plan is a lightweight Debian installation that opens the darts interface automatically. The old laptop has 8 GB RAM; performance with three camera streams has not been tested. An SSD would be faster than an HDD, but no drive has been selected.
 
 ## References
-- B3D Autodarts DIY V2 printable mounts: https://www.printables.com/model/1243079-b3d-autodarts-diy-automatische-punkteerfassung-fur
-- Alternate listing: https://cults3d.com/de/modell-3d/spiel/b3d-autodarts-diy-automatic-score-steeldart-v2
-- GXIVISION OV9732 candidate (previously discussed): https://www.ebay.at/itm/356589930771
-- KY-040 example: https://funduinoshop.com/elektronische-module/keypads-und-buttons/rotary-encoder/ky-040-drehimpulsgeber-rotary-encoder
-- 12mm button example: https://www.berrybase.at/mikro-drucktaster-12mm-rund-printmontage-schliesser-farbe-schwarz
 
-## Before purchasing cameras
-Confirm physical hole spacing, lens angle, fixed-focus range, Linux/Windows UVC compatibility, USB bandwidth and actual compatibility with the chosen offline recognition software. Do not assume that similarly named OV9732 modules have identical mounting holes.
+- [B3D Autodarts DIY V2 camera mounts – Printables](https://www.printables.com/model/1243079-b3d-autodarts-diy-automatische-punkteerfassung-fur)
+- [B3D Autodarts DIY V2 – Cults3D](https://cults3d.com/de/modell-3d/spiel/b3d-autodarts-diy-automatic-score-steeldart-v2)
+- [GXIVISION OV9732 camera candidate](https://www.ebay.at/itm/356589930771)
+- [KY-040 encoder example](https://funduinoshop.com/elektronische-module/keypads-und-buttons/rotary-encoder/ky-040-drehimpulsgeber-rotary-encoder)
+- [12 mm button example](https://www.berrybase.at/mikro-drucktaster-12mm-rund-printmontage-schliesser-farbe-schwarz)
+
+Before buying cameras, check the actual mounting hole spacing, lens angle, focus distance, UVC support and compatibility with the eventual detection software. Similar-looking OV9732 boards do not necessarily share the same dimensions.
