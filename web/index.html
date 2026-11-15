@@ -70,7 +70,7 @@ footer{border-top:1px solid #34495c;min-height:87px;padding:16px 20px;display:gr
 .score-row:last-child{border:0}.score-row.active{border:1px solid #188ac5;background:#123e56;border-radius:10px}
 .score-row strong{font-size:24px}.score-row.active strong{color:#1bc7ff}
 .note{background:#0e2434;border:1px solid #285065;border-radius:11px;padding:14px;margin:16px 0;color:#a9c8dc;font-size:13px;line-height:1.5}
-.focused{outline:2px solid #07c4ff!important;outline-offset:-2px}
+.segments{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.marks{display:block;color:var(--muted);margin-top:4px}.letters{display:grid;grid-template-columns:repeat(auto-fit,minmax(36px,1fr));gap:6px}body.kiosk,body.kiosk *{cursor:none!important}.focused{outline:2px solid #07c4ff!important;outline-offset:-2px}
 @media(max-width:680px){
 header{height:65px;padding:0 12px}.brand{font-size:19px;gap:8px}.brand svg{width:32px;height:32px}.status{font-size:9px;letter-spacing:0}
 .workspace{grid-template-columns:64px minmax(0,1fr)}nav{padding:12px 4px;gap:5px}.nav{min-height:62px;font-size:9px;padding:10px 2px}.nav svg{width:20px;height:20px}
@@ -81,13 +81,121 @@ footer{padding:10px 3px;min-height:68px;gap:2px}.hint{flex-direction:column;gap:
 .panel{padding:14px}.rules{grid-template-columns:1fr}
 }
 @media(max-width:350px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.brand{font-size:16px}}
+@media (orientation:portrait) and (min-width:480px){
+  .console{width:100%;height:100dvh;border:0;overflow:hidden}
+  header{height:clamp(76px,11vw,120px);padding:0 clamp(20px,3.2vw,38px)}
+  .brand{font-size:clamp(24px,4.3vw,49px);gap:clamp(10px,1.5vw,18px)}
+  .brand svg{width:clamp(36px,6vw,65px);height:auto}
+  .status{font-size:clamp(12px,1.65vw,19px)}
+  .workspace{grid-template-columns:clamp(94px,17vw,184px) minmax(0,1fr)}
+  nav{padding:2.1vw 1vw;gap:1vw;overflow-y:auto}
+  .nav{min-height:clamp(65px,10.6vw,122px);font-size:clamp(13px,1.95vw,22px);gap:.8vw}
+  .nav svg{width:clamp(23px,3.3vw,36px);height:auto}
+  main{padding:clamp(16px,3vw,34px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+  main::-webkit-scrollbar{display:none}
+  .eyebrow,.caption{font-size:clamp(12px,1.65vw,18px)}
+  h1{font-size:clamp(29px,5vw,55px);line-height:1.08}
+  .subtitle,.panel p,.details p,.note{font-size:clamp(15px,2.15vw,24px);line-height:1.35}
+  .subtitle{margin-bottom:2.2vw}
+  .switch button{font-size:clamp(14px,2vw,22px);min-height:clamp(42px,6.2vw,68px)}
+  .cards{gap:1.2vw}
+  .tile{height:clamp(93px,15vw,164px);padding:.8vw;gap:.7vw}
+  .tile svg{width:clamp(22px,3.7vw,41px);height:auto}
+  .tile strong{font-size:clamp(15px,2.8vw,31px);overflow-wrap:anywhere}
+  .tile small{font-size:clamp(11px,1.65vw,18px)}
+  .details,.panel{padding:clamp(14px,2.1vw,25px)}
+  .detail-title strong{font-size:clamp(23px,4.1vw,45px)}
+  .panel h2{font-size:clamp(19px,2.6vw,29px)}
+  .player,.action,.rule{font-size:clamp(15px,2.2vw,25px);padding:clamp(12px,1.5vw,18px)}
+  .rule{text-align:center}
+  .rules{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .primary{min-height:clamp(56px,8vw,87px);font-size:clamp(20px,3vw,33px)}
+  .score-hero{padding:clamp(20px,3.1vw,36px);margin:1.7vw 0 2.2vw}
+  .score-hero .pill{font-size:clamp(12px,1.7vw,19px)}
+  .score-hero strong{font-size:clamp(32px,5.2vw,59px);overflow-wrap:anywhere}
+  .big-score{font-size:clamp(92px,20vw,240px);line-height:1.04;font-variant-numeric:tabular-nums}
+  .dart-slots div{font-size:clamp(15px,2.65vw,30px);font-weight:800;padding:1.5vw .5vw}
+  .dart-slots small{font-size:clamp(11px,1.5vw,17px);font-weight:600}
+  .score-row{font-size:clamp(16px,2.55vw,28px);padding:clamp(12px,1.7vw,20px);gap:1vw}
+  .score-row strong{font-size:clamp(21px,3.25vw,38px);text-align:right}
+  footer{min-height:clamp(74px,10vw,112px);padding:1vw 1.4vw}
+  .hint{font-size:clamp(10px,1.6vw,18px);gap:.7vw;white-space:nowrap}
+  .hint small{display:none}
+  .key{width:clamp(28px,4.1vw,46px);height:clamp(28px,4.1vw,46px);font-size:clamp(15px,2.3vw,26px)}
+  .focused{outline:3px solid #8deaff!important;outline-offset:-3px}
+}
+@media (prefers-reduced-motion:no-preference){
+  button{transition:background-color 100ms,border-color 100ms,outline-color 100ms}
+}
+@media (orientation:portrait) and (min-width:480px){
+  :root{--surface:#0d1b28;--raised:#132736;--line:#2a4153;--blue:#59d7ff}
+  .console{background:#09141f}
+  header{background:#0b1723;border-color:var(--line)}
+  .brand{letter-spacing:-.035em}
+  .status{color:#b0d6e3}
+  .status:before{background:#5ae5af;box-shadow:0 0 12px #5ae5af55}
+  nav{background:#0a1621;border-color:var(--line)}
+  .nav{border-radius:14px;color:#afd0df}
+  .nav.active{background:#153245;border-color:#2d6985;box-shadow:none;color:#bdebff}
+  .eyebrow,.caption{color:#9ad8ea;letter-spacing:.12em}
+  .workspace h1{margin:.7vw 0 1.2vw}
+  .subtitle{color:#b1c5d3}
+  .switch{margin:2.8vw 0 1.7vw;border-radius:14px}
+  .switch button.on{background:#b1eaff;color:#091a25;box-shadow:none}
+  .cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.35vw}
+  .tile,.tile.chosen{background:var(--surface);border:1px solid var(--line);box-shadow:none}
+  .tile{height:clamp(114px,19vw,210px);align-items:flex-start;text-align:left;padding:1.65vw 1.8vw;gap:.6vw}
+  .tile svg{color:#72d9fa;margin-bottom:.25vw}
+  .tile strong{font-size:clamp(19px,3.25vw,36px);letter-spacing:-.04em}
+  .tile small{color:#acc3d3}
+  .tile.chosen{background:var(--raised);border-color:#3381a1}
+  .tile.focused{background:#163749}
+  .details,.panel{border-color:var(--line);background:var(--surface);box-shadow:none}
+  .details{margin-top:1.6vw}
+  .details p{margin:.65em 0}
+  .detail-title{border-left-color:#59d7ff}
+  .detail-facts{border:none}
+  .action,.rule,.player{background:var(--surface);border-color:#355063}
+  .primary{background:#a9edff;color:#062030;border-color:#a9edff;box-shadow:none}
+  .primary.focused{outline-color:#0a4761!important;outline-offset:-6px}
+  footer{background:#0b1723;border-color:var(--line)}
+  .hint{color:#c2d8e4}
+  .key{background:#162a39;border-color:#456073}
+  .console[data-view="game"] .workspace{grid-template-columns:minmax(0,1fr)}
+  .console[data-view="game"] nav{display:none}
+  .console[data-view="game"] main{padding:clamp(20px,3.7vw,44px)}
+  .game-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:1vw;margin-bottom:2vw}
+  .game-heading h1{margin-bottom:0}
+  .game-meta{color:#b2d1de;font-size:clamp(14px,2.12vw,24px);text-align:right}
+  .score-hero{min-height:clamp(420px,59vw,650px);border-color:#376378;border-radius:26px;
+    background:radial-gradient(ellipse at 84% 1%,#164356 0%,transparent 68%),#0d2230;
+    padding:3.5vw 3.5vw 3vw;display:grid;grid-template-rows:auto auto 1fr auto auto}
+  .score-hero:after{right:-48px;top:-84px;width:460px;height:460px;opacity:.7}
+  .score-hero .pill{justify-self:start;background:#b2edfa;color:#092a39;letter-spacing:.08em;padding:.55em .9em}
+  .score-hero strong{position:relative;z-index:1;font-size:clamp(34px,6vw,66px);letter-spacing:-.04em;line-height:1.05}
+  .big-score{align-self:center;font-size:clamp(105px,23vw,252px);line-height:1;letter-spacing:-.025em}
+  .big-score.word-score{font-size:clamp(68px,15vw,162px);letter-spacing:-.045em}
+  .score-hero .caption{padding:.4vw 0}
+  .dart-slots{margin-top:2.3vw;gap:1.1vw}
+  .dart-slots div{background:#0a1b28;border:1px solid #375a6d;color:#e9f8ff;border-radius:14px;min-height:8vw}
+  .dart-slots .empty{color:#7996a7;border-style:dashed}
+  .dart-slots small{color:#9abed1;letter-spacing:.09em}
+  .standings{margin-bottom:2vw}
+  .standings h2{padding:.7vw 1.3vw;margin:.35vw 0 .5vw;color:#a6c8d9;font-size:clamp(14px,1.75vw,20px);letter-spacing:.07em}
+  .score-row.active{background:#153545;border-color:#487c91}
+  .score-row.active strong{color:#9feaff}
+  .match-actions{display:grid;grid-template-columns:1fr 1fr;gap:1vw}
+  .match-actions button{margin:0}
+  .match-actions .primary{grid-column:1/-1}
+  .match-actions .action:last-child:nth-child(even){grid-column:1/-1}
+}
 </style>
 </head>
 <body>
 <div class="console">
 <header>
 <div class="brand"><svg viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="26" stroke="#f4f9ff" stroke-width="4" fill="#0b2232"/><circle cx="30" cy="30" r="20" stroke="#17a3bc" stroke-width="5" fill="none"/><circle cx="30" cy="30" r="13" stroke="#e7f0fa" stroke-width="5" fill="none"/><circle cx="30" cy="30" r="6" stroke="#53d6a4" stroke-width="3" fill="#e44b48"/><path d="M30 4v52 M4 30h52 M12 12l36 36 M48 12 12 48 M20 6l20 48 M6 20l48 20 M40 6 20 54 M54 20 6 40" stroke="#edf9ff" stroke-width="1.2"/></svg>DARTS CONSOLE</div>
-<span class="status">OFFLINE DEMO</span>
+<span class="status">OFFLINE READY</span>
 </header>
 <div class="workspace"><nav id="nav" aria-label="Main navigation"></nav><main id="main"></main></div>
 <footer aria-label="Physical button labels">
@@ -98,6 +206,7 @@ footer{padding:10px 3px;min-height:68px;gap:2px}.hint{flex-direction:column;gap:
 <div class="hint"><span class="key">➜</span><span>NEXT<small>F5</small></span></div>
 </footer>
 </div>
+<script src="scoring.js"></script>
 <script>
 const shapes={
 target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
@@ -133,98 +242,369 @@ const modes=[
 ['Bermuda Triangle','Changing targets','triangle',0,'SKILL','A target-changing game with special rounds.'],
 ['Tic-Tac-Toe','Three in a row','grid',0,'TACTICAL','Claim three squares in a row by hitting target numbers.']
 ];
-const saved=['Emre','Arber','Adnan','Atakan','Amir','Ali'];
-const state={page:'play',filter:'all',chosen:'501',players:['Arber','Emre'],out:'Double Out',guest:0,order:[],scores:[],current:0,round:1,cursor:0,message:''};
+if(new URLSearchParams(location.search).has('kiosk'))document.body.classList.add('kiosk');
+const defaults=['Emre','Arber','Adnan','Atakan','Amir','Ali'];
+const storage='darts-console-v1';
+let data={profiles:defaults, matches:[], active:null, out:'Double Out'};
+try {
+  const previous=JSON.parse(localStorage.getItem(storage));
+  if(previous) data={...data,...previous};
+} catch (error) {
+  console.warn('Unable to load console state',error);
+}
+const state={page:data.active?'game':'play',filter:'quick',chosen:'501',players:['Arber','Emre'],
+  guests:[], cursor:0, message:'', out:data.out, rounds:10, bull:false, grid:[], sequence:[], numbers:{}, selfHit:null};
 const nav=document.getElementById('nav'),main=document.getElementById('main');
-const currentMode=()=>modes.find(x=>x[0]===state.chosen)||modes[0];
-function title(top,heading,sub){return '<div class="eyebrow">'+top+'</div><h1>'+heading+'</h1><p class="subtitle">'+sub+'</p>'}
-function note(t){return '<div class="note" role="status">'+t+'</div>'}
-function show(page){state.page=page;state.cursor=0;state.message='';render()}
-function selectMode(mode){state.chosen=mode;render()}
+const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const currentMode=()=>modes.find(mode=>mode[0]===state.chosen);
+const derived=()=>Scoring.replay(data.active);
+const title=(top,heading,sub='')=>'<div class="eyebrow">'+top+'</div><h1>'+heading+'</h1><p class="subtitle">'+sub+'</p>';
+const note=text=>'<div class="note" role="status">'+esc(text)+'</div>';
+const button=(action,label,cls='action',disabled=false)=>'<button data-nav class="'+cls+'" data-action="'+
+  esc(action)+'" '+(disabled?'disabled':'')+'>'+label+'</button>';
+const panel=(heading,children)=>'<section class="panel"><h2>'+heading+'</h2>'+children+'</section>';
+
+function save(){
+  try {localStorage.setItem(storage,JSON.stringify(data))}
+  catch {state.message='Storage unavailable. Progress is available until this page closes.'}
+}
+function show(page,withNav=false){
+  state.page=page;
+  const fullScore=page==='game'&&matchMedia('(orientation:portrait) and (min-width:480px)').matches;
+  state.cursor=withNav||fullScore?0:5;
+  state.message='';
+  render(true);
+}
 function cards(){
-const shown=state.filter==='quick'?modes.slice(0,6):modes;
-const mode=currentMode();
-let html=title('GAME LIBRARY','Choose a game','Select a mode and set up your match.');
-html+='<div class="switch"><button data-nav data-action="quick" class="'+(state.filter==='quick'?'on':'')+'">Quick play</button><button data-nav data-action="all" class="'+(state.filter==='all'?'on':'')+'">All game modes</button></div>';
-html+='<div class="cards">'+shown.map(m=>'<button class="tile '+(m[0]===state.chosen?'chosen ':'')+(m[3]?'':'planned')+'" data-nav data-mode="'+m[0]+'">'+icon(m[2])+'<strong>'+m[0]+'</strong><small>'+m[1]+'</small></button>').join('')+'</div>';
-html+='<section class="details"><div class="detail-top"><div class="detail-title"><strong>'+mode[0]+'</strong><span class="pill">'+mode[4]+'</span></div><div class="detail-facts">';
-html+='<div class="fact">'+icon('users')+' 1 or more players</div><div class="fact">'+icon('target')+(mode[3]?' Start at '+mode[3]+' points':' Mode-specific scoring')+'</div><div class="fact">'+icon('trophy')+(mode[3]?' Finish at exactly zero':' Rules documented')+'</div><div class="fact">'+icon('dart')+(mode[3]?' Optional Double Out':' Not in the demo yet')+'</div></div></div>';
-html+='<p>'+mode[5]+'</p><button class="primary" data-nav data-action="setup" '+(mode[3]?'':'disabled')+'>'+(mode[3]?'▶ &nbsp; Set up match':'Coming later')+'</button></section>';
-return html;
+  const shown=state.filter==='quick'?modes.slice(0,6):modes;
+  const mode=currentMode();
+  const configurable=mode[0]==='Bermuda Triangle';
+  return title('GAME LIBRARY','Choose a game','Turn the encoder to browse. Press OK to select.')+
+    (data.active?button('game','Resume '+esc(data.active.mode)+' <span>›</span>'):'')+
+    '<div class="switch">'+button('quick','Quick play',state.filter==='quick'?'on':'')+
+    button('all','All game modes',state.filter==='all'?'on':'')+'</div><div class="cards">'+
+    shown.map(m=>button('mode:'+m[0],icon(m[2])+'<strong>'+m[0]+'</strong><small>'+m[1]+'</small>',
+      'tile '+(m===mode?'chosen ':'')+'')).join('')+'</div>'+
+    '<section class="details"><div class="detail-top"><div class="detail-title"><strong>'+mode[0]+
+    '</strong></div><div class="detail-facts"><p>'+mode[5]+'</p><p>'+
+    (configurable?'Enter your house round sequence in match setup.':
+      Scoring.minimum(mode[0])===1?'Solo or multiplayer':'At least two players')+
+    '</p></div></div>'+button('setup','Set up match','primary')+'</section>';
 }
 function setup(){
-let html=title('MATCH SETUP',state.chosen+' · Players','Choose players. Match order is randomized at the start.');
-html+='<div class="panel"><h2>Players · '+state.players.length+' selected</h2><div class="players">';
-html+=saved.map(n=>'<button class="player '+(state.players.includes(n)?'checked':'')+'" data-nav data-player="'+n+'">'+n+'<span>'+(state.players.includes(n)?'✓':'+')+'</span></button>').join('');
-html+='</div>';
-html+=state.players.filter(n=>!saved.includes(n)).map(n=>'<button class="player checked" data-nav data-player="'+n+'">'+n+'<span>✓</span></button>').join('');
-html+='<button class="action" data-nav data-action="guest" style="margin-top:15px">Add guest <span>＋</span></button></div>';
-html+='<div class="panel"><h2>Checkout</h2><div class="rules">';
-html+=['Straight Out','Double Out','Master Out'].map(r=>'<button class="rule '+(state.out===r?'checked':'')+'" data-nav data-rule="'+r+'">'+r+'</button>').join('');
-html+='</div></div><button class="primary" data-nav data-action="begin">▶ &nbsp; Start match</button>';
-return html;
+  const mode=currentMode();
+  const selected=state.players;
+  let html=title('MATCH SETUP',mode[0],'Player order is randomized at the start.');
+  html+=panel('Players · '+selected.length+' selected','<div class="players">'+
+    [...data.profiles,...state.guests].map(name=>button('player:'+name,esc(name)+'<span>'+
+      (selected.includes(name)?'✓':'+')+'</span>','player '+(selected.includes(name)?'checked':''))).join('')+
+    '</div><br>'+button('guest','Add guest <span>＋</span>'));
+  if(mode[3]) html+=panel('Checkout','<div class="rules">'+Scoring.checkouts.map(out=>
+    button('out:'+out,out,'rule '+(state.out===out?'checked':''))).join('')+'</div>');
+  if(mode[0]==='Around the Clock') html+=button('bull','Final bull <span>'+(state.bull?'On':'Off')+'</span>');
+  if(mode[0]==='High Score') html+=button('rounds','Rounds <span>'+state.rounds+'</span>');
+  if(mode[0]==='Tic-Tac-Toe') html+=button('grid','Choose nine grid targets <span>'+state.grid.length+'/9</span>');
+  if(mode[0]==='Bermuda Triangle') html+=panel('House round sequence',
+    note('No default round sequence is specified. Add the targets and required multipliers in order.')+
+    state.sequence.map((target,i)=>button('remove-round:'+i,'Round '+(i+1)+' · '+roundTarget(target)+' <span>Remove</span>')).join('')+
+    button('bermuda-number','Add round','action',state.sequence.length>=30));
+  if(mode[0]==='Killer') {
+    html+=panel('Killer house rules',button('killer-assignment','Number assignment <span>'+
+      (state.manualNumbers?'Manual':'Random')+'</span>')+
+      button('self-hit','Hit your own number <span>'+esc(state.selfHit??'Choose')+'</span>')+
+      (state.manualNumbers?selected.map(name=>button('number:'+name,esc(name)+' <span>'+
+        (state.numbers[name]??'Choose')+'</span>')).join(''):'')+
+      '<p>Hits on eliminated targets are ignored.</p>');
+  }
+  return html+button('begin','Start match','primary');
+}
+function picker(){
+  const choosingGrid=state.page==='grid';
+  const available=Array.from({length:20},(_,i)=>i+1).filter(n=>
+    !choosingGrid || !state.grid.includes(n));
+  return title('MATCH SETUP',choosingGrid?'Choose square '+(state.grid.length+1):esc(state.numberPlayer),
+    choosingGrid?'Choose the target numbers in row order.':'Choose a unique Killer target.')+
+    '<div class="rules">'+available.map(n=>button('target:'+n,n,'rule')).join('')+'</div>'+
+    (choosingGrid?'<br>'+button('clear-grid','Clear grid'):'');
+}
+function roundTarget(target){
+  const number=target.n===undefined?'Any number':target.n===25?'Bull':target.n;
+  return number+' · '+({1:'Single',2:'Double',3:'Triple'}[target.m]??'Any multiplier');
 }
 function game(){
-let html=title('MATCH IN PROGRESS',state.chosen+' · '+state.out,'Round '+state.round+' · Player '+(state.current+1)+' of '+state.order.length);
-html+='<div class="score-hero"><span class="pill">NOW THROWING</span><strong>'+state.order[state.current]+'</strong><div class="big-score">'+state.scores[state.current]+'</div><div class="caption">POINTS REMAINING</div><div class="dart-slots">'+[1,2,3].map(n=>'<div><small>DART '+n+'</small>—</div>').join('')+'</div></div>';
-html+='<section class="panel" style="padding:9px">'+state.order.map((n,i)=>'<div class="score-row '+(i===state.current?'active':'')+'"><span>'+n+'</span><strong>'+state.scores[i]+'</strong></div>').join('')+'</section>';
-html+=note('Camera scoring is not connected. This is an interface preview; no throws are being recorded.');
-html+='<button class="action" data-nav data-action="menu">Match menu <span>›</span></button>';
-return html;
+  const match=data.active, view=derived(), p=view.players[view.current];
+  const finished=view.winners!==null;
+  const mode=match.mode;
+  const modeScore=player=>{
+    if(mode==='Around the Clock') return player.target>20?(match.options.bull&&player.target===21?'Bull':'Done'):player.target;
+    if(['Killer','Knockout'].includes(mode)) return player.lives;
+    return player.score;
+  };
+  const unit=mode==='Around the Clock'?'NEXT TARGET':['Killer','Knockout'].includes(mode)?'LIVES':
+    mode==='Baseball'?'RUNS':mode==='Tic-Tac-Toe'?'SQUARES':Number(mode)?'POINTS REMAINING':'POINTS';
+  let extra=mode==='Bermuda Triangle'?' · '+roundTarget(match.options.sequence[view.round-1]):'';
+  if(['Halve-It','Shanghai','Baseball'].includes(mode)){
+    const target=mode==='Halve-It'?[20,19,18,17,16,15,'Bull'][view.round-1]:view.round;
+    extra=' · Target '+target;
+  }
+  let html='<div class="game-heading"><div><div class="eyebrow">'+
+    (finished?'MATCH COMPLETE':'MATCH IN PROGRESS')+'</div><h1>'+esc(mode)+
+    '</h1></div><div class="game-meta">Round '+view.round+extra+
+    (Number(mode)?'<br>'+esc(match.options.out):'')+'</div></div>';
+  if(finished) html+=panel('Result','<p>'+esc(view.winners.length?view.winners.map(i=>view.players[i].name).join(' & '):'Draw')+'</p>');
+  else html+='<div class="score-hero"><span class="pill">NOW THROWING</span><strong>'+esc(p.name)+
+    '</strong><div class="big-score'+(typeof modeScore(p)==='string'?' word-score':'')+'">'+modeScore(p)+
+    '</div><div class="caption">'+unit+'</div><div class="dart-slots">'+[0,1,2].map(i=>
+      '<div class="'+(view.darts[i]?'':'empty')+'"><small>DART '+(i+1)+'</small>'+
+      (view.darts[i]?Scoring.label(view.darts[i].n,view.darts[i].m):'—')+'</div>').join('')+'</div></div>';
+  html+='<section class="panel standings"><h2>Standings</h2>'+view.players.map((player,i)=>
+    '<div class="score-row '+(!finished&&i===view.current?'active':'')+'"><span>'+esc(player.name)+
+    (mode==='Killer'?' · #'+player.number+' · '+((player.marks[player.number]??0)===3?'Killer':(player.marks[player.number]??0)+'/3'):'')+
+    (!player.active?' · Out':'')+(mode==='Cricket'?'<small class="marks">'+[15,16,17,18,19,20,25].map(n=>
+      (n===25?'B':n)+' '+(player.marks[n]??0)+'/3').join(' · ')+'</small>':'')+
+    '</span><strong>'+modeScore(player)+'</strong></div>').join('')+'</section>';
+  if(mode==='Tic-Tac-Toe') html+='<div class="rules">'+match.options.grid.map((n,i)=>
+    '<div class="rule">'+n+' · '+esc(view.owners[i]===null?'Open':view.players[view.owners[i]].name)+'</div>').join('')+'</div><br>';
+  if(view.notice) html+=note(view.notice);
+  if(view.skipped) html+=note(view.skipped+' recorded event(s) no longer fit after a correction. Open Corrections to review.');
+  html+='<div class="match-actions">';
+  if(!finished) html+=button('throw','Enter throw','primary')+
+    button('next','End turn <span>›</span>');
+  html+=button('correction','Correct an earlier throw <span>›</span>')+
+    button('menu','Match menu <span>›</span>')+'</div>';
+  return html;
 }
-function simple(section,lead,text){
-return title('DARTS CONSOLE',section,lead)+'<div class="panel"><p>'+text+'</p></div><button class="action" data-nav data-action="play">Back to games <span>›</span></button>';
+function segment(){
+  if(state.number!==undefined){
+    return title('MANUAL SCORING','Select multiplier','Target '+(state.number===25?'Bull':state.number))+
+      '<div class="rules">'+(state.number===25?[1,2]:[1,2,3]).map(m=>
+        button('hit:'+state.number+','+m,Scoring.label(state.number,m),'rule')).join('')+'</div>';
+  }
+  return title('MANUAL SCORING',state.edit===null?'Enter a throw':'Replace a throw','Select the board target.')+
+    '<div class="segments">'+Array.from({length:20},(_,i)=>button('segment:'+(i+1),i+1,'rule')).join('')+
+    button('segment:25','Bull','rule')+button('hit:0,0','Miss','rule')+'</div>';
 }
-function render(){
-const active=['setup','game','menu','correction'].includes(state.page)?'play':state.page;
-nav.innerHTML=[['play','Play','target'],['players','Players','users'],['stats','Statistics','chart'],['settings','Settings','settings'],['about','About','info']].map(n=>'<button class="nav '+(active===n[0]?'active':'')+'" data-nav data-action="'+n[0]+'">'+icon(n[2])+n[1]+'</button>').join('');
-let html='';
-switch(state.page){
-case 'play':html=cards();break;
-case 'setup':html=setup();break;
-case 'game':html=game();break;
-case 'menu':html=title('MATCH OPTIONS','Match menu','Choose what to do next.')+'<button class="action" data-nav data-action="resume">Resume match <span>›</span></button><button class="action" data-nav data-action="new">New match <span>›</span></button>';break;
-case 'correction':html=simple('Correct a throw','Manual correction is not connected yet.','You will be able to select and correct recorded darts once the scoring engine is implemented.');html+='<button class="action" data-nav data-action="resume">Resume match <span>›</span></button>';break;
-case 'players':html=title('PLAYER LIST','Players','Saved names for match setup.')+'<section class="panel"><div class="players">'+saved.map(n=>'<div class="player">'+n+'</div>').join('')+'</div></section>'+note('Guests can be added when setting up a match.');break;
-case 'stats':html=simple('Statistics','Match statistics will follow with the scoring engine.','Average scores, checkout rates and game history are planned.');break;
-case 'settings':html=simple('Settings','Offline console configuration.','Debian Linux, three cameras, Pico controls and a separate LED dimmer.');break;
-case 'about':html=simple('About','A standalone darts console built from an old laptop.','This is an interactive UI prototype. Automatic hit detection is not integrated.');break;
+function history(){
+  const match=data.active, accepted=new Set(derived().history.map(d=>d.index));
+  return title('MATCH HISTORY','Correct a throw','Select the recorded dart you want to replace.')+
+    (match.events.map((event,i)=>event.type==='throw'?button('edit:'+i,
+      'R'+event.round+' · '+esc(match.players[event.player])+' · Dart '+(event.slot+1)+
+      '<span>'+Scoring.label(event.n,event.m)+(accepted.has(i)?'':' · Skipped')+'</span>'):'').reverse().join('')||note('No recorded throws yet.'))+
+    button('game','Back to match');
 }
-if(state.message)html+=note(state.message);
-main.innerHTML=html;focus();
+function statistics(){
+  const matches=[...data.matches,...(data.active&&derived().winners!==null?[data.active]:[])];
+  const totals=new Map(data.profiles.map(name=>[name,{played:0,won:0,points:0,darts:0}]));
+  const summaries=matches.map(match=>{
+    const view=Scoring.replay(match);
+    if(view.winners===null) return '';
+    const winner=view.winners.map(i=>match.players[i]).join(' & ')||'Draw';
+    match.players.forEach((name,i)=>{
+      const total=totals.get(name);
+      if(!total) return;
+      total.played++;
+      if(view.winners.includes(i)) total.won++;
+      view.history.filter(d=>d.player===i).forEach(d=>{total.darts++;total.points+=d.n*d.m});
+    });
+    return '<div class="score-row"><span>'+esc(match.mode)+' · '+esc(new Date(match.started).toLocaleDateString())+
+      '<small class="marks">'+esc(match.players.join(', '))+'</small></span><strong>'+esc(winner)+'</strong></div>';
+  });
+  return title('RESULTS','Statistics','Completed matches and recorded dart averages.')+
+    panel('Players',[...totals].map(([name,t])=>'<div class="score-row"><span>'+esc(name)+
+      '</span><span>'+t.won+' / '+t.played+' wins · '+(t.darts?(3*t.points/t.darts).toFixed(1):'—')+' per 3 darts</span></div>').join(''))+
+    panel('Match history',summaries.reverse().join('')||'<p>No completed matches yet.</p>');
 }
-function controls(){return [...document.querySelectorAll('[data-nav]:not(:disabled)')]}
-function focus(){const a=controls();if(!a.length)return;state.cursor=Math.min(state.cursor,a.length-1);a.forEach((b,i)=>b.classList.toggle('focused',state.cursor===i))}
-function move(d){const a=controls();if(!a.length)return;state.cursor=(state.cursor+d+a.length)%a.length;focus();const b=controls()[state.cursor];if(b.dataset.mode&&b.dataset.mode!==state.chosen)selectMode(b.dataset.mode);b.scrollIntoView({block:'nearest'})}
-function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function profileEditor(){
+  const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 -';
+  return title('PLAYERS','New player',esc(state.name||'Use the encoder to select characters.'))+
+    '<div class="letters">'+[...chars].map(c=>button('letter:'+c,c===' '?'Space':c,'rule')).join('')+'</div><br>'+
+    button('erase','Erase last character')+button('profile-save','Save player','primary');
+}
+function render(scroll=false){
+  document.querySelector('.console').dataset.view=state.page;
+  const pages=[['play','Play','target'],['players','Players','users'],['stats','Statistics','chart'],
+    ['settings','Settings','settings'],['about','About','info']];
+  const active=state.page==='profile'?'players':pages.some(p=>p[0]===state.page)?state.page:'play';
+  nav.innerHTML=pages.map(([key,label,shape])=>button(key,icon(shape)+label,'nav '+(key===active?'active':''))).join('');
+  const views={play:cards,setup,game,segment,correction:history,grid:picker,number:picker,stats:statistics,
+    profile:profileEditor,
+    'bermuda-number':()=>title('MATCH SETUP','Bermuda Triangle','Choose the target for the next round.')+
+      '<div class="segments">'+Array.from({length:20},(_,i)=>button('bermuda-target:'+(i+1),i+1,'rule')).join('')+
+      button('bermuda-target:25','Bull','rule')+button('bermuda-target:any','Any','rule')+'</div>',
+    'bermuda-multiplier':()=>title('MATCH SETUP','Required multiplier')+'<div class="rules">'+
+      ['Any multiplier','Single','Double','Triple'].map((label,i)=>button('bermuda-m:'+i,label,'rule',
+        state.bermudaTarget===25&&i===3)).join('')+'</div>',
+    rounds:()=>title('MATCH SETUP','Rounds','Choose the match length.')+'<div class="letters">'+
+      Array.from({length:30},(_,i)=>button('round-count:'+(i+1),i+1,'rule')).join('')+'</div>',
+    menu:()=>title('MATCH OPTIONS','Match menu')+button('game','Resume match')+button('play','Game library'),
+    replace:()=>title('MATCH SETUP','Replace current match?',derived().winners?'The result will be kept in match history.':'The unfinished match will be removed.')+
+      button('begin-confirm','Start new match')+button('setup','Back to setup'),
+    players:()=>title('PLAYER LIST','Players','Saved profiles')+panel('Profiles','<div class="players">'+data.profiles.map(name=>
+      '<div class="player">'+esc(name)+'</div>').join('')+'</div>')+button('new-profile','Add player'),
+    settings:()=>title('CONSOLE','Settings')+panel('Scoring',button('default-out','Default checkout <span>'+esc(data.out)+'</span>')+
+      '<p>Manual entry is available from the match screen.</p>'),
+    about:()=>title('CONSOLE','About')+panel('Darts Console','<p>Offline darts scoring for a portrait display and Raspberry Pi Pico controls.</p>')};
+  main.innerHTML=views[state.page]()+ (state.message?note(state.message):'');
+  highlight(scroll);
+}
+function controls(){return [...document.querySelectorAll('[data-nav]:not(:disabled)')].filter(b=>b.offsetParent)}
+function highlight(scroll){
+  const available=controls();
+  state.cursor=Math.min(state.cursor,available.length-1);
+  available.forEach((b,i)=>b.classList.toggle('focused',i===state.cursor));
+  if(scroll) available[state.cursor]?.scrollIntoView({block:'nearest'});
+}
+function shuffle(values){
+  const result=[...values];
+  for(let i=result.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [result[i],result[j]]=[result[j],result[i]];
+  }
+  return result;
+}
+function say(message){
+  state.message=message;
+  render();
+  main.lastElementChild.scrollIntoView({block:'nearest'});
+}
+function begin(confirm=false){
+  const n=state.players.length;
+  if(n<Scoring.minimum(state.chosen)||n>20||(state.chosen==='Tic-Tac-Toe'&&n!==2)){
+    say(state.chosen==='Tic-Tac-Toe'?'Select exactly two players.':'Select '+Scoring.minimum(state.chosen)+' to 20 players.');
+    return;
+  }
+  if(state.chosen==='Bermuda Triangle'&&!state.sequence.length) return say('Add the house round sequence first.');
+  if(state.chosen==='Tic-Tac-Toe'&&state.grid.length!==9) return say('Choose nine distinct grid targets.');
+  const players=shuffle(state.players);
+  let numbers;
+  if(state.chosen==='Killer'){
+    if(!state.selfHit) return say('Choose the rule for hitting your own number.');
+    numbers=state.manualNumbers?players.map(name=>state.numbers[name]):shuffle(Array.from({length:20},(_,i)=>i+1)).slice(0,n);
+    if(numbers.includes(undefined)||new Set(numbers).size!==n) return say('Choose a unique number for every player.');
+  }
+  if(data.active&&!confirm) return show('replace');
+  if(data.active&&derived().winners!==null) data.matches.push(data.active);
+  data.active=Scoring.start(state.chosen,players,{out:state.out,rounds:state.rounds,bull:state.bull,
+    grid:[...state.grid], sequence:[...state.sequence], numbers, selfHit:state.selfHit});
+  save();
+  show('game');
+}
+function openThrow(index=null){
+  state.edit=index;
+  state.number=undefined;
+  show('segment');
+}
 function clickButton(b){
-if(!b||b.disabled)return;state.cursor=Math.max(0,controls().indexOf(b));
-if(b.dataset.mode){selectMode(b.dataset.mode);return}
-if(b.dataset.player){const n=b.dataset.player;state.players=state.players.includes(n)?state.players.filter(v=>v!==n):[...state.players,n];render();return}
-if(b.dataset.rule){state.out=b.dataset.rule;render();return}
-const act=b.dataset.action;
-if(act==='all'||act==='quick'){state.filter=act;state.cursor=0;render()}
-else if(act==='setup')show('setup');
-else if(act==='guest'){state.guest++;state.players.push('Guest '+state.guest);render()}
-else if(act==='begin'){if(!state.players.length){state.message='Select at least one player.';render();return}state.order=shuffle(state.players);state.scores=state.order.map(()=>currentMode()[3]);state.current=0;state.round=1;show('game')}
-else if(act==='resume')show('game');
-else if(act==='menu')show('menu');
-else if(act==='new')show('play');
-else if(['play','players','stats','settings','about'].includes(act))show(act);
+  if(!b||b.disabled)return;
+  state.cursor=Math.max(0,controls().indexOf(b));
+  const [action,...pieces]=b.dataset.action.split(':');
+  const value=pieces.join(':');
+  state.message='';
+  switch(action){
+    case 'quick': case 'all':
+      state.filter=action;
+      if(action==='quick'&&!modes.slice(0,6).some(m=>m[0]===state.chosen)) state.chosen='501';
+      break;
+    case 'mode':state.chosen=value;return show('setup');
+    case 'bermuda-target':
+      state.bermudaTarget=value==='any'?undefined:Number(value);
+      return show('bermuda-multiplier');
+    case 'bermuda-m':
+      state.sequence.push({n:state.bermudaTarget,m:Number(value)});
+      return show('setup');
+    case 'remove-round':state.sequence.splice(Number(value),1);break;
+    case 'player':
+      state.players=state.players.includes(value)?state.players.filter(p=>p!==value):[...state.players,value];
+      break;
+    case 'guest': {
+      let number=state.guests.length+1;
+      while([...data.profiles,...state.guests].includes('Guest '+number)) number++;
+      state.guests.push('Guest '+number);
+      state.players.push(state.guests.at(-1));
+      break;
+    }
+    case 'new-profile':state.name='';return show('profile');
+    case 'letter':if(state.name.length<24) state.name+=value; break;
+    case 'erase':state.name=state.name.slice(0,-1); break;
+    case 'profile-save': {
+      const name=state.name.trim();
+      if(!name||[...data.profiles,...state.guests].some(n=>n.toLowerCase()===name.toLowerCase())) return say('Enter a unique player name.');
+      data.profiles.push(name);
+      save();
+      return show('players');
+    }
+    case 'out':state.out=value;break;
+    case 'default-out':
+      data.out=Scoring.checkouts[(Scoring.checkouts.indexOf(data.out)+1)%3];
+      state.out=data.out;save();break;
+    case 'bull':state.bull=!state.bull;break;
+    case 'round-count':state.rounds=Number(value);return show('setup');
+    case 'grid':if(state.grid.length===9)state.grid=[];return show('grid');
+    case 'clear-grid':state.grid=[];return show('grid');
+    case 'killer-assignment':state.manualNumbers=!state.manualNumbers;break;
+    case 'self-hit':state.selfHit=state.selfHit==='Ignore'?'Lose lives':'Ignore';break;
+    case 'number':state.numberPlayer=value;return show('number');
+    case 'target':
+      if(state.page==='grid'){
+        state.grid.push(Number(value));
+        return show(state.grid.length===9?'setup':'grid');
+      }
+      state.numbers[state.numberPlayer]=Number(value);
+      return show('setup');
+    case 'begin':return begin();
+    case 'begin-confirm':return begin(true);
+    case 'throw':return openThrow();
+    case 'edit':return openThrow(Number(value));
+    case 'segment':state.number=Number(value);return show('segment');
+    case 'hit': {
+      const [n,m]=value.split(',').map(Number);
+      if(state.edit===null) Scoring.record(data.active,n,m);
+      else Scoring.correct(data.active,state.edit,n,m);
+      save();
+      return show('game');
+    }
+    case 'next':Scoring.next(data.active);save();return show('game');
+    default:return show(action,action==='play');
+  }
+  render();
 }
-document.addEventListener('click',e=>{const b=e.target.closest('button[data-nav]');if(b)clickButton(b)});
-document.addEventListener('keydown',e=>{
-if(!['ArrowUp','ArrowDown','Enter','Escape','F2','F4','F5'].includes(e.key))return;
-e.preventDefault();
-if(e.key==='ArrowUp')move(-1);
-else if(e.key==='ArrowDown')move(1);
-else if(e.key==='Enter')clickButton(controls()[state.cursor]);
-else if(e.key==='Escape'){if(state.page==='game')show('menu');else if(state.page==='menu'||state.page==='correction')show('game');else show('play')}
-else if(e.key==='F2'&&state.page==='game')show('correction');
-else if(e.key==='F4'&&state.page==='game'){state.message='Undo is not available until throws are recorded.';render()}
-else if(e.key==='F5'&&state.page==='game'){state.message='Turn switching will be connected to the scoring engine.';render()}
+document.addEventListener('click',event=>{
+  const b=event.target.closest('button[data-nav]');
+  if(b) clickButton(b);
+});
+const back={setup:'play',game:'menu',menu:'game',correction:'game',rounds:'setup',grid:'setup',number:'setup',
+  replace:'setup',profile:'players','bermuda-number':'setup','bermuda-multiplier':'bermuda-number'};
+document.addEventListener('keydown',event=>{
+  const key=event.key;
+  if(!['ArrowUp','ArrowDown','Enter','Escape','F2','F4','F5'].includes(key))return;
+  event.preventDefault();
+  if(event.repeat&&key!=='ArrowUp'&&key!=='ArrowDown') return;
+  if(key==='ArrowUp'||key==='ArrowDown'){
+    const items=controls();
+    state.cursor=(state.cursor+(key==='ArrowUp'?-1:1)+items.length)%items.length;
+    const selected=items[state.cursor]?.dataset.action;
+    if(state.page==='play'&&selected?.startsWith('mode:')&&state.chosen!==selected.slice(5)){
+      state.chosen=selected.slice(5);
+      render(true);
+    } else highlight(true);
+  } else if(key==='Enter') clickButton(controls()[state.cursor]);
+  else if(key==='Escape'){
+    if(state.page==='segment'){
+      if(state.number!==undefined){state.number=undefined;return show('segment')}
+      return show(state.edit===null?'game':'correction');
+    }
+    show(back[state.page]||'play',state.page==='play');
+  } else if(state.page==='game'){
+    if(key==='F2') show('correction');
+    else if(key==='F4'){Scoring.undo(data.active);save();show('game')}
+    else if(key==='F5'&&!derived().winners){Scoring.next(data.active);save();show('game')}
+  }
 });
 render();
+if(state.page==='play'){
+  state.cursor=controls().findIndex(b=>b.classList.contains('chosen'));
+  highlight(false);
+}
 </script>
 </body>
 </html>
