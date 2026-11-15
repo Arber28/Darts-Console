@@ -35,11 +35,39 @@ try {
   }
   if (location.search.includes('resume')) {
     expect(state.page === 'play', 'reopen on home screen');
+    expect(!main.querySelector('[data-action="game"]'), 'no resume shortcut on home');
+    press('F4');
+    expect(state.page === 'players', 'physical Players button');
+    press('F2');
+    expect(state.page === 'stats', 'physical Statistics button');
+    press('F5');
+    expect(state.page === 'settings', 'physical Settings button');
+    choose('about');
+    press('Escape');
+    expect(state.page === 'settings', 'About returns to Settings');
+    press('Escape');
+    choose('mode:501');
+    expect(state.page === 'saved', 'saved match decision after choosing its mode');
     choose('game');
     expect(derived().history.length === 1, 'persisted history');
     expect(derived().history[0].n === 25, 'persisted corrected bull');
     press('F4');
     expect(derived().history.length === 0, 'undo after browser restart');
+    press('Escape');
+    choose('play');
+    choose('mode:High Score');
+    expect(state.page === 'setup', 'another mode opens setup');
+    choose('begin');
+    expect(data.unfinished['501'], 'previous mode retained');
+    press('Escape');
+    choose('play');
+    choose('mode:501');
+    expect(state.page === 'saved', 'return to previous mode offers resume');
+    choose('discard');
+    expect(state.page === 'setup' && data.active === null, 'discard enters new setup');
+    expect(data.unfinished['High Score'], 'discard preserves other modes');
+    choose('begin');
+    expect(derived().players[0].score === 501, 'fresh match starts from initial score');
   } else {
     choose('mode:501');
     choose('player:Arber');
