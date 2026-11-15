@@ -1,43 +1,23 @@
 # Build checklist
 
-## Hardware
+## Verified
 
-- [x] Settle on a portrait screen, four buttons and a push-button rotary encoder
-- [x] Choose preliminary Pico pin assignments
-- [x] Plan separate LED dimming
-- [ ] Confirm laptop connections and test portrait display output
-- [ ] Choose a storage drive
-- [ ] Check camera mounting dimensions and test all three cameras on Linux
-- [ ] Choose the LED strip, dimmer and power supply
-- [ ] Adjust and print the mounts and console enclosure
+- [x] Audit the existing Debian installation, SSD, graphics and USB inventory over SSH.
+- [x] Install the lightweight kiosk and verify Sway, Chromium, loopback HTTP and SSH after reboot.
+- [x] Implement event replay, busts, checkout rules, Corrections and Undo across turn boundaries.
+- [x] Implement the fourteen modes, with explicit setup for house targets and round sequences.
+- [x] Save profiles, the active match and completed results locally.
+- [x] Exercise scoring through the keyboard path in Chromium at 1080×1920 with only loopback networking.
+- [x] Verify nominal board regions and camera consensus on synthetic coordinates.
 
-## Software
+## Hardware acceptance
 
-- [x] Build a basic offline menu demo
-- [x] Add keyboard input through Pico firmware
-- [x] Write down the proposed game rules
-- [ ] Configure Debian to start the interface automatically
-- [ ] Select and test local camera-based hit detection
-- [ ] Implement scoring, bust rules and checkout logic
-- [ ] Implement throw history, Undo and manual correction
-- [ ] Finish player switching and save game state
-- [ ] Test a full match without an internet connection
+- [ ] Confirm upright portrait display and distance readability at the throw line.
+- [ ] Verify browser relaunch after killing its process.
+- [ ] Verify a cold start with Ethernet unplugged and Wi-Fi disabled.
+- [ ] Connect the Pico, test every button and check real encoder direction and debounce.
+- [ ] Mount and test simultaneous camera feeds, calibration, real throws and board clearings.
+- [ ] Measure LED flicker in all three streams and confirm independent dimming.
+- [ ] Validate camera candidates before connecting them to live scoring.
 
-## Bench tests
-
-| Test | Expected result | Result |
-|---|---|---|
-| Pico connection | Recognized as a USB keyboard | Not tested |
-| Encoder | Up, down and Enter | Not tested |
-| Four buttons | Escape, F4, F2 and F5 | Not tested |
-| Display | Correct portrait orientation | Not tested |
-| Three cameras | Stable simultaneous streams | Not tested |
-| Calibration | Dart hits map to the right segments | Not tested |
-| X01 bust | Score returns to the start of the turn | Not tested |
-| Undo | Previous state is restored | Not tested |
-| LED ring | Independent dimming and switching | Not tested |
-| Offline restart | Console launches without Wi-Fi | Not tested |
-
-## Before closing the enclosure
-
-Measure button holes, encoder shaft clearance, camera hole spacing and screen dimensions. Test USB power under load. Use 3.3 V Pico signals and keep LED power separate.
+See the [Linux setup](INSTALL_LINUX.md) and [camera bench procedure](DETECTION.md) for verification steps.
