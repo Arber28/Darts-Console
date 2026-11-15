@@ -1,0 +1,15 @@
+[Unit]
+Description=Darts Console local web server
+
+[Service]
+User=darts-kiosk
+WorkingDirectory=/opt/darts-console/web
+ExecStart=/usr/bin/python3 -m http.server 8765 --bind 127.0.0.1
+Restart=always
+RestartSec=2
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+
+[Install]
+WantedBy=graphical.target

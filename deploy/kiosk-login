@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+[ "$(tty)" = /dev/tty1 ] || exit 1
+exec dbus-run-session -- sway --config /etc/darts-console/sway.conf
