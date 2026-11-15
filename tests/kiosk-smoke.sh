@@ -53,13 +53,13 @@ try {
     expect(derived().history[0].n === 25, 'persisted corrected bull');
     press('F4');
     expect(derived().history.length === 0, 'undo after browser restart');
-    press('Escape');
+    choose('menu');
     choose('play');
     choose('mode:High Score');
     expect(state.page === 'setup', 'another mode opens setup');
     choose('begin');
     expect(data.unfinished['501'], 'previous mode retained');
-    press('Escape');
+    choose('menu');
     choose('play');
     choose('mode:501');
     expect(state.page === 'saved', 'return to previous mode offers resume');
@@ -81,10 +81,19 @@ try {
     expect(document.querySelector('.score-hero').getBoundingClientRect().width >= 950, 'full scoreboard');
     expect(document.querySelector('.focused').dataset.action === 'throw', 'repeat manual scoring focus');
     press('F2');
-    choose('edit:0');
+    expect(state.page === 'segment' && state.edit === 0, 'correct opens latest dart');
     choose('segment:25');
     choose('hit:25,2');
     expect(derived().players[0].score === 451, 'bull correction');
+    press('Escape');
+    expect(derived().darts.length === 2 && derived().darts[1].n === 0, 'one press records miss');
+    expect(derived().players[0].score === 451, 'miss preserves remaining score');
+    press('F4');
+    expect(derived().darts.length === 1, 'undo miss');
+    expect(document.getElementById('match-heading').textContent === '501', 'mode in header');
+    const hero = document.querySelector('.score-hero');
+    expect(getComputedStyle(hero).textAlign === 'center', 'centered score');
+    expect(document.querySelector('.dart-slot').getBoundingClientRect().height >= 190, 'large dart controls');
     press('F5');
     expect(derived().round === 2, 'next turn');
   }

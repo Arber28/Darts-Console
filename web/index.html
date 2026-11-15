@@ -120,12 +120,32 @@ footer{grid-template-columns:1fr 1fr 1.25fr 1fr 1fr;padding:0 24px;gap:8px;min-h
  footer{padding:0 8px;min-height:96px;gap:2px}.softkey{font-size:14px;min-height:90px}.softkey small{font-size:9px}
  .encoder-hint{font-size:10px;gap:4px}.encoder-hint small{font-size:9px}.encoder-dot{width:22px;height:22px}
 }
+header{justify-content:space-between;gap:24px}
+#match-heading{font-size:clamp(22px,3.4vw,38px);font-weight:600;text-align:right;letter-spacing:-.035em}
+.console[data-view="game"] main{padding-top:10px}
+.game-meta{text-align:center;margin:0 0 26px;font-size:24px}
+.score-hero{text-align:center;min-height:760px;padding:34px 28px;grid-template-rows:auto auto 1fr auto auto}
+.score-hero strong{font-size:clamp(38px,6vw,66px)}
+.big-score{font-size:clamp(130px,29vw,314px);line-height:1.1;letter-spacing:-.045em}
+.big-score.word-score{font-size:18vw}
+.dart-slots{margin-top:36px;gap:16px}
+.dart-slot{min-height:200px;background:transparent;border:1px solid #aaaeb5;border-radius:10px;color:#16181c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px 6px}
+.dart-slot small{font-size:24px;letter-spacing:.06em;font-weight:550}
+.dart-slot span{font-size:clamp(36px,7vw,76px);font-weight:650;letter-spacing:-.04em}
+.dart-slot.empty{color:#747982;border-style:dashed}
+.dart-slot:disabled{opacity:.6}
+.dart-slot.focused{outline:3px solid #17191d;outline-offset:-3px}
+.standings .score-row{padding:12px 18px}
+@media(max-width:600px){
+ .game-meta{font-size:16px;margin-bottom:20px}.score-hero{min-height:520px;padding:24px 14px}
+ .dart-slot{min-height:130px}.dart-slot small{font-size:16px}.dart-slots{gap:8px}
+}
 </style>
 </head>
 <body>
 <div class="console">
 <header>
-<div class="brand"><span class="brand-mark" aria-hidden="true"></span>Darts Console</div></header>
+<div class="brand"><span class="brand-mark" aria-hidden="true"></span>Darts Console</div><div id="match-heading"></div></header>
 <div class="workspace"><main id="main"></main></div>
 <footer aria-label="Physical controls"></footer>
 </div>
@@ -226,9 +246,16 @@ function selectMode(mode){
 }
 function shortcuts(){
   if(state.page==='game')return [
-    ['Escape','Back',()=>show('menu')],
+    ['Escape',derived().winners===null?'Miss':'Menu',()=>{
+      if(derived().winners!==null)return show('menu');
+      Scoring.record(data.active,0,0);save();show('game');
+    }],
     ['F4','Undo',()=>{Scoring.undo(data.active);save();show('game')}],
-    ['F2','Correct',()=>show('correction')],
+    ['F2','Correct',()=>{
+      const latest=derived().history.at(-1);
+      if(latest)openThrow(latest.index);
+      else show('correction');
+    }],
     ['F5','Next',()=>{Scoring.next(data.active);save();show('game')}]
   ];
   return [
@@ -307,16 +334,16 @@ function game(){
     const target=mode==='Halve-It'?[20,19,18,17,16,15,'Bull'][view.round-1]:view.round;
     extra=' · Target '+target;
   }
-  let html='<div class="game-heading"><div><div class="eyebrow">'+
-    (finished?'MATCH COMPLETE':'MATCH IN PROGRESS')+'</div><h1>'+esc(mode)+
-    '</h1></div><div class="game-meta">Round '+view.round+extra+
-    (Number(mode)?'<br>'+esc(match.options.out):'')+'</div></div>';
+  let html='<div class="game-meta">Round '+view.round+extra+
+    (Number(mode)?' · '+esc(match.options.out):'')+'</div>';
   if(finished) html+=panel('Result','<p>'+esc(view.winners.length?view.winners.map(i=>view.players[i].name).join(' & '):'Draw')+'</p>');
   else html+='<div class="score-hero"><span class="pill">NOW THROWING</span><strong>'+esc(p.name)+
     '</strong><div class="big-score'+(typeof modeScore(p)==='string'?' word-score':'')+'">'+modeScore(p)+
     '</div><div class="caption">'+unit+'</div><div class="dart-slots">'+[0,1,2].map(i=>
-      '<div class="'+(view.darts[i]?'':'empty')+'"><small>DART '+(i+1)+'</small>'+
-      (view.darts[i]?Scoring.label(view.darts[i].n,view.darts[i].m):'—')+'</div>').join('')+'</div></div>';
+      button(view.darts[i]?'edit:'+view.history.filter(d=>d.player===view.current&&d.round===view.round)[i].index:'throw',
+        '<small>DART '+(i+1)+'</small><span>'+
+        (view.darts[i]?Scoring.label(view.darts[i].n,view.darts[i].m):'—')+'</span>',
+        'dart-slot '+(view.darts[i]?'recorded':'empty'),i>view.darts.length)).join('')+'</div></div>';
   html+='<section class="panel standings"><h2>Standings</h2>'+view.players.map((player,i)=>
     '<div class="score-row '+(!finished&&i===view.current?'active':'')+'"><span>'+esc(player.name)+
     (mode==='Killer'?' · #'+player.number+' · '+((player.marks[player.number]??0)===3?'Killer':(player.marks[player.number]??0)+'/3'):'')+
@@ -328,8 +355,6 @@ function game(){
   if(view.notice) html+=note(view.notice);
   if(view.skipped) html+=note(view.skipped+' recorded event(s) no longer fit after a correction. Open Corrections to review.');
   html+='<div class="match-actions">';
-  if(!finished) html+=button('throw','Enter throw','primary')+
-    button('next','End turn <span>›</span>');
   html+=button('correction','Correct an earlier throw <span>›</span>')+
     button('menu','Match menu <span>›</span>')+'</div>';
   return html;
@@ -382,6 +407,8 @@ function profileEditor(){
 }
 function render(scroll=false){
   document.querySelector('.console').dataset.view=state.page;
+  const matchPage=['game','menu','segment','correction'].includes(state.page);
+  document.getElementById('match-heading').textContent=matchPage&&data.active?data.active.mode:'';
   const views={play:cards,setup,game,segment,correction:history,grid:picker,number:picker,stats:statistics,
     profile:profileEditor,
     'bermuda-number':()=>title('MATCH SETUP','Bermuda Triangle','Choose the target for the next round.')+
@@ -402,6 +429,7 @@ function render(scroll=false){
       '<p>Manual entry is available from the match screen.</p>')+button('about','About'),
     about:()=>title('CONSOLE','About')+panel('Darts Console','<p>Offline darts scoring for a portrait display and Raspberry Pi Pico controls.</p>')};
   main.innerHTML=views[state.page]()+ (state.message?note(state.message):'');
+  if(state.page==='game')state.cursor=Math.max(0,controls().findIndex(b=>b.dataset.action==='throw'));
   renderFooter();
   highlight(scroll);
 }
