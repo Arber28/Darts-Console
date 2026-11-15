@@ -161,7 +161,7 @@ try {
 } catch (error) {
   console.warn('Unable to load console state',error);
 }
-const state={page:data.active?'game':'play',filter:'quick',chosen:'501',players:['Arber','Emre'],
+const state={page:'play',filter:'quick',chosen:'501',players:['Arber','Emre'],
   guests:[], cursor:0, message:'', out:data.out, rounds:10, bull:false, grid:[], sequence:[], numbers:{}, selfHit:null};
 const nav=document.getElementById('nav'),main=document.getElementById('main');
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

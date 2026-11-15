@@ -34,6 +34,8 @@ try {
     throw Error('Could not reach ' + action);
   }
   if (location.search.includes('resume')) {
+    expect(state.page === 'play', 'reopen on home screen');
+    choose('game');
     expect(derived().history.length === 1, 'persisted history');
     expect(derived().history[0].n === 25, 'persisted corrected bull');
     press('F4');
