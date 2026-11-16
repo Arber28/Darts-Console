@@ -81,6 +81,47 @@ footer{padding:10px 3px;min-height:68px;gap:2px}.hint{flex-direction:column;gap:
 .panel{padding:14px}.rules{grid-template-columns:1fr}
 }
 @media(max-width:350px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.brand{font-size:16px}}
+
+/* Match screen: prioritize the score and the last detected dart. */
+.console.in-match header{height:48px;padding:0 16px}
+.console.in-match .brand{font-size:18px;gap:9px}
+.console.in-match .brand svg{height:29px;width:29px}
+.console.in-match .workspace{display:block;min-height:0}
+.console.in-match nav{display:none}
+.console.in-match main{padding:10px 13px 13px}
+.console.in-match footer{min-height:55px;padding:7px 8px}
+.console.in-match .hint small{display:none}
+.console.in-match .hint{font-size:10px}
+.console.in-match .key{height:27px;width:27px}
+.match-header{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#a9d3ec;font-size:12px;font-weight:800;margin-bottom:9px}
+.match-header .match-name{color:#fff;font-size:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.match-score{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:clamp(255px,45dvh,540px);border-radius:18px;border:1px solid #2c779a;background:radial-gradient(ellipse at 50% 35%,#12466a 0%,#0d263c 64%,#061726 100%);padding:11px 4px 7px;position:relative;overflow:hidden}
+.match-score .score-label{color:#9bdfff;font-size:clamp(12px,2vw,18px);letter-spacing:.2em;font-weight:800}
+.match-score .score-number{font-size:clamp(125px,38vw,440px);line-height:.92;letter-spacing:-.085em;font-weight:950;font-variant-numeric:tabular-nums;max-width:100%;white-space:nowrap;text-align:center;text-indent:-.04em}
+.match-score .score-number.four-digits{font-size:clamp(95px,27vw,310px)}
+.match-score .score-player{font-size:clamp(23px,4vw,38px);font-weight:850;margin-bottom:auto}
+.match-score .score-label.bottom{margin-top:auto}
+.throw-section{margin-top:10px}
+.throw-summary{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 7px;font-size:13px;font-weight:850;color:#a9d5eb}
+.throw-summary strong{font-size:clamp(27px,6vw,49px);color:#fff}
+.throw-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.throw-cell{border:1px solid #3b6782;background:#102b40;border-radius:12px;text-align:center;min-height:clamp(82px,12dvh,120px);padding:9px 4px;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.throw-cell small{color:#9fbbcc;letter-spacing:.1em;font-size:11px;font-weight:800}
+.throw-cell strong{font-size:clamp(32px,7vw,72px);font-weight:900;line-height:1.1}
+.throw-cell.hit{border-color:#0dd0ff;background:#12415d}
+.match-others{margin-top:9px;display:flex;gap:6px;overflow-x:auto;align-items:stretch}
+.match-others .other{background:#0b2435;border:1px solid #345268;border-radius:9px;padding:6px 10px;flex:1;min-width:95px;display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:12px}
+.match-others .other strong{font-size:23px}
+.preview-throw{margin-top:9px;width:100%;min-height:40px;border:1px dashed #427a99;background:#0d293e;border-radius:9px;font-weight:750;font-size:12px}
+.throw-pop{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;pointer-events:none;background:#04121dcc;animation:throwFade .9s ease-out forwards}
+.throw-pop .pop-inner{text-align:center;animation:throwZoom .9s cubic-bezier(.1,.8,.18,1) forwards}
+.throw-pop strong{font-size:clamp(135px,42vw,430px);font-weight:950;line-height:1;color:#fff;text-shadow:0 0 65px #0ac8ff88;letter-spacing:-.08em;display:block}
+.throw-pop span{font-size:clamp(22px,5vw,45px);color:#80dfff;font-weight:900}
+@keyframes throwZoom{0%{transform:scale(.55);opacity:0}28%{transform:scale(1.1);opacity:1}68%{transform:scale(1);opacity:1}100%{transform:scale(1.02);opacity:0}}
+@keyframes throwFade{0%{opacity:0}12%{opacity:1}75%{opacity:1}100%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.throw-pop,.throw-pop .pop-inner{animation:none}.throw-pop{background:#04121df0}}
+@media(max-width:680px){.console.in-match main{padding:8px}.console.in-match header{height:43px}.console.in-match footer{min-height:48px}.console.in-match .hint{font-size:8px}.match-score{min-height:clamp(255px,44dvh,490px)}}
+
 </style>
 </head>
 <body>
@@ -165,11 +206,15 @@ html+='</div></div><button class="primary" data-nav data-action="begin">▶ &nbs
 return html;
 }
 function game(){
-let html=title('MATCH IN PROGRESS',state.chosen+' · '+state.out,'Round '+state.round+' · Player '+(state.current+1)+' of '+state.order.length);
-html+='<div class="score-hero"><span class="pill">NOW THROWING</span><strong>'+state.order[state.current]+'</strong><div class="big-score">'+state.scores[state.current]+'</div><div class="caption">POINTS REMAINING</div><div class="dart-slots">'+[1,2,3].map(n=>'<div><small>DART '+n+'</small>—</div>').join('')+'</div></div>';
-html+='<section class="panel" style="padding:9px">'+state.order.map((n,i)=>'<div class="score-row '+(i===state.current?'active':'')+'"><span>'+n+'</span><strong>'+state.scores[i]+'</strong></div>').join('')+'</section>';
-html+=note('Camera scoring is not connected. This is an interface preview; no throws are being recorded.');
-html+='<button class="action" data-nav data-action="menu">Match menu <span>›</span></button>';
+const currentName=state.order[state.current]||'Player';
+const score=state.scores[state.current]??501;
+const throws=state.previewThrows||[];
+let html='<div class="match-header"><span class="match-name">'+currentName+'</span><span>'+state.chosen+' · '+state.out+' · ROUND '+state.round+'</span></div>';
+html+='<section class="match-score"><div class="score-player">'+currentName+'</div><div class="score-number '+(String(score).length>3?'four-digits':'')+'">'+score+'</div><div class="score-label bottom">POINTS REMAINING</div></section>';
+html+='<section class="throw-section"><div class="throw-summary"><span>THIS TURN · '+throws.length+'/3 DARTS</span><span>TURN TOTAL <strong>'+throws.reduce((s,t)=>s+t.points,0)+'</strong></span></div>';
+html+='<div class="throw-grid">'+[0,1,2].map(i=>'<div class="throw-cell '+(throws[i]?'hit':'')+'"><small>DART '+(i+1)+'</small><strong>'+(throws[i]?throws[i].label:'—')+'</strong></div>').join('')+'</div></section>';
+html+='<div class="match-others">'+state.order.map((n,i)=>i===state.current?'':'<div class="other"><span>'+n+'</span><strong>'+state.scores[i]+'</strong></div>').join('')+'</div>';
+html+='<button class="preview-throw" data-nav data-action="preview-throw">Preview throw animation (demo only)</button>';
 return html;
 }
 function simple(section,lead,text){
@@ -191,11 +236,15 @@ case 'settings':html=simple('Settings','Offline console configuration.','Debian 
 case 'about':html=simple('About','A standalone darts console built from an old laptop.','This is an interactive UI prototype. Automatic hit detection is not integrated.');break;
 }
 if(state.message)html+=note(state.message);
+document.querySelector('.console').classList.toggle('in-match',state.page==='game');
 main.innerHTML=html;focus();
 }
 function controls(){return [...document.querySelectorAll('[data-nav]:not(:disabled)')]}
 function focus(){const a=controls();if(!a.length)return;state.cursor=Math.min(state.cursor,a.length-1);a.forEach((b,i)=>b.classList.toggle('focused',state.cursor===i))}
 function move(d){const a=controls();if(!a.length)return;state.cursor=(state.cursor+d+a.length)%a.length;focus();const b=controls()[state.cursor];if(b.dataset.mode&&b.dataset.mode!==state.chosen)selectMode(b.dataset.mode);b.scrollIntoView({block:'nearest'})}
+function animateDart(label){
+const overlay=document.createElement('div');overlay.className='throw-pop';overlay.setAttribute('aria-live','polite');overlay.innerHTML='<div class="pop-inner"><span>LAST DART</span><strong>'+label+'</strong></div>';document.body.appendChild(overlay);setTimeout(()=>overlay.remove(),950);
+}
 function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function clickButton(b){
 if(!b||b.disabled)return;state.cursor=Math.max(0,controls().indexOf(b));
@@ -206,7 +255,13 @@ const act=b.dataset.action;
 if(act==='all'||act==='quick'){state.filter=act;state.cursor=0;render()}
 else if(act==='setup')show('setup');
 else if(act==='guest'){state.guest++;state.players.push('Guest '+state.guest);render()}
-else if(act==='begin'){if(!state.players.length){state.message='Select at least one player.';render();return}state.order=shuffle(state.players);state.scores=state.order.map(()=>currentMode()[3]);state.current=0;state.round=1;show('game')}
+else if(act==='begin'){if(!state.players.length){state.message='Select at least one player.';render();return}state.order=shuffle(state.players);state.scores=state.order.map(()=>currentMode()[3]);state.current=0;state.round=1;state.previewThrows=[];show('game')}
+else if(act==='preview-throw'){
+const demo=[{label:'T20',points:60},{label:'S20',points:20},{label:'D10',points:20}];
+state.previewThrows=state.previewThrows||[];
+if(state.previewThrows.length>=3)state.previewThrows=[];
+const dart=demo[state.previewThrows.length];state.previewThrows.push(dart);render();animateDart(dart.label);
+}
 else if(act==='resume')show('game');
 else if(act==='menu')show('menu');
 else if(act==='new')show('play');
