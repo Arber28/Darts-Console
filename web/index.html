@@ -458,8 +458,12 @@ function checkoutRoute(score, dartsLeft, out){
       if(rest)candidates.push({d,rest});
     }
     candidates.sort((a,b)=>{
-      const rank=x=>(x.d.m===1?0:x.d.m===2?6:10)+
-        (x.d.n===25?12:0)+(x.rest.routeScore||priority(x.rest));
+      const rank=x=>{
+        const finalDart=x.rest.route?.at(-1)||x.rest;
+        // Prefer familiar doubles (D20, D16...) over a harder bull finish.
+        const setupPenalty=x.d.m===1?0:x.d.m===2?8:14;
+        return priority(finalDart)*5+setupPenalty+(x.d.n===25?15:0);
+      };
       return rank(a)-rank(b);
     });
     return candidates[0]?{route:[candidates[0].d,...(candidates[0].rest.route||[candidates[0].rest])],
