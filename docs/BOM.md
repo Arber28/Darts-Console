@@ -19,7 +19,7 @@ The **three GXIVISION OV2710 cameras were ordered and paid** on 2026-11-16 for *
 | 1 | **KY-040** rotary encoder with push button | On hand / no purchase planned | [Amazon listing](https://amzn.eu/d/05MyUipj) | AYHYHLJZ 4-pack considered; use one |
 | 4 | **Blue clicky MX-style keyboard switches** | On hand / no purchase planned | [Amazon listing](https://amzn.eu/d/0eZNfhsp) | Gsbnjuy 30-pack considered; four used; print compatible keycaps |
 | 1 | **UGREEN 4-port USB 3.0 hub**, 15 cm cable | On hand / no purchase planned | [Amazon listing](https://amzn.eu/d/0cIdLONb) | Test three cameras simultaneously |
-| 1 length | **KSIBNW COB LED strip**, 3 m roll, 6000 K white, 5 V USB, dimmer | On hand / no purchase planned | Awaiting owner link | 8 mm width, 25 mm cut increments, advertised 9 W/m and CRI >90; final ring circumference not measured |
+| 1 length | **KSIBNW COB LED strip**, 3 m roll, 6000 K white, 5 V USB, dimmer | On hand / no purchase planned | [Amazon listing](https://amzn.eu/d/03nj8HNP) | 8 mm width, 25 mm cut increments, advertised 9 W/m and CRI >90; final ring circumference not measured |
 | 1 | Existing laptop with portrait display, 8 GB RAM | Already owned | — | Host computer and screen |
 | 1 | Suitable SSD | Already owned | — | No purchase needed |
 | 1 | USB-C **data** cable | Already owned | — | For RP2040-Zero |
