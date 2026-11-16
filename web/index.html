@@ -229,6 +229,27 @@ header{justify-content:space-between;gap:24px}
  .console[data-view="game"] .standings{margin-bottom:8px}
 }
 
+
+/* Finish assistance and a dedicated victory experience. */
+.checkout-advice{display:flex;align-items:center;justify-content:space-between;gap:9px;border:1px solid #767980;background:#27292d;border-radius:9px;padding:12px 14px;margin:10px 0}
+.checkout-advice .checkout-heading{display:block;color:#bbbdc2;font-size:clamp(10px,1.8vw,14px);font-weight:750;letter-spacing:.11em}
+.checkout-advice .checkout-route{display:block;color:#fff;font-size:clamp(20px,5.2vw,38px);font-weight:750;letter-spacing:-.035em;white-space:nowrap}
+.checkout-advice .checkout-small{font-size:clamp(10px,2vw,14px);color:#c6c8ce;text-align:right;max-width:35%}
+.winner-card{text-align:center;background:linear-gradient(155deg,#f4f4f4,#cbccd0);color:#16171a;border-radius:12px;border:1px solid white;padding:clamp(22px,5vw,48px) 14px;margin:8px 0 14px;overflow:hidden}
+.winner-icon{font-size:clamp(36px,8vw,72px)}
+.winner-label{font-size:clamp(13px,3vw,22px);letter-spacing:.2em;font-weight:800;margin-top:12px}
+.winner-name{font-size:clamp(54px,14vw,122px);font-weight:900;line-height:1.1;letter-spacing:-.06em;overflow-wrap:anywhere;margin:15px 0}
+.winner-sub{font-size:clamp(16px,3vw,25px);color:#4c4d51}
+.victory-overlay{position:fixed;inset:0;z-index:130;background:#101114;display:flex;justify-content:center;align-items:center;flex-direction:column;pointer-events:none;overflow:hidden;text-align:center;animation:victoryBackground 3400ms forwards}
+.victory-overlay .victory-title{z-index:2;font-size:clamp(25px,6vw,55px);font-weight:700;letter-spacing:.22em;color:#d5d5d8}
+.victory-overlay .victory-name{z-index:2;font-size:clamp(70px,19vw,180px);font-weight:900;letter-spacing:-.06em;line-height:1.08;color:white;max-width:92vw;overflow-wrap:anywhere;animation:victoryPop 3400ms ease-out forwards}
+.victory-overlay .victory-footer{z-index:2;font-size:clamp(18px,4vw,35px);color:#c8c9cb;margin-top:12px}
+.victory-particle{position:absolute;top:-10%;left:var(--left);width:var(--size);height:calc(var(--size)*1.8);border-radius:2px;background:var(--shade);opacity:.8;animation:falling var(--duration) ease-in forwards;animation-delay:var(--delay)}
+@keyframes falling{0%{transform:translate3d(0,-15vh,0) rotate(0)}100%{transform:translate3d(var(--drift),115vh,0) rotate(750deg)}}
+@keyframes victoryPop{0%{opacity:0;transform:scale(.5)}20%{opacity:1;transform:scale(1.1)}35%,80%{opacity:1;transform:scale(1)}100%{opacity:0}}
+@keyframes victoryBackground{0%,75%{opacity:1}100%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.victory-particle{display:none}.victory-overlay,.victory-overlay .victory-name{animation:none}}
+
 </style>
 </head>
 <body>
@@ -337,7 +358,8 @@ function shortcuts(){
   if(state.page==='game')return [
     ['Escape',derived().winners===null?'Miss':'Menu',()=>{
       if(derived().winners!==null)return show('menu');
-      Scoring.record(data.active,0,0);save();show('game');showThrowFeedback(0,0);
+      const before=derived().winners;
+      Scoring.record(data.active,0,0);save();show('game');showThrowFeedback(0,0);announceVictory(before,1700);
     }],
     ['F4','Undo',()=>{Scoring.undo(data.active);save();show('game')}],
     ['F2','Correct',()=>{
@@ -345,7 +367,7 @@ function shortcuts(){
       if(latest)openThrow(latest.index);
       else show('correction');
     }],
-    ['F5','Next',()=>{Scoring.next(data.active);save();show('game')}]
+    ['F5','Next',()=>{const before=derived().winners;Scoring.next(data.active);save();show('game');announceVictory(before)}]
   ];
   return [
     ['Escape',state.page==='play'?'Play':'Back',()=>{
@@ -407,6 +429,100 @@ function roundTarget(target){
   const number=target.n===undefined?'Any number':target.n===25?'Bull':target.n;
   return number+' · '+({1:'Single',2:'Double',3:'Triple'}[target.m]??'Any multiplier');
 }
+
+/* Local finish routes: intentional low-score hints, not guesses from a remote API.
+ * At most 60 remaining and never more darts than remain in the current visit.
+ * Only the final dart may finish; the multiplier respects the active checkout rule. */
+function checkoutRoute(score, dartsLeft, out){
+  if(!Number.isInteger(score)||score<1||score>60||dartsLeft<1)return null;
+  const all=[];
+  for(let n=1;n<=20;n++)for(let m=1;m<=3;m++)all.push({n,m,points:n*m,label:Scoring.label(n,m)});
+  for(let m=1;m<=2;m++)all.push({n:25,m,points:25*m,label:m===2?'BULL':'25'});
+  const finish=d=>out==='Straight Out'||d.m===2||(out==='Master Out'&&d.m===3);
+  // Keep the specifically useful two-dart route visible for 43.
+  if(score===43&&out==='Double Out'&&dartsLeft>=2)return ['S13','D15'];
+  const priority=d=>{
+    const fav={D20:0,D16:1,D12:2,D10:3,D8:4,D18:5,D15:6,D6:7,D4:8,D2:9,D1:10,BULL:12};
+    return fav[d.label]??(d.m===2?18:d.m===1?24:28);
+  };
+  const route=(remaining,count)=>{
+    if(count===1){
+      return all.filter(d=>d.points===remaining&&finish(d))
+        .sort((a,b)=>priority(a)-priority(b))[0]||null;
+    }
+    const candidates=[];
+    for(const d of all){
+      if(d.points>=remaining)continue;
+      // For low finishes favor clean singles before doubles/triples as setup darts.
+      const rest=route(remaining-d.points,count-1);
+      if(rest)candidates.push({d,rest});
+    }
+    candidates.sort((a,b)=>{
+      const rank=x=>(x.d.m===1?0:x.d.m===2?6:10)+
+        (x.d.n===25?12:0)+(x.rest.routeScore||priority(x.rest));
+      return rank(a)-rank(b);
+    });
+    return candidates[0]?{route:[candidates[0].d,...(candidates[0].rest.route||[candidates[0].rest])],
+      routeScore:priority(candidates[0].rest.route?.at(-1)||candidates[0].rest)}:null;
+  };
+  for(let count=1;count<=Math.min(3,dartsLeft);count++){
+    const found=route(score,count);
+    if(found)return (found.route||[found]).map(d=>d.label);
+  }
+  return null;
+}
+function finishAdvice(mode,view,match){
+  if(['301','501','701'].includes(mode)){
+    const p=view.players[view.current];
+    const dartsLeft=3-view.darts.length;
+    const route=checkoutRoute(p.score,dartsLeft,match.options.out||'Double Out');
+    return route?{route:route.join(' → '),detail:'POSSIBLE FINISH'}:null;
+  }
+  if(mode==='Around the Clock'){
+    const p=view.players[view.current];
+    const target=p.target===21?'BULL':p.target;
+    return {route:String(target),detail:'NEXT TARGET'};
+  }
+  if(mode==='Cricket'){
+    const p=view.players[view.current];
+    const targets=[20,19,18,17,16,15,25];
+    const t=targets.find(n=>(p.marks[n]||0)<3);
+    return t?{route:t===25?'BULL':String(t),detail:'TARGET TO CLOSE'}:null;
+  }
+  return null;
+}
+function celebrateWinner(){
+  const match=data.active;
+  if(!match)return;
+  const view=derived();
+  if(view.winners===null)return;
+  document.querySelector('.victory-overlay')?.remove();
+  const overlay=document.createElement('div');
+  overlay.className='victory-overlay';
+  const winners=view.winners.map(i=>view.players[i].name).join(' & ');
+  overlay.innerHTML='<div class="victory-title">'+(winners?'MATCH WINNER':'MATCH FINISHED')+
+    '</div><div class="victory-name">'+esc(winners||'DRAW')+
+    '</div><div class="victory-footer">'+esc(match.mode)+' · '+(winners?'VICTORY!':'DRAW')+'</div>';
+  for(let i=0;i<48;i++){
+    const piece=document.createElement('span');
+    piece.className='victory-particle';
+    piece.style.setProperty('--left',((i*37)%100)+'%');
+    piece.style.setProperty('--size',(5+(i%5)*2)+'px');
+    piece.style.setProperty('--shade',['#fff','#bdbec3','#8d8f96'][i%3]);
+    piece.style.setProperty('--delay',((i%11)*.08)+'s');
+    piece.style.setProperty('--duration',(2+(i%6)*.23)+'s');
+    piece.style.setProperty('--drift',((i%2?-1:1)*(12+i%30))+'vw');
+    overlay.appendChild(piece);
+  }
+  document.body.appendChild(overlay);
+  setTimeout(()=>overlay.remove(),3400);
+}
+function announceVictory(previousWinner, delay=0){
+  if(previousWinner!==null||derived().winners===null)return;
+  if(delay)setTimeout(()=>{if(data.active&&derived().winners!==null)celebrateWinner()},delay);
+  else celebrateWinner();
+}
+
 function game(){
   const match=data.active, view=derived(), p=view.players[view.current];
   const finished=view.winners!==null;
@@ -424,7 +540,14 @@ function game(){
     extra=' · Target '+target;
   }
   let html=extra?'<div class="game-meta">'+esc(extra.replace(/^ · /,''))+'</div>':'';
-  if(finished) html+=panel('Result','<p>'+esc(view.winners.length?view.winners.map(i=>view.players[i].name).join(' & '):'Draw')+'</p>');
+  if(finished){
+    const winner=view.winners.map(i=>view.players[i].name).join(' & ');
+    html+='<section class="winner-card"><div class="winner-icon">★ ★ ★</div>'+
+      '<div class="winner-label">'+(winner?'MATCH WINNER':'MATCH FINISHED')+'</div>'+
+      '<div class="winner-name">'+esc(winner||'DRAW')+'</div>'+
+      '<div class="winner-sub">'+esc(mode)+' · '+view.round+' rounds</div></section>'+
+      button('rematch','↻  Play again','primary');
+  }
   else {
     const value=modeScore(p);
     const darts=view.darts;
@@ -434,6 +557,11 @@ function game(){
       '</strong></div><div class="big-score'+(typeof value==='string'?' word-score':'')+'">'+esc(value)+
       '</div><div class="caption">'+unit+'</div></div>';
     html+='<div class="turn-header"><span>THIS TURN · '+darts.length+'/3 DARTS</span><span>TOTAL <strong>'+turnTotal+'</strong></span></div>';
+    const tip=finishAdvice(mode,view,match);
+    if(tip)html+='<div class="checkout-advice"><div><span class="checkout-heading">'+
+      esc(tip.detail)+'</span><span class="checkout-route">'+esc(tip.route)+
+      '</span></div><span class="checkout-small">'+
+      (Number(mode)?'Suggested route · '+(3-darts.length)+' dart(s) left':'Live target guidance')+'</span></div>';
     html+='<div class="dart-slots">'+[0,1,2].map(i=>
       button(darts[i]?'edit:'+roundHistory[i].index:'throw',
         '<small>DART '+(i+1)+'</small><span>'+
@@ -705,15 +833,26 @@ function clickButton(b){
     case 'segment':state.number=Number(value);return show('segment');
     case 'hit': {
       const [n,m]=value.split(',').map(Number);
+      const previousWinner=derived().winners;
       const newThrow=state.edit===null;
       if(newThrow) Scoring.record(data.active,n,m);
       else Scoring.correct(data.active,state.edit,n,m);
       save();
       show('game');
       if(newThrow)showThrowFeedback(n,m);
+      announceVictory(previousWinner,newThrow?1700:0);
       return;
     }
-    case 'next':Scoring.next(data.active);save();return show('game');
+    case 'next':{
+      const before=derived().winners;
+      Scoring.next(data.active);save();show('game');announceVictory(before);return;
+    }
+    case 'rematch':{
+      const old=data.active;
+      parkMatch();
+      data.active=Scoring.start(old.mode,[...old.players],{...old.options});
+      save();show('game');return;
+    }
     default:return show(action,action==='play');
   }
   render();
