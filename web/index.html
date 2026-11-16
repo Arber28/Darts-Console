@@ -193,12 +193,48 @@ header{justify-content:space-between;gap:24px}
  .console[data-view="game"] .big-score{font-size:clamp(105px,39vw,320px)}
 }
 @media(prefers-reduced-motion:reduce){.throw-flash,.throw-flash-inner{animation:none}.throw-flash{background:rgba(12,13,15,.96)}}
+
+/* Compact portrait game screen. Rules live in the header, not a separate row. */
+.console[data-view="game"] header{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:clamp(6px,2vw,18px);min-height:clamp(43px,6dvh,65px);padding:0 12px;border-bottom:1px solid #303237}
+#match-context{display:none}
+.console[data-view="game"] #match-context{display:block;color:#b9bbc0;font-size:clamp(9px,2.4vw,16px);font-weight:600;white-space:nowrap}
+.console[data-view="game"] .brand{font-size:clamp(13px,3.6vw,20px);white-space:nowrap}
+.console[data-view="game"] #match-heading{font-size:clamp(15px,3.5vw,21px)}
+.console[data-view="game"] .game-meta{margin:0 0 5px;font-size:12px}
+.console[data-view="game"] main{padding:8px 10px 12px}
+.console[data-view="game"] .score-hero{box-sizing:border-box;height:clamp(222px,31dvh,355px);min-height:0;max-height:none;padding:9px 8px 7px;margin:0 0 11px;display:flex;align-items:center;justify-content:space-between;flex-direction:column}
+.console[data-view="game"] .throwing-line{display:flex;align-items:baseline;justify-content:center;flex-wrap:nowrap;gap:8px;white-space:nowrap;max-width:100%;font-size:clamp(11px,2.8vw,18px);font-weight:700;letter-spacing:.04em;color:#4d5056}
+.console[data-view="game"] .throwing-line strong{font-size:clamp(20px,5vw,33px);font-weight:750;margin:0;color:#17181b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.console[data-view="game"] .big-score{width:100%;flex:1;display:flex;align-items:center;justify-content:center;line-height:.9;margin:0;min-height:0}
+.console[data-view="game"] .caption{padding:0;font-size:clamp(10px,2.6vw,15px)}
+.console[data-view="game"] .dart-slot{min-height:clamp(79px,11dvh,116px)}
+.console[data-view="game"] .dart-slot.recorded{background:#ededee;border-color:#ededee;color:#141517}
+.console[data-view="game"] .dart-slot.recorded small{color:#4f5156}
+.console[data-view="game"] .dart-slot.ready{border:2px solid #e0e1e4;background:#292b30;color:#fff}
+.console[data-view="game"] .standings .score-row.active{background:#ededee;color:#17181b;border-radius:6px;font-weight:700}
+.console[data-view="game"] .standings .score-row.active strong{color:#17181b}
+.console[data-view="game"] .standings .score-row.active .marks{color:#50535a}
+.console[data-view="game"] .on-turn{display:inline-block;background:#202226;color:#fff;padding:3px 6px;border-radius:4px;margin-right:9px;font-size:clamp(9px,1.7vw,12px);font-weight:750;letter-spacing:.03em;vertical-align:middle}
+.console[data-view="game"] .match-actions{display:block;margin:0 0 5px}
+.console[data-view="game"] .match-actions .match-options{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:58px;border:1px solid #85878d;background:#25272b;padding:12px 16px;margin:0;color:#f5f5f5}
+.console[data-view="game"] .match-options-title{font-size:clamp(13px,2.8vw,20px);font-weight:750;letter-spacing:.02em}
+.console[data-view="game"] .match-options-subtitle{font-size:clamp(10px,2vw,15px);font-weight:500;color:#c1c3c7;text-align:right}
+@media(max-width:600px){
+ .console[data-view="game"] header{min-height:46px;padding:0 9px;gap:5px}
+ .console[data-view="game"] .brand{font-size:clamp(12px,3.3vw,15px)}
+ .console[data-view="game"] #match-context{font-size:clamp(9px,2.2vw,12px)}
+ .console[data-view="game"] #match-heading{font-size:clamp(14px,3.3vw,17px)}
+ .console[data-view="game"] .score-hero{height:clamp(220px,31dvh,295px);min-height:0}
+ .console[data-view="game"] .dart-slot{min-height:80px}
+ .console[data-view="game"] .standings{margin-bottom:8px}
+}
+
 </style>
 </head>
 <body>
 <div class="console">
 <header>
-<div class="brand"><span class="brand-mark" aria-hidden="true"></span>Darts Console</div><div id="match-heading"></div></header>
+<div class="brand"><span class="brand-mark" aria-hidden="true"></span>Darts Console</div><div id="match-context" aria-live="polite"></div><div id="match-heading"></div></header>
 <div class="workspace"><main id="main"></main></div>
 <footer aria-label="Physical controls"></footer>
 </div>
@@ -387,26 +423,25 @@ function game(){
     const target=mode==='Halve-It'?[20,19,18,17,16,15,'Bull'][view.round-1]:view.round;
     extra=' · Target '+target;
   }
-  let html='<div class="game-meta">Round '+view.round+extra+
-    (Number(mode)?' · '+esc(match.options.out):'')+'</div>';
+  let html=extra?'<div class="game-meta">'+esc(extra.replace(/^ · /,''))+'</div>':'';
   if(finished) html+=panel('Result','<p>'+esc(view.winners.length?view.winners.map(i=>view.players[i].name).join(' & '):'Draw')+'</p>');
   else {
     const value=modeScore(p);
     const darts=view.darts;
     const turnTotal=darts.reduce((sum,d)=>sum+d.n*d.m,0);
     const roundHistory=view.history.filter(d=>d.player===view.current&&d.round===view.round);
-    html+='<div class="score-hero"><span class="pill">NOW THROWING</span><strong>'+esc(p.name)+
-      '</strong><div class="big-score'+(typeof value==='string'?' word-score':'')+'">'+esc(value)+
+    html+='<div class="score-hero"><div class="throwing-line"><span>NOW THROWING:</span><strong>'+esc(p.name)+
+      '</strong></div><div class="big-score'+(typeof value==='string'?' word-score':'')+'">'+esc(value)+
       '</div><div class="caption">'+unit+'</div></div>';
     html+='<div class="turn-header"><span>THIS TURN · '+darts.length+'/3 DARTS</span><span>TOTAL <strong>'+turnTotal+'</strong></span></div>';
     html+='<div class="dart-slots">'+[0,1,2].map(i=>
       button(darts[i]?'edit:'+roundHistory[i].index:'throw',
         '<small>DART '+(i+1)+'</small><span>'+
         (darts[i]?esc(Scoring.label(darts[i].n,darts[i].m)):'—')+'</span>',
-        'dart-slot '+(darts[i]?'recorded':'empty'),i>darts.length)).join('')+'</div>';
+        'dart-slot '+(darts[i]?'recorded':i===darts.length?'ready':'empty'),i>darts.length)).join('')+'</div>';
   }
   html+='<section class="panel standings"><h2>Standings</h2>'+view.players.map((player,i)=>
-    '<div class="score-row '+(!finished&&i===view.current?'active':'')+'"><span>'+esc(player.name)+
+    '<div class="score-row '+(!finished&&i===view.current?'active':'')+'"><span>'+(!finished&&i===view.current?'<span class="on-turn">AT BOARD</span>':'')+esc(player.name)+
     (mode==='Killer'?' · #'+player.number+' · '+((player.marks[player.number]??0)===3?'Killer':(player.marks[player.number]??0)+'/3'):'')+
     (!player.active?' · Out':'')+(mode==='Cricket'?'<small class="marks">'+[15,16,17,18,19,20,25].map(n=>
       (n===25?'B':n)+' '+(player.marks[n]??0)+'/3').join(' · ')+'</small>':'')+
@@ -415,9 +450,7 @@ function game(){
     '<div class="rule">'+n+' · '+esc(view.owners[i]===null?'Open':view.players[view.owners[i]].name)+'</div>').join('')+'</div><br>';
   if(view.notice) html+=note(view.notice);
   if(view.skipped) html+=note(view.skipped+' recorded event(s) no longer fit after a correction. Open Corrections to review.');
-  html+='<div class="match-actions">';
-  html+=button('correction','Correct an earlier throw <span>›</span>')+
-    button('menu','Match menu <span>›</span>')+'</div>';
+  html+='<div class="match-actions">'+button('menu','<span class="match-options-title">⚙ &nbsp; MATCH OPTIONS</span><span class="match-options-subtitle">Pause · Resume · Leave match &nbsp; ›</span>','action match-options')+'</div>';
   return html;
 }
 function segment(){
@@ -494,6 +527,9 @@ function render(scroll=false){
   document.querySelector('.console').dataset.view=state.page;
   const matchPage=['game','menu','segment','correction'].includes(state.page);
   document.getElementById('match-heading').textContent=matchPage&&data.active?data.active.mode:'';
+  const context=document.getElementById('match-context');
+  const currentView=matchPage&&data.active?derived():null;
+  context.textContent=currentView?'ROUND '+currentView.round+(Number(data.active.mode)?' · '+data.active.options.out.toUpperCase():''):'';
   const views={play:cards,setup,game,segment,correction:history,grid:picker,number:picker,stats:statistics,
     profile:profileEditor,
     'bermuda-number':()=>title('MATCH SETUP','Bermuda Triangle','Choose the target for the next round.')+
