@@ -6,7 +6,7 @@ The owner will provide the actual product URLs one at a time. Do not substitute 
 
 | Component | Direct item URL |
 |---|---|
-| 3× GXIVISION S2M07 OV2710 USB cameras, 100° / 2 m | Pending owner link |
+| 3× GXIVISION S2M07 OV2710 USB cameras, 100° / 2 m | [AliExpress product link](https://a.aliexpress.com/_EGOiQmK) |
 | RP2040-Zero USB-C board | Pending owner link |
 | KY-040 push-button rotary encoder | Pending owner link |
 | Blue mechanical keyboard switches (MX-style) | Pending owner link |
