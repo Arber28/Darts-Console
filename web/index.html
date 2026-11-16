@@ -140,6 +140,59 @@ header{justify-content:space-between;gap:24px}
  .game-meta{font-size:16px;margin-bottom:20px}.score-hero{min-height:520px;padding:24px 14px}
  .dart-slot{min-height:130px}.dart-slot small{font-size:16px}.dart-slots{gap:8px}
 }
+
+/* Match-focused layout: preserve the neutral monochrome design. */
+.console[data-view="game"] header{min-height:58px;padding:0 20px}
+.console[data-view="game"] .brand{font-size:19px}
+.console[data-view="game"] #match-heading{font-size:20px}
+.console[data-view="game"] main{padding:6px 12px 12px;overflow-y:auto}
+.console[data-view="game"] footer{min-height:76px;padding:0 9px}
+.console[data-view="game"] .softkey{min-height:68px;font-size:16px;gap:5px}
+.console[data-view="game"] .softkey small{font-size:10px}
+.console[data-view="game"] .encoder-hint{font-size:12px}
+.console[data-view="game"] .encoder-hint small{font-size:10px;margin-top:3px}
+.console[data-view="game"] .encoder-dot{width:27px;height:27px}
+.console[data-view="game"] .game-meta{font-size:clamp(12px,2vw,17px);margin:2px 0 8px;text-align:center;color:#b3b5b9}
+.console[data-view="game"] .score-hero{min-height:clamp(320px,48dvh,590px);margin:0 0 10px;padding:12px 8px 10px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;text-align:center;background:#ededee;color:#17181b}
+.console[data-view="game"] .score-hero .pill{font-size:clamp(10px,1.5vw,15px);padding-top:3px;color:#575b60}
+.console[data-view="game"] .score-hero strong{font-size:clamp(23px,4.8vw,43px);margin:2px 0 0;line-height:1.08}
+.console[data-view="game"] .big-score{width:100%;font-size:clamp(110px,39vw,520px);font-weight:750;letter-spacing:-.075em;line-height:.92;margin:auto 0;text-align:center;font-variant-numeric:tabular-nums}
+.console[data-view="game"] .big-score.word-score{font-size:clamp(82px,20vw,240px);letter-spacing:-.045em}
+.console[data-view="game"] .caption{font-size:clamp(12px,1.8vw,18px);padding-bottom:3px;color:#56595f}
+.console[data-view="game"] .turn-header{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:4px 2px 8px;color:#c4c5c8;font-size:clamp(13px,2vw,18px);font-weight:600}
+.console[data-view="game"] .turn-header strong{font-size:clamp(24px,5vw,48px);color:#f5f5f5;letter-spacing:-.04em}
+.console[data-view="game"] .dart-slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 10px}
+.console[data-view="game"] .dart-slot{min-width:0;min-height:clamp(92px,13dvh,142px);padding:7px 3px;gap:5px;background:#24262a;border:1px solid #50535a;color:#f5f5f5;border-radius:8px}
+.console[data-view="game"] .dart-slot small{font-size:clamp(11px,1.8vw,16px);color:#b5b8bc}
+.console[data-view="game"] .dart-slot span{font-size:clamp(29px,7.5vw,86px);font-weight:700;line-height:1.1;letter-spacing:-.04em}
+.console[data-view="game"] .dart-slot.recorded{border-color:#e9e9ea;background:#34363b}
+.console[data-view="game"] .dart-slot.empty{color:#777b81;border-style:dashed}
+.console[data-view="game"] .standings{padding:8px 12px;margin-bottom:10px}
+.console[data-view="game"] .standings h2{font-size:14px;margin:0 0 4px}
+.console[data-view="game"] .standings .score-row{padding:6px 8px;font-size:clamp(15px,2.4vw,24px)}
+.console[data-view="game"] .standings .score-row strong{font-size:clamp(20px,3.3vw,33px)}
+.console[data-view="game"] .match-actions{gap:8px;margin-bottom:6px}
+.console[data-view="game"] .match-actions button{min-height:48px;padding:10px;font-size:14px}
+.throw-flash{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:rgba(12,13,15,.91);pointer-events:none;text-align:center;animation:flashOut 1100ms ease-out forwards}
+.throw-flash-inner{display:flex;flex-direction:column;align-items:center;gap:8px;animation:flashIn 1100ms ease-out forwards}
+.throw-flash-label{font-size:clamp(18px,4vw,36px);font-weight:600;color:#c6c7ca;letter-spacing:.12em}
+.throw-flash-hit{font-size:clamp(135px,41vw,490px);font-weight:750;line-height:.95;letter-spacing:-.075em;color:#fff}
+.throw-flash-points{font-size:clamp(26px,7vw,68px);font-weight:650;color:#f5f5f5}
+@keyframes flashIn{0%{opacity:0;transform:scale(.7)}25%{opacity:1;transform:scale(1.06)}55%{transform:scale(1)}85%{opacity:1}100%{opacity:0}}
+@keyframes flashOut{0%{opacity:0}15%{opacity:1}75%{opacity:1}100%{opacity:0}}
+@media(max-width:600px){
+ .console[data-view="game"] header{min-height:45px;padding:0 10px}
+ .console[data-view="game"] .brand{font-size:15px}
+ .console[data-view="game"] #match-heading{font-size:16px}
+ .console[data-view="game"] footer{min-height:58px;padding:0 4px}
+ .console[data-view="game"] .softkey{min-height:52px;font-size:12px;gap:3px}
+ .console[data-view="game"] .softkey small{font-size:8px}
+ .console[data-view="game"] .encoder-hint{font-size:9px}
+ .console[data-view="game"] .encoder-dot{width:19px;height:19px}
+ .console[data-view="game"] .score-hero{min-height:clamp(295px,47dvh,480px)}
+ .console[data-view="game"] .big-score{font-size:clamp(105px,39vw,320px)}
+}
+@media(prefers-reduced-motion:reduce){.throw-flash,.throw-flash-inner{animation:none}.throw-flash{background:rgba(12,13,15,.96)}}
 </style>
 </head>
 <body>
@@ -248,7 +301,7 @@ function shortcuts(){
   if(state.page==='game')return [
     ['Escape',derived().winners===null?'Miss':'Menu',()=>{
       if(derived().winners!==null)return show('menu');
-      Scoring.record(data.active,0,0);save();show('game');
+      Scoring.record(data.active,0,0);save();show('game');showThrowFeedback(0,0);
     }],
     ['F4','Undo',()=>{Scoring.undo(data.active);save();show('game')}],
     ['F2','Correct',()=>{
@@ -337,19 +390,27 @@ function game(){
   let html='<div class="game-meta">Round '+view.round+extra+
     (Number(mode)?' · '+esc(match.options.out):'')+'</div>';
   if(finished) html+=panel('Result','<p>'+esc(view.winners.length?view.winners.map(i=>view.players[i].name).join(' & '):'Draw')+'</p>');
-  else html+='<div class="score-hero"><span class="pill">NOW THROWING</span><strong>'+esc(p.name)+
-    '</strong><div class="big-score'+(typeof modeScore(p)==='string'?' word-score':'')+'">'+modeScore(p)+
-    '</div><div class="caption">'+unit+'</div><div class="dart-slots">'+[0,1,2].map(i=>
-      button(view.darts[i]?'edit:'+view.history.filter(d=>d.player===view.current&&d.round===view.round)[i].index:'throw',
+  else {
+    const value=modeScore(p);
+    const darts=view.darts;
+    const turnTotal=darts.reduce((sum,d)=>sum+d.n*d.m,0);
+    const roundHistory=view.history.filter(d=>d.player===view.current&&d.round===view.round);
+    html+='<div class="score-hero"><span class="pill">NOW THROWING</span><strong>'+esc(p.name)+
+      '</strong><div class="big-score'+(typeof value==='string'?' word-score':'')+'">'+esc(value)+
+      '</div><div class="caption">'+unit+'</div></div>';
+    html+='<div class="turn-header"><span>THIS TURN · '+darts.length+'/3 DARTS</span><span>TOTAL <strong>'+turnTotal+'</strong></span></div>';
+    html+='<div class="dart-slots">'+[0,1,2].map(i=>
+      button(darts[i]?'edit:'+roundHistory[i].index:'throw',
         '<small>DART '+(i+1)+'</small><span>'+
-        (view.darts[i]?Scoring.label(view.darts[i].n,view.darts[i].m):'—')+'</span>',
-        'dart-slot '+(view.darts[i]?'recorded':'empty'),i>view.darts.length)).join('')+'</div></div>';
+        (darts[i]?esc(Scoring.label(darts[i].n,darts[i].m)):'—')+'</span>',
+        'dart-slot '+(darts[i]?'recorded':'empty'),i>darts.length)).join('')+'</div>';
+  }
   html+='<section class="panel standings"><h2>Standings</h2>'+view.players.map((player,i)=>
     '<div class="score-row '+(!finished&&i===view.current?'active':'')+'"><span>'+esc(player.name)+
     (mode==='Killer'?' · #'+player.number+' · '+((player.marks[player.number]??0)===3?'Killer':(player.marks[player.number]??0)+'/3'):'')+
     (!player.active?' · Out':'')+(mode==='Cricket'?'<small class="marks">'+[15,16,17,18,19,20,25].map(n=>
       (n===25?'B':n)+' '+(player.marks[n]??0)+'/3').join(' · ')+'</small>':'')+
-    '</span><strong>'+modeScore(player)+'</strong></div>').join('')+'</section>';
+    '</span><strong>'+esc(modeScore(player))+'</strong></div>').join('')+'</section>';
   if(mode==='Tic-Tac-Toe') html+='<div class="rules">'+match.options.grid.map((n,i)=>
     '<div class="rule">'+n+' · '+esc(view.owners[i]===null?'Open':view.players[view.owners[i]].name)+'</div>').join('')+'</div><br>';
   if(view.notice) html+=note(view.notice);
@@ -474,6 +535,30 @@ function begin(){
   save();
   show('game');
 }
+function showThrowFeedback(n,m){
+  // Called after a genuine recorded dart, not when navigating or correcting history.
+  const existing=document.querySelector('.throw-flash');
+  if(existing)existing.remove();
+  const overlay=document.createElement('div');
+  overlay.className='throw-flash';
+  overlay.setAttribute('role','status');
+  const inner=document.createElement('div');
+  inner.className='throw-flash-inner';
+  const lead=document.createElement('div');
+  lead.className='throw-flash-label';
+  lead.textContent='LAST DART';
+  const hit=document.createElement('div');
+  hit.className='throw-flash-hit';
+  hit.textContent=Scoring.label(n,m);
+  const points=document.createElement('div');
+  points.className='throw-flash-points';
+  points.textContent='+'+(n*m)+' POINTS';
+  inner.append(lead,hit,points);
+  overlay.append(inner);
+  document.body.appendChild(overlay);
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) setTimeout(()=>overlay.remove(),700);
+  else overlay.addEventListener('animationend',e=>{if(e.target===overlay)overlay.remove()},{once:true});
+}
 function openThrow(index=null){
   state.edit=index;
   state.number=undefined;
@@ -547,10 +632,13 @@ function clickButton(b){
     case 'segment':state.number=Number(value);return show('segment');
     case 'hit': {
       const [n,m]=value.split(',').map(Number);
-      if(state.edit===null) Scoring.record(data.active,n,m);
+      const newThrow=state.edit===null;
+      if(newThrow) Scoring.record(data.active,n,m);
       else Scoring.correct(data.active,state.edit,n,m);
       save();
-      return show('game');
+      show('game');
+      if(newThrow)showThrowFeedback(n,m);
+      return;
     }
     case 'next':Scoring.next(data.active);save();return show('game');
     default:return show(action,action==='play');
