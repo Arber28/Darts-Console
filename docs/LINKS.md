@@ -1,37 +1,38 @@
-# Useful links
+# Project links
 
-A short reference list for the build. Product listings are examples, not confirmed purchases.
+## Hardware — exact purchased/selected item URLs
 
-## Linux and development
+The owner will provide the actual product URLs one at a time. Do not substitute similarly named products, archived prices or search results for these links.
 
-| Resource | Link |
+| Component | Direct item URL |
+|---|---|
+| 3× GXIVISION S2M07 OV2710 USB cameras, 100° / 2 m | Pending owner link |
+| RP2040-Zero USB-C board | Pending owner link |
+| KY-040 push-button rotary encoder | Pending owner link |
+| Blue mechanical keyboard switches (MX-style) | Pending owner link |
+| UGREEN 4-port USB 3.0 hub, 15 cm | Pending owner link |
+| KSIBNW 3 m 6000 K COB USB LED strip with dimmer | Pending owner link |
+
+See [Bill of materials](BOM.md) for current inventory status and costs.
+
+## Software
+
+| Resource | URL |
 |---|---|
 | Debian download | https://www.debian.org/distrib/ |
 | Debian installation guide | https://www.debian.org/releases/stable/installmanual |
 | Debian Wiki | https://wiki.debian.org/ |
-| Debian package search | https://packages.debian.org/stable/ |
-| CircuitPython for Pico | https://circuitpython.org/board/raspberry_pi_pico/ |
+| CircuitPython | https://circuitpython.org/ |
 | Adafruit HID library | https://github.com/adafruit/Adafruit_CircuitPython_HID |
-| Raspberry Pi Pico documentation | https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html |
-| Python | https://www.python.org/ |
-| OpenCV documentation | https://docs.opencv.org/ |
-| Linux Video4Linux2 documentation | https://www.kernel.org/doc/html/latest/userspace-api/media/v4l/v4l2.html |
+| RP2040 documentation | https://www.raspberrypi.com/documentation/microcontrollers/rp2040.html |
+| Autodarts | https://autodarts.io/ |
+| OpenCV | https://docs.opencv.org/ |
+| Video4Linux2 | https://www.kernel.org/doc/html/latest/userspace-api/media/v4l/v4l2.html |
 
-## Darts and printed parts
+## 3D prints
 
-| Resource | Link | Notes |
-|---|---|---|
-| Autodarts | https://autodarts.io/ | Reference project; offline use and integration not checked |
-| B3D Autodarts DIY V2 | https://www.printables.com/model/1243079-b3d-autodarts-diy-automatische-punkteerfassung-fur | Camera mounts; check hole spacing |
-| B3D alternative listing | https://cults3d.com/de/modell-3d/spiel/b3d-autodarts-diy-automatic-score-steeldart-v2 | Alternate source for printed parts |
-| Darts Console repository | https://github.com/Arber28/Darts-Console | Project files |
-
-## Hardware examples
-
-| Part | Link | Notes |
-|---|---|---|
-| GXIVISION OV9732 camera candidate | https://www.ebay.at/itm/356589930771 | Dimensions and compatibility not confirmed |
-| KY-040 rotary encoder | https://funduinoshop.com/elektronische-module/keypads-und-buttons/rotary-encoder/ky-040-drehimpulsgeber-rotary-encoder | Example listing |
-| 12 mm push button | https://www.berrybase.at/mikro-drucktaster-12mm-rund-printmontage-schliesser-farbe-schwarz | Check mounting style |
-
-No specific storage drive or LED dimmer has been selected.
+| Resource | URL |
+|---|---|
+| B3D Autodarts DIY V2 | https://www.printables.com/model/1243079-b3d-autodarts-diy-automatische-punkteerfassung-fur |
+| B3D alternative listing | https://cults3d.com/de/modell-3d/spiel/b3d-autodarts-diy-automatic-score-steeldart-v2 |
+| Project repo | https://github.com/Arber28/Darts-Console |
