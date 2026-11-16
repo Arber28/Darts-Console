@@ -466,6 +466,30 @@ function profileEditor(){
     '<div class="letters">'+[...chars].map(c=>button('letter:'+c,c===' '?'Space':c,'rule')).join('')+'</div><br>'+
     button('erase','Erase last character')+button('profile-save','Save player','primary');
 }
+function fitMainScore(){
+  const number=document.querySelector('.console[data-view="game"] .big-score');
+  const card=number?.closest('.score-hero');
+  if(!number||!card)return;
+  // Fit the digits to the card rather than sizing them from viewport width.
+  const content=number.textContent.trim();
+  const family=getComputedStyle(number).fontFamily;
+  const weight=getComputedStyle(number).fontWeight;
+  const spacingFactor=content.length>3||/\\D/.test(content)?-.045:-.075;
+  const availableWidth=Math.max(120,card.clientWidth-24)*.95;
+  const availableHeight=card.clientHeight*.74;
+  const ctx=document.createElement('canvas').getContext('2d');
+  if(!ctx)return;
+  let lo=40,hi=Math.min(650,availableHeight*1.35);
+  for(let i=0;i<20;i++){
+    const mid=(lo+hi)/2;
+    ctx.font=weight+' '+mid+'px '+family;
+    const textWidth=ctx.measureText(content).width+spacingFactor*mid*Math.max(0,content.length-1);
+    if(textWidth<=availableWidth&&mid*.98<=availableHeight)lo=mid;
+    else hi=mid;
+  }
+  number.style.fontSize=lo.toFixed(1)+'px';
+}
+window.addEventListener('resize',fitMainScore);
 function render(scroll=false){
   document.querySelector('.console').dataset.view=state.page;
   const matchPage=['game','menu','segment','correction'].includes(state.page);
@@ -490,6 +514,7 @@ function render(scroll=false){
       '<p>Manual entry is available from the match screen.</p>')+button('about','About'),
     about:()=>title('CONSOLE','About')+panel('Darts Console','<p>Offline darts scoring for a portrait display and Raspberry Pi Pico controls.</p>')};
   main.innerHTML=views[state.page]()+ (state.message?note(state.message):'');
+  if(state.page==='game')fitMainScore();
   if(state.page==='game')state.cursor=Math.max(0,controls().findIndex(b=>b.dataset.action==='throw'));
   renderFooter();
   highlight(scroll);
