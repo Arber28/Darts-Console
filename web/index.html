@@ -613,7 +613,19 @@ function showThrowFeedback(n,m){
   hit.textContent=Scoring.label(n,m);
   const points=document.createElement('div');
   points.className='throw-flash-points';
-  points.textContent='+'+(n*m)+' POINTS';
+  const mode=data.active?.mode;
+  const amount=n*m;
+  if(['301','501','701'].includes(mode)){
+    // A busted turn restores the starting score; do not suggest points were deducted.
+    const replay=derived();
+    points.textContent=replay.notice?.includes(' busted')?'BUST · NO SCORE':'−'+amount+' POINTS';
+  } else if(mode==='Around the Clock'){
+    points.textContent=amount?'TARGET HIT':'MISS';
+  } else if(mode==='Killer'||mode==='Knockout'){
+    points.textContent=amount?'HIT RECORDED':'MISS';
+  } else {
+    points.textContent='+'+amount+' POINTS';
+  }
   inner.append(lead,hit,points);
   overlay.append(inner);
   document.body.appendChild(overlay);
