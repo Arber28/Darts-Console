@@ -869,8 +869,8 @@ function game(){
     const roundHistory=view.history.filter(d=>d.player===view.current&&d.round===view.round);
     html+='<div class="score-hero"><div class="throwing-line"><span>Now throwing</span><strong>'+esc(p.name)+
       '</strong></div><div class="big-score'+(typeof value==='string'?' word-score':'')+'">'+esc(value)+
-      '</div><div class="caption">'+unit+'</div></div>';
-    html+='<div class="turn-header"><span>THIS TURN · '+darts.length+'/3 DARTS</span><span>TOTAL <strong>'+turnTotal+'</strong></span></div>';
+      '</div><div class="caption">'+esc(unit.toLowerCase())+'</div></div>';
+    html+='<div class="turn-header"><span>This turn · '+darts.length+' of 3 darts</span><span>Total <strong>'+turnTotal+'</strong></span></div>';
     const tip=finishAdvice(mode,view,match);
     const suggested=tip && tip.route!=='NO DIRECT FINISH' ? tip.route.split(' → ') : [];
     if(suggested.length){
@@ -881,7 +881,7 @@ function game(){
       const suggestion=!darts[i] ? suggested[i-darts.length] : null;
       const recorded=Boolean(darts[i]);
       return button(recorded?'edit:'+roundHistory[i].index:'throw',
-        '<small>DART '+(i+1)+(suggestion?' · AIM':'')+'</small><span>'+
+        '<small>Dart '+(i+1)+(suggestion?' · aim':'')+'</small><span>'+
         (recorded?esc(Scoring.label(darts[i].n,darts[i].m)):suggestion?esc(suggestion):'—')+'</span>',
         'dart-slot '+(recorded?'recorded':suggestion?'suggested':i===darts.length?'ready':'empty'),i>darts.length);
     }).join('')+'</div>';
