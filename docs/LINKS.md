@@ -10,7 +10,7 @@ The owner will provide the actual product URLs one at a time. Do not substitute 
 | RP2040-Zero USB-C board | [Amazon product link](https://amzn.eu/d/09UHp4mh) |
 | KY-040 push-button rotary encoder | [Amazon product link](https://amzn.eu/d/05MyUipj) |
 | Blue mechanical keyboard switches (MX-style) | [Amazon product link](https://amzn.eu/d/0eZNfhsp) |
-| UGREEN 4-port USB 3.0 hub, 15 cm | Pending owner link |
+| UGREEN 4-port USB 3.0 hub, 15 cm | [Amazon product link](https://amzn.eu/d/0cIdLONb) |
 | KSIBNW 3 m 6000 K COB USB LED strip with dimmer | Pending owner link |
 
 See [Bill of materials](BOM.md) for current inventory status and costs.
