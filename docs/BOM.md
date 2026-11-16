@@ -15,7 +15,7 @@ The **three GXIVISION OV2710 cameras were ordered and paid** on 2026-11-16 for *
 | Build qty | Part | Status | Exact product link | Notes |
 |---:|---|---|---|---|
 | 3 | GXIVISION **OV2710 S2M07**, 2 MP, 1080p, 100° lens, USB, 2 m cables | **Ordered / paid** | [AliExpress listing](https://a.aliexpress.com/_EGOiQmK) | AliExpress, Dart Machine Specialty Store; €47.45 charged total |
-| 1 | **RP2040-Zero** board, RP2040, USB-C | On hand / no purchase planned | Awaiting owner link | AYWHP 3-pack was considered; only one board is used. Not pin-compatible with standard Pico |
+| 1 | **RP2040-Zero** board, RP2040, USB-C | On hand / no purchase planned | [Amazon listing](https://amzn.eu/d/09UHp4mh) | AYWHP 3-pack was considered; only one board is used. Not pin-compatible with standard Pico |
 | 1 | **KY-040** rotary encoder with push button | On hand / no purchase planned | Awaiting owner link | AYHYHLJZ 4-pack considered; use one |
 | 4 | **Blue clicky MX-style keyboard switches** | On hand / no purchase planned | Awaiting owner link | Gsbnjuy 30-pack considered; four used; print compatible keycaps |
 | 1 | **UGREEN 4-port USB 3.0 hub**, 15 cm cable | On hand / no purchase planned | Awaiting owner link | Test three cameras simultaneously |
