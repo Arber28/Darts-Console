@@ -8,7 +8,7 @@ The owner will provide the actual product URLs one at a time. Do not substitute 
 |---|---|
 | 3× GXIVISION S2M07 OV2710 USB cameras, 100° / 2 m | [AliExpress product link](https://a.aliexpress.com/_EGOiQmK) |
 | RP2040-Zero USB-C board | [Amazon product link](https://amzn.eu/d/09UHp4mh) |
-| KY-040 push-button rotary encoder | Pending owner link |
+| KY-040 push-button rotary encoder | [Amazon product link](https://amzn.eu/d/05MyUipj) |
 | Blue mechanical keyboard switches (MX-style) | Pending owner link |
 | UGREEN 4-port USB 3.0 hub, 15 cm | Pending owner link |
 | KSIBNW 3 m 6000 K COB USB LED strip with dimmer | Pending owner link |
