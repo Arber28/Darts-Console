@@ -235,7 +235,7 @@ header{justify-content:space-between;gap:24px}
 .checkout-advice .checkout-heading{display:block;color:#bbbdc2;font-size:clamp(10px,1.8vw,14px);font-weight:750;letter-spacing:.11em}
 .checkout-advice .checkout-route{display:block;color:#fff;font-size:clamp(20px,5.2vw,38px);font-weight:750;letter-spacing:-.035em;white-space:nowrap}
 .checkout-advice .checkout-small{font-size:clamp(10px,2vw,14px);color:#c6c8ce;text-align:right;max-width:35%}
-.winner-card{text-align:center;background:linear-gradient(155deg,#f4f4f4,#cbccd0);color:#16171a;border-radius:12px;border:1px solid white;padding:clamp(22px,5vw,48px) 14px;margin:8px 0 14px;overflow:hidden}
+.winner-card{text-align:center;background:#ededee;color:#16171a;border-radius:12px;border:1px solid white;padding:clamp(22px,5vw,48px) 14px;margin:8px 0 14px;overflow:hidden}
 .winner-icon{font-size:clamp(36px,8vw,72px)}
 .winner-label{font-size:clamp(13px,3vw,22px);letter-spacing:.2em;font-weight:800;margin-top:12px}
 .winner-name{font-size:clamp(54px,14vw,122px);font-weight:900;line-height:1.1;letter-spacing:-.06em;overflow-wrap:anywhere;margin:15px 0}
@@ -260,90 +260,6 @@ header{justify-content:space-between;gap:24px}
 .console[data-view="game"] .winner-actions{display:grid;grid-template-columns:1fr;gap:12px;margin:0 0 18px}
 .console[data-view="game"] .winner-actions .primary{margin:0}
 .console[data-view="game"] .winner-actions .winner-home{background:#24262b;color:#f4f4f4;border:1px solid #85878d;text-align:center;justify-content:center;min-height:clamp(60px,8vw,88px);font-size:clamp(17px,2.25vw,25px)}
-
-
-/* Quiet studio visual system. One typographic scale, clear hierarchy, subtle sage for targets. */
-:root{font-family:Inter,"Segoe UI",Arial,sans-serif;background:#111415;color:#f0f2ef;--accent:#e9ece8;--muted:#a8afad;--line:#343a39;--sage:#b9cdbb}
-body,.console{background:#111415;color:#f0f2ef}
-header{background:#111415;border-bottom:1px solid #2b3130}
-.brand{color:#f0f2ef;font-weight:650;letter-spacing:-.045em}
-main{padding:clamp(16px,4vw,35px)}
-.section-kicker{display:block;font-size:clamp(11px,1.7vw,16px);color:#a0aaa5;margin:0 0 10px}
-h1,.home-heading h1{font-weight:650;letter-spacing:-.055em}
-.home-heading{margin:10px 0 26px}
-.home-heading h1{font-size:clamp(38px,7vw,72px);margin:0}
-.switch{background:#1d2222;gap:3px;padding:4px;border:1px solid #303736;border-radius:11px;margin-bottom:20px}
-.switch button{flex:1;background:transparent;border:0;border-radius:8px;color:#adb5b1;padding:13px 10px;font-weight:600}
-.switch button.on{background:#e9ece8;color:#171b19}
-.cards{gap:12px}
-.tile,.tile:nth-child(even){background:#1e2323;border:1px solid #2d3432;border-radius:12px;min-height:clamp(148px,22vw,226px);padding:clamp(20px,3vw,30px)}
-.tile:nth-child(even){background:#222726}
-.tile strong,.tile.numeric strong{font-weight:650}
-.tile small{color:#adb5b1}
-.tile.chosen{border-color:#939e97;box-shadow:none}
-.tile.focused{background:#e9ece8;color:#171b19;border-color:#e9ece8;box-shadow:none}
-.tile.focused small{color:#536159}
-.home-summary{border-top:1px solid #323937;margin-top:26px;padding-top:19px;align-items:start;color:#b9c3bd}
-.home-summary strong{color:#f1f3f0;font-weight:650}
-.primary,.action,.player,.rule{background:#242a29;border:1px solid #39413e;border-radius:10px;color:#f1f2ef;font-weight:600}
-.primary{background:#e9ece8;border-color:#e9ece8;color:#171b19;font-weight:700}
-.action{min-height:61px}
-.panel{background:#1c2221;border:1px solid #323a37;border-radius:12px;padding:22px}
-.panel h2{font-weight:650;color:#d8dfda}
-.player.checked,.rule.checked{background:#303c36;border-color:#99b09e}
-.note{background:#232b28;border:1px solid #405048;border-left:3px solid #95b29b;border-radius:8px}
-.focused,button:focus-visible{outline:2px solid #c1d3c6;outline-offset:2px}
-footer{background:#191e1d;border-top:1px solid #303935}
-.softkey{color:#f0f2ef;font-weight:600}
-.softkey small{color:#929e97;letter-spacing:.01em}
-.encoder-hint{color:#c0c9c2}
-.encoder-dot{border-color:#a0aea4}
-.console[data-view="game"] header{background:#111415;border-bottom:1px solid #303935}
-.console[data-view="game"] #match-context{color:#b9c4bb;font-weight:550}
-.console[data-view="game"] .score-hero{background:#e9ece8;color:#171a18;border:0;border-radius:13px}
-.console[data-view="game"] .throwing-line{color:#626f66;font-weight:550;letter-spacing:0}
-.console[data-view="game"] .throwing-line strong{color:#171a18;font-weight:700}
-.console[data-view="game"] .caption{color:#68756b;text-transform:none;letter-spacing:.015em;font-weight:600}
-.console[data-view="game"] .turn-header{color:#bbc5bd;font-weight:550}
-.console[data-view="game"] .turn-header strong{font-weight:700}
-.console[data-view="game"] .dart-slot{border-radius:11px;background:#202625;border:1px solid #35403a;color:#f0f2ef}
-.console[data-view="game"] .dart-slot small{color:#aeb9b1;letter-spacing:0;font-weight:550}
-.console[data-view="game"] .dart-slot span{font-weight:700}
-.console[data-view="game"] .dart-slot.empty{border:1px solid #333c37;background:#1e2322;color:#78877b}
-.console[data-view="game"] .dart-slot.ready{border:1.5px solid #b3c2b6;background:#252d29}
-.console[data-view="game"] .dart-slot.recorded{background:#e9ece8;color:#171a18;border-color:#e9ece8}
-.console[data-view="game"] .dart-slot.recorded small{color:#596b5e}
-.console[data-view="game"] .checkout-inline-label{color:#b9cdbb;letter-spacing:0;font-weight:650}
-.console[data-view="game"] .checkout-inline-label span:last-child{color:#9faea3}
-.console[data-view="game"] .dart-slot.suggested{background:#283b30;border:1px solid #88a994;color:#e7f0e6}
-.console[data-view="game"] .dart-slot.suggested small{color:#bcd0bf}
-.console[data-view="game"] .dart-slot.suggested span{color:#f1f7ee}
-.console[data-view="game"] .standings{background:#1b2220;border:1px solid #333c37;border-radius:11px}
-.console[data-view="game"] .standings h2{color:#adbab0;font-weight:600;font-size:clamp(14px,2vw,18px)}
-.console[data-view="game"] .standings .score-row.active{background:#e9ece8;color:#171b19}
-.console[data-view="game"] .standings .score-row.active strong{color:#171b19}
-.console[data-view="game"] .on-turn{background:#d3ded5;color:#3c5343;font-weight:650}
-.console[data-view="game"] .match-actions .match-options{background:transparent;border:1px solid #515e56;border-radius:10px;min-height:54px}
-.console[data-view="game"] .match-options-title{font-size:clamp(14px,2.7vw,19px);font-weight:650;letter-spacing:0}
-.console[data-view="game"] .match-options-subtitle{color:#a7b5aa}
-.winner-card{background:#e9ece8;color:#171b19;border:0;border-radius:13px}
-.winner-icon{font-size:clamp(14px,3vw,20px);font-weight:600;letter-spacing:.02em;color:#697d6e}
-.winner-label{font-size:clamp(14px,3vw,21px);font-weight:650;letter-spacing:.02em;color:#65796c}
-.winner-name{font-weight:750}
-.winner-sub{color:#637468}
-.console[data-view="game"] .winner-actions .winner-home{background:#262d29;border-color:#46554b;border-radius:10px}
-.victory-overlay{background:#161c19}
-.victory-overlay .victory-title{letter-spacing:.05em;color:#b4cbb9}
-.victory-overlay .victory-footer{color:#bdcdbf}
-.throw-flash{background:#151b18ed}
-.throw-flash-label{letter-spacing:.04em;color:#adbfaf;font-weight:550}
-@media(max-width:600px){
- .tile{padding:19px}
- .panel{padding:17px}
- .home-summary{display:block}
- .home-summary p{margin-top:8px}
- .console[data-view="game"] .checkout-inline-label span:last-child{font-size:10px}
-}
 
 </style>
 </head>
@@ -425,7 +341,7 @@ function show(page,withNav=false){
 function cards(){
   const shown=state.filter==='quick'?modes.slice(0,6):modes;
   const mode=currentMode();
-  return '<div class="home-heading"><div><span class="section-kicker">Darts / Games</span><h1>Choose a game</h1></div></div>'+
+  return '<div class="home-heading"><h1>Choose a game.</h1></div>'+
     '<div class="switch">'+button('quick','Quick play',state.filter==='quick'?'on':'')+
     button('all','All games',state.filter==='all'?'on':'')+'</div><div class="cards">'+
     shown.map(m=>button('mode:'+m[0],'<span class="tile-arrow" aria-hidden="true">↗</span><strong>'+
@@ -481,7 +397,7 @@ function renderFooter(){
   const buttons=shortcuts().map(([key,label])=>
     '<button class="softkey" data-shortcut="'+key+'"><span>'+label+'</span><small>'+
     ({Escape:'BACK',F4:'UNDO',F2:'CORRECT',F5:'NEXT'}[key])+'</small></button>');
-  buttons.splice(2,0,'<div class="encoder-hint"><span class="encoder-dot"></span><span>Rotate<small>Press to select</small></span></div>');
+  buttons.splice(2,0,'<div class="encoder-hint"><span class="encoder-dot"></span><span>Turn to select<small>Press to confirm</small></span></div>');
   document.querySelector('footer').innerHTML=buttons.join('');
 }
 function setup(){
@@ -813,9 +729,9 @@ function celebrateWinner(){
   const overlay=document.createElement('div');
   overlay.className='victory-overlay';
   const winners=view.winners.map(i=>view.players[i].name).join(' & ');
-  overlay.innerHTML='<div class="victory-title">'+(winners?'Winner':'Match finished')+
+  overlay.innerHTML='<div class="victory-title">'+(winners?'MATCH WINNER':'MATCH FINISHED')+
     '</div><div class="victory-name">'+esc(winners||'DRAW')+
-    '</div><div class="victory-footer">'+esc(match.mode)+' · '+(winners?'Match complete':'Draw')+'</div>';
+    '</div><div class="victory-footer">'+esc(match.mode)+' · '+(winners?'VICTORY!':'DRAW')+'</div>';
   for(let i=0;i<48;i++){
     const piece=document.createElement('span');
     piece.className='victory-particle';
@@ -855,39 +771,39 @@ function game(){
   let html=extra?'<div class="game-meta">'+esc(extra.replace(/^ · /,''))+'</div>':'';
   if(finished){
     const winner=view.winners.map(i=>view.players[i].name).join(' & ');
-    html+='<section class="winner-card"><div class="winner-icon">Match complete</div>'+
-      '<div class="winner-label">'+(winner?'Winner':'Match finished')+'</div>'+
+    html+='<section class="winner-card"><div class="winner-icon">★ ★ ★</div>'+
+      '<div class="winner-label">'+(winner?'MATCH WINNER':'MATCH FINISHED')+'</div>'+
       '<div class="winner-name">'+esc(winner||'DRAW')+'</div>'+
       '<div class="winner-sub">'+esc(mode)+' · '+view.round+' rounds</div></section>'+
-      '<div class="winner-actions">'+button('rematch','Play again','primary')+
-      button('finished-home','Back to main menu','action winner-home')+'</div>';
+      '<div class="winner-actions">'+button('rematch','↻  Play again','primary')+
+      button('finished-home','←  Back to main menu','action winner-home')+'</div>';
   }
   else {
     const value=modeScore(p);
     const darts=view.darts;
     const turnTotal=darts.reduce((sum,d)=>sum+d.n*d.m,0);
     const roundHistory=view.history.filter(d=>d.player===view.current&&d.round===view.round);
-    html+='<div class="score-hero"><div class="throwing-line"><span>Now throwing</span><strong>'+esc(p.name)+
+    html+='<div class="score-hero"><div class="throwing-line"><span>NOW THROWING:</span><strong>'+esc(p.name)+
       '</strong></div><div class="big-score'+(typeof value==='string'?' word-score':'')+'">'+esc(value)+
-      '</div><div class="caption">'+esc(unit.toLowerCase())+'</div></div>';
-    html+='<div class="turn-header"><span>This turn · '+darts.length+' of 3 darts</span><span>Total <strong>'+turnTotal+'</strong></span></div>';
+      '</div><div class="caption">'+unit+'</div></div>';
+    html+='<div class="turn-header"><span>THIS TURN · '+darts.length+'/3 DARTS</span><span>TOTAL <strong>'+turnTotal+'</strong></span></div>';
     const tip=finishAdvice(mode,view,match);
     const suggested=tip && tip.route!=='NO DIRECT FINISH' ? tip.route.split(' → ') : [];
     if(suggested.length){
-      html+='<div class="checkout-inline-label"><span>'+(Number(mode)?'Suggested checkout':'Suggested target')+'</span>'+
-        '<span>Green: aim · White: hit</span></div>';
+      html+='<div class="checkout-inline-label"><span>◎ SUGGESTED '+(Number(mode)?'CHECKOUT':'TARGET')+'</span>'+
+        '<span>GOLD = AIM · WHITE = HIT</span></div>';
     }
     html+='<div class="dart-slots">'+[0,1,2].map(i=>{
       const suggestion=!darts[i] ? suggested[i-darts.length] : null;
       const recorded=Boolean(darts[i]);
       return button(recorded?'edit:'+roundHistory[i].index:'throw',
-        '<small>Dart '+(i+1)+(suggestion?' · aim':'')+'</small><span>'+
+        '<small>DART '+(i+1)+(suggestion?' · AIM':'')+'</small><span>'+
         (recorded?esc(Scoring.label(darts[i].n,darts[i].m)):suggestion?esc(suggestion):'—')+'</span>',
         'dart-slot '+(recorded?'recorded':suggestion?'suggested':i===darts.length?'ready':'empty'),i>darts.length);
     }).join('')+'</div>';
   }
-  html+='<section class="panel standings"><h2>Players</h2>'+view.players.map((player,i)=>
-    '<div class="score-row '+(!finished&&i===view.current?'active':'')+'"><span>'+(!finished&&i===view.current?'<span class="on-turn">Throwing</span>':'')+esc(player.name)+
+  html+='<section class="panel standings"><h2>Standings</h2>'+view.players.map((player,i)=>
+    '<div class="score-row '+(!finished&&i===view.current?'active':'')+'"><span>'+(!finished&&i===view.current?'<span class="on-turn">AT BOARD</span>':'')+esc(player.name)+
     (mode==='Killer'?' · #'+player.number+' · '+((player.marks[player.number]??0)===3?'Killer':(player.marks[player.number]??0)+'/3'):'')+
     (!player.active?' · Out':'')+(mode==='Cricket'?'<small class="marks">'+[15,16,17,18,19,20,25].map(n=>
       (n===25?'B':n)+' '+(player.marks[n]??0)+'/3').join(' · ')+'</small>':'')+
@@ -896,7 +812,7 @@ function game(){
     '<div class="rule">'+n+' · '+esc(view.owners[i]===null?'Open':view.players[view.owners[i]].name)+'</div>').join('')+'</div><br>';
   if(view.notice) html+=note(view.notice);
   if(view.skipped) html+=note(view.skipped+' recorded event(s) no longer fit after a correction. Open Corrections to review.');
-  if(!finished)html+='<div class="match-actions">'+button('menu','<span class="match-options-title">Match options</span><span class="match-options-subtitle">Pause or leave &nbsp; ›</span>','action match-options')+'</div>';
+  if(!finished)html+='<div class="match-actions">'+button('menu','<span class="match-options-title">⚙ &nbsp; MATCH OPTIONS</span><span class="match-options-subtitle">Pause · Resume · Leave match &nbsp; ›</span>','action match-options')+'</div>';
   return html;
 }
 function segment(){
@@ -1053,7 +969,7 @@ function showThrowFeedback(n,m){
   inner.className='throw-flash-inner';
   const lead=document.createElement('div');
   lead.className='throw-flash-label';
-  lead.textContent='Last dart';
+  lead.textContent='LAST DART';
   const hit=document.createElement('div');
   hit.className='throw-flash-hit';
   hit.textContent=Scoring.label(n,m);
