@@ -265,6 +265,168 @@ header{justify-content:space-between;gap:24px}
 
 /* Offline kiosk updater uses the same unobtrusive settings styling. */
 .update-status{font-size:clamp(14px,2vw,19px)!important;color:#d2d3d6!important;line-height:1.4!important}
+
+/* Portrait match layout — fill the display, keep the scoreboard dominant. */
+.console[data-view="game"] header{
+  min-height:clamp(48px,5.5dvh,88px);
+  padding:0 clamp(14px,2.5vw,28px);
+  gap:clamp(8px,2vw,22px);
+}
+.console[data-view="game"] .brand{font-size:clamp(15px,2vw,25px)}
+.console[data-view="game"] #match-context{font-size:clamp(11px,1.7vw,18px)}
+.console[data-view="game"] #match-heading{font-size:clamp(18px,2.6vw,29px)}
+.console[data-view="game"] main{
+  padding:clamp(10px,1.4dvh,24px) clamp(14px,2.3vw,28px) 16px;
+  display:flex;
+  flex-direction:column;
+  gap:clamp(8px,1dvh,16px);
+}
+.console[data-view="game"] .score-hero{
+  flex:0 0 auto;
+  height:clamp(360px,41.5dvh,850px);
+  min-height:0;
+  max-height:none;
+  width:100%;
+  margin:0;
+  padding:clamp(18px,2.8dvh,40px) clamp(12px,2vw,26px);
+  border-radius:9px;
+  background:#ededee;
+}
+.console[data-view="game"] .throwing-line{
+  gap:12px;
+  font-size:clamp(14px,1.8vw,22px);
+  letter-spacing:.07em;
+}
+.console[data-view="game"] .throwing-line strong{
+  font-size:clamp(22px,3.2vw,42px);
+  font-weight:750;
+  letter-spacing:-.035em;
+}
+.console[data-view="game"] .big-score{
+  width:100%;
+  max-width:100%;
+  flex:1 1 auto;
+  min-height:0;
+  overflow:visible;
+  margin:0;
+  line-height:.9;
+  font-weight:800;
+  letter-spacing:-.075em;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+.console[data-view="game"] .caption{
+  font-size:clamp(12px,1.55vw,19px);
+  letter-spacing:.13em;
+  padding:0;
+}
+.console[data-view="game"] .turn-header{
+  flex:0 0 auto;
+  margin:0;
+  padding:3px 3px 0;
+  font-size:clamp(15px,1.85vw,23px);
+}
+.console[data-view="game"] .turn-header strong{
+  font-size:clamp(27px,4vw,49px);
+  line-height:1;
+}
+.console[data-view="game"] .dart-slots{
+  flex:0 0 auto;
+  width:100%;
+  gap:clamp(8px,1.2vw,16px);
+  margin:0;
+}
+.console[data-view="game"] .dart-slot{
+  min-height:clamp(120px,14.8dvh,285px);
+  padding:clamp(12px,1.8dvh,26px) 6px;
+  gap:clamp(10px,1.6dvh,22px);
+  background:#232529;
+  border:1px solid #5b5d63;
+  border-radius:9px;
+}
+.console[data-view="game"] .dart-slot small{
+  font-size:clamp(13px,1.8vw,22px);
+  letter-spacing:.09em;
+}
+.console[data-view="game"] .dart-slot span{
+  font-size:clamp(44px,7.6vw,100px);
+  line-height:1;
+}
+.console[data-view="game"] .dart-slot.recorded{
+  background:#ededee;
+  color:#17181b;
+  border-color:#ededee;
+}
+.console[data-view="game"] .dart-slot.ready{background:#292b30}
+.console[data-view="game"] .standings{
+  flex:0 0 auto;
+  padding:clamp(10px,1.3dvh,18px) clamp(12px,1.8vw,22px);
+  margin:0;
+  background:#1c1e22;
+  border:1px solid #34363a;
+  border-radius:9px;
+}
+.console[data-view="game"] .standings h2{
+  margin:0 0 10px;
+  font-size:clamp(13px,1.7vw,20px);
+  font-weight:650;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+}
+.console[data-view="game"] .standings .score-row{
+  min-height:clamp(42px,4.5dvh,78px);
+  padding:8px 12px;
+  font-size:clamp(19px,2.5vw,31px);
+}
+.console[data-view="game"] .standings .score-row strong{
+  font-size:clamp(27px,3.7vw,45px);
+  font-variant-numeric:tabular-nums;
+}
+.console[data-view="game"] .match-actions{
+  flex:0 0 auto;
+  display:block;
+  margin:0;
+}
+.console[data-view="game"] .match-actions .match-options{
+  min-height:clamp(44px,5dvh,76px);
+  padding:10px clamp(12px,1.7vw,22px);
+  border-color:#42454b;
+  background:#1c1e22;
+}
+.console[data-view="game"] .match-options-title{
+  font-size:clamp(15px,1.9vw,23px);
+  font-weight:650;
+}
+.console[data-view="game"] .match-options-subtitle{
+  font-size:clamp(11px,1.5vw,18px);
+}
+.console[data-view="game"] .checkout-inline-label{
+  flex:0 0 auto;
+  margin:2px 2px 0;
+}
+.console[data-view="game"] footer{
+  min-height:clamp(68px,7.5dvh,125px);
+  padding:0 clamp(8px,1.5vw,20px);
+}
+.console[data-view="game"] .softkey{
+  min-height:clamp(62px,7dvh,112px);
+  font-size:clamp(16px,2.2vw,25px);
+}
+.console[data-view="game"] .softkey small{
+  font-size:clamp(10px,1.3vw,16px);
+}
+.console[data-view="game"] .encoder-hint{
+  font-size:clamp(12px,1.5vw,19px);
+}
+.console[data-view="game"] .encoder-hint small{
+  font-size:clamp(10px,1.2vw,16px);
+}
+/* Short landscape/desktop windows retain a scrollable match, not clipped controls. */
+@media(max-height:850px) and (min-aspect-ratio:3/4){
+  .console[data-view="game"] .score-hero{height:clamp(275px,47dvh,530px)}
+  .console[data-view="game"] .dart-slot{min-height:100px}
+}
+
 </style>
 </head>
 <body>
@@ -870,24 +1032,29 @@ function fitMainScore(){
   const number=document.querySelector('.console[data-view="game"] .big-score');
   const card=number?.closest('.score-hero');
   if(!number||!card)return;
-  // Fit the digits to the card rather than sizing them from viewport width.
-  const content=number.textContent.trim();
-  const family=getComputedStyle(number).fontFamily;
-  const weight=getComputedStyle(number).fontWeight;
-  const spacingFactor=content.length>3||/\\D/.test(content)?-.045:-.075;
-  const availableWidth=Math.max(120,card.clientWidth-24)*.95;
-  const availableHeight=card.clientHeight*.74;
+  const text=number.textContent.trim();
+  const style=getComputedStyle(number);
   const ctx=document.createElement('canvas').getContext('2d');
-  if(!ctx)return;
-  let lo=40,hi=Math.min(650,availableHeight*1.35);
-  for(let i=0;i<20;i++){
-    const mid=(lo+hi)/2;
-    ctx.font=weight+' '+mid+'px '+family;
-    const textWidth=ctx.measureText(content).width+spacingFactor*mid*Math.max(0,content.length-1);
-    if(textWidth<=availableWidth&&mid*.98<=availableHeight)lo=mid;
-    else hi=mid;
+  if(!ctx||!text)return;
+
+  // The number must fill the *width* of the scorecard, not be capped by
+  // an undersized fixed card height. Keep a small safety margin for glyphs.
+  const availableWidth=Math.max(80,card.clientWidth-24)*.97;
+  const heading=card.querySelector('.throwing-line');
+  const caption=card.querySelector('.caption');
+  const verticalSpace=Math.max(60,card.clientHeight-(heading?.offsetHeight||0)-
+    (caption?.offsetHeight||0)-32);
+  const heightLimit=verticalSpace*.91;
+  const letterSpacing=text.length>3||/[^0-9]/.test(text)?-.045:-.075;
+  let low=32,high=1100;
+  for(let i=0;i<24;i++){
+    const size=(low+high)/2;
+    ctx.font=style.fontWeight+' '+size+'px '+style.fontFamily;
+    const width=ctx.measureText(text).width+letterSpacing*size*Math.max(0,text.length-1);
+    if(width<=availableWidth&&size*.96<=heightLimit)low=size;
+    else high=size;
   }
-  number.style.fontSize=lo.toFixed(1)+'px';
+  number.style.fontSize=low.toFixed(1)+'px';
 }
 window.addEventListener('resize',fitMainScore);
 
