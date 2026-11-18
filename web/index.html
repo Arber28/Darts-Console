@@ -919,11 +919,18 @@ async function startSoftwareUpdate(){
     if(!response.ok)throw new Error(payload.error||'The update service is unavailable');
     state.updateInfo='Checking GitHub for the latest version…';
     render();
+    const requestedAt=Math.floor(Date.now()/1000);
+    let attempts=0;
     const poll=async ()=>{
       try{
+        if(++attempts>75)throw Error('Update status timed out; check the service logs');
         const result=await fetch('/api/update/status',{cache:'no-store'});
         if(!result.ok)throw Error('Cannot read update status');
         const status=await result.json();
+        if(status.updated_at && status.updated_at<requestedAt-2){
+          setTimeout(poll,1200);
+          return;
+        }
         const stage=status.state||'starting';
         state.updateInfo=status.message||stage;
         if(['updated','up-to-date','error'].includes(stage)){
