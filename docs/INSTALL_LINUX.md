@@ -1,69 +1,49 @@
 # Linux setup
 
-The old laptop will run Debian with a portrait display and start the Darts Console automatically. Wi-Fi won't be available where the board is installed, so everything must work offline after setup.
+The current target is a Lenovo 80SV with Debian 13.7 AMD64, Intel HD Graphics 620, 8 GB of RAM, a 128 GB SATA SSD and a 1920×1080 internal eDP panel mounted in portrait. The existing installation and SSH service are sufficient.
 
-## Downloads
+## Install and start the kiosk
 
-- [Debian installer](https://www.debian.org/distrib/)
-- [Debian installation guide](https://www.debian.org/releases/stable/installmanual)
-- [Debian Wiki](https://wiki.debian.org/)
-- [Debian packages](https://packages.debian.org/stable/)
-- [CircuitPython for Raspberry Pi Pico](https://circuitpython.org/board/raspberry_pi_pico/)
-- [Adafruit USB HID library](https://github.com/adafruit/Adafruit_CircuitPython_HID)
+1. Keep a working SSH session or a second virtual terminal available. Run the package install as root.
 
-## Before installation
+   ```sh
+   apt-get update
+   apt-get install --no-install-recommends sway chromium dbus-user-session v4l-utils fonts-dejavu-core
+   ```
 
-Check the laptop model and USB ports, choose a compatible internal drive and prepare a bootable Debian USB stick. Keep a keyboard available for setup. Internet access is useful during installation; it shouldn't be required afterward.
+2. Copy this repository or its `web` and `deploy` directories to the laptop. Run the installer as root from a shell you control.
 
-## Setup order
+   ```sh
+   sh deploy/install-kiosk.sh
+   ```
 
-1. Install the current Debian stable release from the official installer.
-2. Set up a lightweight graphical session and a browser for the interface. Exact packages will depend on the laptop.
-3. Rotate the display by 90 degrees in the graphical settings and check the resolution.
-4. Open `web/index.html` locally to test the interface.
-5. Install CircuitPython and the HID library on the Pico, then copy over `firmware/code.py`.
-6. Test the encoder and all four buttons with the laptop.
-7. Check the USB cameras one by one, then all three at once. Add a powered hub if USB power or bandwidth becomes a problem.
-8. Once camera detection and scoring work, configure the interface to start automatically after boot.
-9. Disconnect from the network and test a full restart.
+3. From SSH or a different virtual terminal, activate the display session.
 
-There is no final kiosk service configuration yet. Choose the startup method after confirming whether the system uses X11 or Wayland.
+   ```sh
+   systemctl restart getty@tty1
+   ```
 
-## Useful commands
+The installer enables the loopback web server on port 8765 and configures tty1 to launch Sway as the dedicated `darts-kiosk` user. Sway runs Chromium fullscreen. A wrapper restarts the browser process after it exits. systemd restarts tty1 when the compositor exits and restarts the web server when it exits. Chromium keeps match state under `/var/lib/darts-kiosk/.config/darts-chromium/`. Keep this profile directory when updating or backing up the console.
 
-```bash
-# CPU architecture
-uname -m
+To update, rerun the installer with the new source and restart tty1. The installer preserves an existing `/etc/darts-console/sway.conf`.
 
-# Connected USB devices
-lsusb
+## Portrait orientation
 
-# Available drives
-lsblk
+The default rotates `eDP-1` by 90°. If the image is inverted relative to the mount, set `transform 270` instead in `/etc/darts-console/sway.conf` and restart tty1. On a different laptop, check the connected output under `/sys/class/drm/` and update the output name.
 
-# Video devices (requires v4l-utils)
-v4l2-ctl --list-devices
+## Verify
 
-# Recent kernel messages
-dmesg | tail -n 50
+```sh
+systemctl is-active ssh darts-web getty@tty1
+loginctl list-sessions
+journalctl -b -u getty@tty1 -u darts-web
+sh tests/kiosk-smoke.sh
 ```
 
-## Button mapping
+The smoke test runs headless Chromium within its own network namespace. Only loopback is available inside that namespace. At the physical console, verify the image is upright, the whole display is filled, and all Pico controls work. Then test restarting without Ethernet and Wi-Fi from the laptop itself. Keep SSH or a second terminal available when testing crash recovery.
 
-| Control | Keyboard input |
-|---|---|
-| Encoder clockwise / counterclockwise | Arrow Down / Arrow Up |
-| Encoder press | Enter |
-| Back | Escape |
-| Undo | F4 |
-| Correct | F2 |
-| Next | F5 |
+To restore the tty1 login prompt, move the dedicated drop-in `/etc/systemd/system/getty@tty1.service.d/darts-console.conf` out of that directory, run `systemctl daemon-reload`, and restart tty1. Disable `darts-web.service` if the web server is no longer needed.
 
-The interface demo reacts to these inputs. Actual scoring, Undo and turn advancement still need to be implemented.
+## Pico controls
 
-## Open hardware details
-
-- Laptop display connection and graphics driver
-- Storage drive model and capacity
-- Camera module dimensions and Linux compatibility
-- Detection engine and its performance with three cameras
+Flash [CircuitPython](https://circuitpython.org/board/raspberry_pi_pico/), install `adafruit_hid` to `CIRCUITPY/lib/`, then copy [the firmware](../firmware/code.py) to `CIRCUITPY/code.py`. The device maps rotation, OK, Back, Undo, Correct and Next to arrow keys, Enter, Escape, F4, F2 and F5. See [Wiring](WIRING.md) for pins and [Camera detection](DETECTION.md) for the camera bench procedure.

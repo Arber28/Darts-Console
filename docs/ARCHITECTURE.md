@@ -55,17 +55,29 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    CAM["Three camera feeds"] --> DET["Hit detection"]
-    DET --> SEG["Board segment"]
-    SEG --> RULES["Game rules"]
-    RULES --> STATE["Scores and throw history"]
-    STATE --> UI["Console interface"]
-    KEYS["Pico controls"] --> UI
-    UI -->|"Corrections"| STATE
+    CAM["Three USB cameras"] --> DET["OpenCV calibration and bench detector"]
+    DET --> OUT["Local JSON candidate stream"]
+    KEYS["Pico USB keyboard input"] --> UI["Chromium kiosk"]
+    UI -->|Manual throws and corrections| LOG["Match event log"]
+    LOG --> RULES["Scoring replay"]
+    RULES --> UI
+    LOG --> STORE["Chromium local storage"]
+    STORE --> LOG
 ```
 
-This is the intended software flow, not a working camera pipeline. The detection engine, camera calibration, scoring history and correction logic still need to be implemented.
+Each event identifies the player, round and dart slot. Corrections replay the log. Events that no longer fit after a correction are visible in the history as skipped. The camera stream remains independent during hardware validation.
 
+## Startup
+
+```mermaid
+flowchart LR
+    SYSTEMD["systemd"] --> WEB["Loopback web server"]
+    SYSTEMD --> TTY["tty1 kiosk session"]
+    TTY --> SWAY["Sway, portrait Wayland output"]
+    SWAY --> WATCH["Browser launcher"]
+    WATCH --> CHROME["Chromium fullscreen"]
+    CHROME --> WEB
+```
 ## Power
 
 ```mermaid

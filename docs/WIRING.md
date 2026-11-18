@@ -47,4 +47,4 @@ The Pico connects to the laptop using USB. The LED strip and its separate dimmer
 
 ## Software mapping
 
-The key codes are defined in [firmware/code.py](../firmware/code.py) and handled by [web/index.html](../web/index.html). Undo and Next are wired and recognized, but the scoring actions behind them are not implemented yet.
+The key codes are defined in [firmware/code.py](../firmware/code.py) and handled by [web/index.html](../web/index.html). Undo removes the latest accepted throw and restores its turn. Next ends the current turn. Correct opens the recorded-throw list.

@@ -1,6 +1,6 @@
 # Game rules
 
-These are the rules planned for the console. They're written down here so the scoring logic has a clear reference. Game modes are not playable in the current interface demo.
+These are the rules planned for the console. The scoring engine uses the rules below. The final section records choices for gaps in the original rules.
 
 Each player gets up to three darts per turn. Every game will need a way to correct a missed or incorrectly detected hit, including corrections to earlier turns.
 
@@ -118,6 +118,10 @@ The nine target numbers still need to be fixed.
 - Each game has its own scoring view.
 - Undo and manual correction must work across busts, eliminations and game-ending throws.
 
-## Games to build first
+## Console choices for open rules
 
-Start with 301/501/701, High Score and Around the Clock. Add Cricket, Shanghai and the remaining modes once throw history and corrections work.
+- For Killer, choose random or manual unique number assignment and whether hitting your own number as an active killer costs lives. Eliminated targets are ignored.
+- Tied leaders share the result in fixed-round games, including Shanghai. A dedicated Shanghai tie-break remains open.
+- Bermuda Triangle uses the ordered sequence supplied during setup. Each round can select a number, bull or any target, with an optional required multiplier. Valid hits score face value and a round without any valid hit halves the total, rounded down.
+- Tic-Tac-Toe uses a grid of nine distinct numbers supplied during setup. The two entries can represent individuals or teams. A filled grid without a winning line is a draw.
+- Ending a turn early skips unused dart slots. A correction that changes a turn boundary can invalidate later recorded events. The console flags those events and keeps them visible for review.

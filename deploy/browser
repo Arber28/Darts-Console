@@ -1,0 +1,26 @@
+#!/bin/sh
+set -eu
+
+# A launcher belongs to exactly one compositor session.
+# Older sessions must never open windows in a newer Chromium instance.
+exec 9>"$XDG_RUNTIME_DIR/darts-browser.lock"
+flock -n 9 || exit 0
+session_alive() {
+    swaymsg -t get_version >/dev/null 2>&1
+}
+session_alive || exit 0
+
+# Wait for the loopback server before creating the window.
+until python3 -c 'import urllib.request; urllib.request.urlopen("http://127.0.0.1:8765/", timeout=2).close()' 2>/dev/null; do
+    session_alive || exit 0
+    sleep 1
+done
+
+while session_alive; do
+    chromium --ozone-platform=wayland --kiosk --no-first-run \
+        --no-default-browser-check --disable-session-crashed-bubble \
+        --disable-background-networking --disable-sync --disable-pinch \
+        --user-data-dir="$HOME/.config/darts-chromium" \
+        'http://127.0.0.1:8765/?kiosk' || true
+    sleep 2
+done
