@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Update only the two web assets, never local profiles, browser data or OS."""
-import hashlib
+import base64
 import json
 import os
 import shutil
@@ -13,6 +13,8 @@ from pathlib import Path
 TARGET = Path("/opt/darts-console/web")
 STATUS = Path("/var/lib/darts-kiosk/update-status.json")
 BASE = "https://raw.githubusercontent.com/Arber28/Darts-Console/main/web/"
+API = "https://api.github.com/repos/Arber28/Darts-Console/contents/web/"
+TOKEN_FILE = Path("/etc/darts-console/github-token")
 FILES = ("index.html", "scoring.js")
 MAX_BYTES = 2 * 1024 * 1024
 
@@ -26,11 +28,36 @@ def publish(state, message):
     os.replace(tmp, STATUS)
 
 def download(name):
-    request = urllib.request.Request(BASE + name, headers={"User-Agent": "DartsConsole-Updater/1"})
-    with urllib.request.urlopen(request, timeout=20) as response:
-        if response.status != 200:
-            raise RuntimeError("GitHub returned HTTP " + str(response.status))
-        data = response.read(MAX_BYTES + 1)
+    headers = {"User-Agent": "DartsConsole-Updater/1"}
+    if TOKEN_FILE.is_file():
+        token = TOKEN_FILE.read_text(encoding="utf-8").strip()
+        if not token:
+            raise RuntimeError("GitHub token file is empty")
+        headers.update({"Authorization": "Bearer " + token,
+                        "Accept": "application/vnd.github+json",
+                        "X-GitHub-Api-Version": "2022-11-28"})
+        request = urllib.request.Request(API + name + "?ref=main", headers=headers)
+    else:
+        request = urllib.request.Request(BASE + name, headers=headers)
+    try:
+        with urllib.request.urlopen(request, timeout=20) as response:
+            if response.status != 200:
+                raise RuntimeError("GitHub returned HTTP " + str(response.status))
+            raw = response.read(MAX_BYTES + 1)
+    except urllib.error.HTTPError as error:
+        if error.code in (401, 403, 404):
+            raise RuntimeError("GitHub access denied. Configure a read-only token in /etc/darts-console/github-token.") from None
+        raise
+    if len(raw) > MAX_BYTES:
+        raise RuntimeError("GitHub response is too large")
+    if TOKEN_FILE.is_file():
+        try:
+            payload = json.loads(raw)
+            data = base64.b64decode(payload["content"], validate=False)
+        except (ValueError, KeyError, TypeError) as error:
+            raise RuntimeError("Invalid response from GitHub API") from error
+    else:
+        data = raw
     if len(data) > MAX_BYTES:
         raise RuntimeError("GitHub file is too large")
     if name == "index.html" and not (data.startswith(b"<!doctype html>") and b"</html>" in data):
