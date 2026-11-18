@@ -1,0 +1,14 @@
+[Unit]
+Description=Darts Console verified GitHub update
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/usr/bin/python3 /opt/darts-console/deploy/update-from-github.py
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectHome=yes
+ProtectSystem=strict
+ReadWritePaths=/opt/darts-console/web /var/lib/darts-kiosk
