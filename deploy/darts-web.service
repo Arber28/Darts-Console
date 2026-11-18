@@ -4,7 +4,7 @@ Description=Darts Console local web server
 [Service]
 User=darts-kiosk
 WorkingDirectory=/opt/darts-console/web
-ExecStart=/usr/bin/python3 -m http.server 8765 --bind 127.0.0.1
+ExecStart=/usr/bin/python3 /opt/darts-console/deploy/api-server.py
 Restart=always
 RestartSec=2
 NoNewPrivileges=yes
