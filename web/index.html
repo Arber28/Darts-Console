@@ -262,6 +262,9 @@ header{justify-content:space-between;gap:24px}
 .console[data-view="game"] .winner-actions .primary{margin:0}
 .console[data-view="game"] .winner-actions .winner-home{background:#24262b;color:#f4f4f4;border:1px solid #85878d;text-align:center;justify-content:center;min-height:clamp(60px,8vw,88px);font-size:clamp(17px,2.25vw,25px)}
 
+
+/* Offline kiosk updater uses the same unobtrusive settings styling. */
+.update-status{font-size:clamp(14px,2vw,19px)!important;color:#d2d3d6!important;line-height:1.4!important}
 </style>
 </head>
 <body>
@@ -318,7 +321,8 @@ try {
   console.warn('Unable to load console state',error);
 }
 const state={page:'play',filter:'quick',chosen:'501',players:['Arber','Emre'],
-  guests:[], cursor:0, message:'', out:data.out, rounds:10, bull:false, grid:[], sequence:[], numbers:{}, selfHit:null};
+  guests:[], cursor:0, message:'', out:data.out, rounds:10, bull:false, grid:[], sequence:[], numbers:{}, selfHit:null,
+  updateConfirm:false, updateBusy:false, updateInfo:'Requires an internet connection on this laptop.'};
 const main=document.getElementById('main');
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const currentMode=()=>modes.find(mode=>mode[0]===state.chosen);
@@ -886,6 +890,69 @@ function fitMainScore(){
   number.style.fontSize=lo.toFixed(1)+'px';
 }
 window.addEventListener('resize',fitMainScore);
+
+function updatePanel(){
+  let html=panel('Software update',
+    '<p>Install the latest version from the GitHub main branch. Saved matches and player profiles are preserved.</p>'+
+    '<p class="update-status" role="status">'+esc(state.updateInfo)+'</p>');
+  if(state.updateConfirm){
+    html+=button('update-confirm','Confirm installation','primary')+
+      button('update-cancel','Cancel');
+  } else {
+    html+=button('update-start',state.updateBusy?'Installing update…':'Update from GitHub',
+      'action',state.updateBusy);
+  }
+  return html;
+}
+async function startSoftwareUpdate(){
+  if(state.updateBusy)return;
+  state.updateConfirm=false;
+  state.updateBusy=true;
+  state.updateInfo='Contacting the local update service…';
+  render();
+  try{
+    const response=await fetch('/api/update/start',{
+      method:'POST',
+      headers:{'X-Darts-Update':'requested'}
+    });
+    const payload=await response.json();
+    if(!response.ok)throw new Error(payload.error||'The update service is unavailable');
+    state.updateInfo='Checking GitHub for the latest version…';
+    render();
+    const poll=async ()=>{
+      try{
+        const result=await fetch('/api/update/status',{cache:'no-store'});
+        if(!result.ok)throw Error('Cannot read update status');
+        const status=await result.json();
+        const stage=status.state||'starting';
+        state.updateInfo=status.message||stage;
+        if(['updated','up-to-date','error'].includes(stage)){
+          state.updateBusy=false;
+          if(stage==='updated'){
+            state.updateInfo='Installed successfully. Reloading the console…';
+            render();
+            setTimeout(()=>location.reload(),1300);
+            return;
+          }
+          render();
+          return;
+        }
+        render();
+        setTimeout(poll,1200);
+      }catch(error){
+        state.updateBusy=false;
+        state.updateInfo='Status check failed: '+error.message;
+        render();
+      }
+    };
+    setTimeout(poll,1100);
+  }catch(error){
+    state.updateBusy=false;
+    state.updateInfo='Update unavailable: '+error.message;
+    render();
+  }
+}
+
 function render(scroll=false){
   document.querySelector('.console').dataset.view=state.page;
   const matchPage=['game','menu','segment','correction'].includes(state.page);
@@ -910,7 +977,7 @@ function render(scroll=false){
     players:()=>title('PLAYER LIST','Players','Saved profiles')+panel('Profiles','<div class="players">'+data.profiles.map(name=>
       '<div class="player">'+esc(name)+'</div>').join('')+'</div>')+button('new-profile','Add player'),
     settings:()=>title('CONSOLE','Settings')+panel('Scoring',button('default-out','Default checkout <span>'+esc(data.out)+'</span>')+
-      '<p>Manual entry is available from the match screen.</p>')+button('about','About'),
+      '<p>Manual entry is available from the match screen.</p>')+updatePanel()+button('about','About'),
     about:()=>title('CONSOLE','About')+panel('Darts Console','<p>Offline darts scoring for a portrait display and Raspberry Pi Pico controls.</p>')};
   main.innerHTML=views[state.page]()+ (state.message?note(state.message):'');
   if(state.page==='game')fitMainScore();
@@ -1045,6 +1112,15 @@ function clickButton(b){
       return show('players');
     }
     case 'out':state.out=value;break;
+    case 'update-start':
+      if(state.updateBusy)return;
+      state.updateConfirm=true;
+      return render();
+    case 'update-cancel':
+      state.updateConfirm=false;
+      return render();
+    case 'update-confirm':
+      return startSoftwareUpdate();
     case 'default-out':
       data.out=Scoring.checkouts[(Scoring.checkouts.indexOf(data.out)+1)%3];
       state.out=data.out;save();break;
