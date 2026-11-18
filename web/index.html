@@ -427,6 +427,31 @@ header{justify-content:space-between;gap:24px}
   .console[data-view="game"] .dart-slot{min-height:100px}
 }
 
+
+/* Encoder focus: one selected control, with a distinct outline.
+   A free dart is the next action, but its standby border is NOT focus. */
+.console[data-view="game"] .dart-slot.ready{
+  border:1px solid #686b72;
+  background:#24262a;
+}
+.console[data-view="game"] button[data-nav].focused,
+.console[data-view="game"] button[data-nav]:focus-visible{
+  outline:4px solid #fff!important;
+  outline-offset:-5px!important;
+  box-shadow:0 0 0 2px #111214!important;
+  position:relative;
+  z-index:2;
+}
+.console[data-view="game"] .dart-slot.recorded.focused,
+.console[data-view="game"] .dart-slot.recorded:focus-visible{
+  outline-color:#161719!important;
+  box-shadow:inset 0 0 0 2px #fff!important;
+}
+.console[data-view="game"] .match-options.focused{
+  background:#36383d!important;
+  border-color:#fff!important;
+}
+
 </style>
 </head>
 <body>
@@ -500,8 +525,9 @@ function save(){
   catch {state.message='Storage unavailable. Progress is available until this page closes.'}
 }
 function show(page,withNav=false){
+  const changed=state.page!==page;
   state.page=page;
-  state.cursor=0;
+  if(changed)state.cursor=0;
   state.message='';
   render(true);
 }
@@ -1153,18 +1179,29 @@ function render(scroll=false){
     settings:()=>title('CONSOLE','Settings')+panel('Scoring',button('default-out','Default checkout <span>'+esc(data.out)+'</span>')+
       '<p>Manual entry is available from the match screen.</p>')+updatePanel()+button('about','About'),
     about:()=>title('CONSOLE','About')+panel('Darts Console','<p>Offline darts scoring for a portrait display and Raspberry Pi Pico controls.</p>')};
+  // Keep the encoder selection stable across redraws. A score update may
+  // disable the previously selected throw slot, so prefer the next free dart.
+  const previousAction=controls()[state.cursor]?.dataset.action;
   main.innerHTML=views[state.page]()+ (state.message?note(state.message):'');
   if(state.page==='game')fitMainScore();
-  if(state.page==='game')state.cursor=Math.max(0,controls().findIndex(b=>b.dataset.action==='throw'));
   renderFooter();
+  const available=controls();
+  const sameAction=previousAction && available.findIndex(b=>b.dataset.action===previousAction);
+  if(sameAction!==undefined && sameAction>=0){
+    state.cursor=sameAction;
+  }else if(state.page==='game'){
+    const nextDart=available.findIndex(b=>b.dataset.action==='throw');
+    state.cursor=nextDart>=0?nextDart:Math.min(state.cursor,available.length-1);
+  }
   highlight(scroll);
 }
 function controls(){return [...document.querySelectorAll('[data-nav]:not(:disabled)')].filter(b=>b.offsetParent)}
 function highlight(scroll){
   const available=controls();
-  state.cursor=Math.min(state.cursor,available.length-1);
+  state.cursor=available.length?Math.max(0,Math.min(state.cursor,available.length-1)):0;
+  document.querySelectorAll('button.focused').forEach(b=>b.classList.remove('focused'));
   available.forEach((b,i)=>b.classList.toggle('focused',i===state.cursor));
-  if(scroll) available[state.cursor]?.scrollIntoView({block:'nearest'});
+  if(scroll && available[state.cursor])available[state.cursor].scrollIntoView({block:'nearest'});
 }
 function shuffle(values){
   const result=[...values];
