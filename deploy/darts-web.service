@@ -7,7 +7,6 @@ WorkingDirectory=/opt/darts-console/web
 ExecStart=/usr/bin/python3 /opt/darts-console/deploy/api-server.py
 Restart=always
 RestartSec=2
-NoNewPrivileges=yes
 ProtectSystem=strict
 ProtectHome=yes
 
