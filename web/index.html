@@ -793,6 +793,31 @@ header{justify-content:space-between;gap:24px}
 .console[data-view="players"] .profile-row-stats small{
   color:#a6aab2;font-size:clamp(12px,1.8vw,18px);
 }
+
+/* 24 distinct avatars and 24 vivid colors (no white, black or gray color choices). */
+.profile-avatar{background:color-mix(in srgb,var(--profile-color) 16%,#202226);border-color:var(--profile-color);color:var(--profile-color)}
+.profile-avatar svg{width:61%;height:61%;flex:none}
+.profile-customize{max-width:940px;margin:auto;display:flex;flex-direction:column;gap:clamp(18px,2.6dvh,32px)}
+.profile-customize-top{display:flex;align-items:center;gap:clamp(14px,2.4vw,25px);min-width:0}
+.profile-customize-top>div{display:flex;flex-direction:column;gap:8px;min-width:0}
+.profile-customize-top strong{font-size:clamp(24px,4.2vw,42px);overflow-wrap:anywhere}
+.profile-customize-top small{color:#a9adb6;font-size:clamp(11px,1.7vw,17px);letter-spacing:.09em}
+.profile-preview-avatar{width:clamp(78px,13vw,128px);height:clamp(78px,13vw,128px);flex:none}
+.profile-customize-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:clamp(8px,1.5vw,16px)}
+.profile-customize-grid.icons{grid-template-columns:repeat(6,minmax(0,1fr))}
+.profile-option{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(6px,1dvh,12px);min-width:0;min-height:clamp(96px,13dvh,145px);padding:6px;background:#24262b;border:1px solid #40434a;border-radius:10px;color:#eef0f2}
+.profile-option-icon{display:grid;place-items:center;width:clamp(30px,5.4vw,57px);height:clamp(30px,5.4vw,57px);color:var(--icon-color,#e7e8ec)}
+.profile-option-icon svg{width:100%;height:100%}
+.profile-option small{font-size:clamp(9px,1.35vw,14px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;color:#c4c6cd}
+.profile-option.chosen,.profile-color-option.chosen{border:2px solid #f1f1f2;background:#34363c}
+.profile-color-option{display:grid;place-items:center;min-width:0;min-height:clamp(80px,11dvh,128px);background:#24262b;border:1px solid #464951;border-radius:10px;padding:clamp(8px,1.3vw,13px)}
+.profile-color-swatch{display:block;width:clamp(38px,7vw,76px);aspect-ratio:1;border-radius:50%;background:var(--swatch)}
+.profile-color-option.chosen .profile-color-swatch{box-shadow:0 0 0 3px #25272b,0 0 0 5px var(--swatch)}
+.match-profile-avatar,.match-profile-mini{display:inline-grid;place-items:center;background:color-mix(in srgb,var(--profile-color) 14%,transparent);border:1px solid var(--profile-color);border-radius:50%;color:var(--profile-color);vertical-align:middle;flex:none}
+.match-profile-avatar{width:clamp(35px,5vw,58px);height:clamp(35px,5vw,58px);margin-right:12px}
+.match-profile-mini{width:clamp(24px,3vw,34px);height:clamp(24px,3vw,34px);margin-right:10px}
+.match-profile-avatar svg,.match-profile-mini svg{width:67%;height:67%}
+@media(max-width:600px){.profile-customize-grid{gap:7px}.profile-option{min-height:87px}.profile-color-option{min-height:80px}}
 </style>
 </head>
 <body>
@@ -840,6 +865,11 @@ const modes=[
 ['Tic-Tac-Toe','Three in a row','grid',0,'TACTICAL','Claim three squares in a row by hitting target numbers.']
 ];
 if(new URLSearchParams(location.search).has('kiosk'))document.body.classList.add('kiosk');
+const profileIconOptions=[["Ninja","A","M5 10C5 5 8 3 12 3s7 2 7 7v9H5z M5 11h14 M7 14h10 M8 14l2 1 m6-1-2 1 M9 19h6"],["Samurai","A","M4 10 6 4l6 3 6-3 2 6-3 2H7z M6 13h12v5l-6 4-6-4z M8 16h8 M12 7v4"],["Ritter","A","M6 8h12l1 8-7 6-7-6z M12 2v12 M6 12h12 M9 17h6 M7 6l5-4 5 4"],["Wikinger","A","M6 10C3 10 2 7 2 5c3 2 5 2 7 4m9 1c3 0 4-3 4-5-3 2-5 2-7 4 M6 10h12v7l-6 5-6-5z M6 13h12 M9 16h6"],["Gladiator","A","m4 12 8-9 8 9-2 8H6z M7 12h10 M12 7v13 M9 15h6 M6 20h12"],["Assassin","A","M12 2 3 12l3 9h12l3-9z M7 14l5 2 5-2 M9 18h6 M6 11l6-3 6 3"],["Magier","A","m12 2 8 15H4z M6 17h12v4H6z M12 6v6m-3-3h6 M3 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1z"],["Soldat","A","M3 12a9 9 0 0 1 18 0H3z M7 12v6l5 4 5-4v-6 M8 16h8 M12 4v5"],["Schädel","B","M12 2a9 9 0 0 0-9 9c0 4 2 6 5 7v4h8v-4c3-1 5-3 5-7a9 9 0 0 0-9-9z M7 11l3 2-3 1zm10 0-3 2 3 1z M10 17h4m-2 0v4"],["Dämon","B","M6 9 3 2l8 5m7 2 3-7-8 5 M5 10l7-3 7 3v7l-7 5-7-5z M8 13l3 2m5-2-3 2 M10 18h4"],["Geist","B","M4 11a8 8 0 0 1 16 0v11l-4-3-4 3-4-3-4 3z M8 12h1m6 0h1 M9 16q3 2 6 0"],["Joker","B","M4 8 2 2l7 4 3-5 3 5 7-4-2 6v8l-8 6-8-6z M8 12h2m4 0h2 M8 16q4 4 8 0"],["Kapuze","B","M12 2C7 4 4 8 4 14l3 7h10l3-7c0-6-3-10-8-12z M7 13q5-7 10 0l-2 6H9z M10 15h4"],["Cyborg","B","M5 5h14v14H5z M9 2v3m6-3v3 M9 19v3m6-3v3 M2 9h3m-3 6h3m14-6h3m-3 6h3 M8 11h3v3H8zm8-1v5 M9 17h6"],["Alien","B","M12 2C6 2 3 7 3 13c0 5 5 9 9 9s9-4 9-9c0-6-3-11-9-11z M5 12l6 1-3 4z M19 12l-6 1 3 4z M10 19h4"],["Teufel","B","M5 9 3 2l7 5m9 2 2-7-7 5 M5 10q7-7 14 0v8l-7 4-7-4z M8 13h2m4 0h2 M10 18l2 1 2-1"],["Krone","C","m2 7 5 5 5-9 5 9 5-5-2 13H4z M5 17h14"],["Blitz","C","M14 2 4 14h7l-1 8 10-13h-7z"],["Flamme","C","M12 22c5 0 8-4 8-9 0-4-3-7-6-11 1 5-2 6-3 7C10 6 9 5 8 4 7 9 4 11 4 15c0 4 3 7 8 7z M12 21c-3-2-2-5 0-8 0 3 3 4 2 6"],["Zielscheibe","C","M12 2a10 10 0 1 0 0 20a10 10 0 1 0 0-20 M12 6a6 6 0 1 0 0 12a6 6 0 1 0 0-12 M12 10a2 2 0 1 0 0 4a2 2 0 1 0 0-4"],["Dart","C","m4 20 13-13 M15 3l6-1-2 6-4-5z M4 20l-2 2 1-6 M10 10l4 4 M17 7l-2 5"],["Schild","C","M12 2 21 6v6c0 6-4 9-9 10-5-1-9-4-9-10V6z M12 6v12m-5-6h10"],["Stern","C","m12 2 3.1 6.5 7.1 1-5.1 5 .9 7-6-3.3-6 3.3.9-7-5.1-5 7.1-1z"],["Pokal","C","M8 21h8 M12 17v4 M7 4h10v6a5 5 0 0 1-10 0V4z M7 6H4v3a4 4 0 0 0 4 4 M17 6h3v3a4 4 0 0 1-4 4"]];
+const profileColorOptions=["#F04452","#F26B38","#F39A29","#E6BA24","#B5CE35","#70CE35","#25C97B","#1CCFA9","#22B5C8","#2A94E8","#4568F0","#6854EF","#9148E8","#C348D8","#E44BA6","#ED4779","#DA6337","#B58A1F","#75AD27","#25B88A","#1F8FC3","#5466D8","#A24DB6","#D54C62"];
+function profileAppearance(name){const a=data.profileAppearance?.[name]||{};const i=Number.isInteger(a.icon)?a.icon:Math.max(0,data.profiles.indexOf(name))%profileIconOptions.length;const c=Number.isInteger(a.color)?a.color:Math.max(0,data.profiles.indexOf(name))%profileColorOptions.length;return {icon:Math.max(0,Math.min(23,i)),color:Math.max(0,Math.min(23,c))}}
+function profileIconSvg(index){const entry=profileIconOptions[index]||profileIconOptions[0];return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="'+entry[2]+'"/></svg>'}
+function profileBadge(name,cls='profile-avatar'){const a=profileAppearance(name);return '<span class="'+cls+'" style="--profile-color:'+profileColorOptions[a.color]+'">'+profileIconSvg(a.icon)+'</span>'}
 const defaults=['Emre','Arber','Adnan','Atakan','Amir','Ali'];
 const storage='darts-console-v1';
 let data={profiles:defaults, matches:[], active:null, unfinished:{}, out:'Double Out'};
@@ -851,7 +881,7 @@ try {
 }
 const state={page:'home',filter:'quick',chosen:'501',players:['Arber','Emre'],
   guests:[], cursor:0, message:'', out:data.out, rounds:10, bull:false, grid:[], sequence:[], numbers:{}, selfHit:null,
-  selectedProfile:0, editOriginal:null, updateConfirm:false, updateBusy:false, updateInfo:'Requires an internet connection on this laptop.'};
+  selectedProfile:0, editOriginal:null, editIcon:0, editColor:0, updateConfirm:false, updateBusy:false, updateInfo:'Requires an internet connection on this laptop.'};
 const main=document.getElementById('main');
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const currentMode=()=>modes.find(mode=>mode[0]===state.chosen);
@@ -888,7 +918,7 @@ ensureMatchNumbers();
 function show(page,withNav=false){
   const changed=state.page!==page;
   state.page=page;
-  if(changed)state.cursor=page==='players'?state.selectedProfile:0;
+  if(changed)state.cursor=page==='players'?state.selectedProfile:page==='profile-icons'?state.editIcon:page==='profile-colors'?state.editColor:0;
   state.message='';
   // Info pages place their action button at the bottom. Do not let
   // keyboard selection scroll past the heading on initial entry.
@@ -1002,12 +1032,15 @@ function adjacentInfoMode(direction){
 function selectedProfileName(){return data.profiles[state.selectedProfile]||null}
 function newPlayer(){
   state.editOriginal=null;state.name='';
+  state.editIcon=data.profiles.length%24;state.editColor=data.profiles.length%24;
   show('profile');
 }
 function editPlayer(){
   const name=selectedProfileName();
   if(!name)return;
   state.editOriginal=name;state.name=name;
+  const appearance=profileAppearance(name);
+  state.editIcon=appearance.icon;state.editColor=appearance.color;
   show('profile');
 }
 function confirmPlayerDeletion(){
@@ -1018,6 +1051,7 @@ function deletePlayerProfile(){
   const name=selectedProfileName();
   if(!name)return show('players');
   data.profiles=data.profiles.filter(n=>n!==name);
+  if(data.profileAppearance)delete data.profileAppearance[name];
   state.players=state.players.filter(n=>n!==name);
   // Completed matches are intentionally retained: deleting a profile is not deleting match history.
   state.selectedProfile=Math.min(state.selectedProfile,Math.max(0,data.profiles.length-1));
@@ -1039,6 +1073,16 @@ function shortcuts(){
     ['Escape','Back',()=>show('players')],
     ['F4','Löschen',()=>{state.name=state.name.slice(0,-1);render(false)}],
     ['F2','Leerzeichen',()=>{if(state.name.length<24)state.name+=' ';render(false)}],
+    ['F5','Weiter',()=>show('profile-icons')]
+  ];
+  if(state.page==='profile-icons')return [
+    ['Escape','Back',()=>show('profile')],
+    ['F4','',()=>{}],['F2','',()=>{}],
+    ['F5','Weiter',()=>show('profile-colors')]
+  ];
+  if(state.page==='profile-colors')return [
+    ['Escape','Back',()=>show('profile-icons')],
+    ['F4','',()=>{}],['F2','',()=>{}],
     ['F5','Speichern',savePlayerProfile]
   ];
   if(state.page==='stats-match-detail')return [
@@ -1111,13 +1155,13 @@ function runShortcut(key){
   shortcuts().find(item=>item[0]===key)?.[2]();
 }
 function renderFooter(){
-  if(['players','profile','player-delete'].includes(state.page)){
+  if(['players','profile','profile-icons','profile-colors','player-delete'].includes(state.page)){
     const labels=shortcuts().map(([key,label])=>label
       ?'<button class="softkey library-key" data-shortcut="'+key+'"><span>'+esc(label.toUpperCase())+'</span></button>'
       :'<span class="stats-empty-softkey" aria-hidden="true"></span>');
     labels.splice(2,0,'<div class="home-encoder" aria-hidden="true"><svg viewBox="0 0 60 60">'+
       '<circle cx="30" cy="30" r="23" fill="none" stroke="#fff" stroke-width="2.8"/>'+
-      (state.page==='players'||state.page==='profile'?'<circle cx="30" cy="30" r="8" fill="#fff"/>':'')+
+      (['players','profile','profile-icons','profile-colors'].includes(state.page)?'<circle cx="30" cy="30" r="8" fill="#fff"/>':'')+
       '</svg></div>');
     document.querySelector('footer').innerHTML=labels.join('');
     return;
@@ -1173,7 +1217,7 @@ function setup(){
   const selected=state.players;
   let html=title('MATCH SETUP',mode[0],'Player order is randomized at the start.');
   html+=panel('Players · '+selected.length+' selected','<div class="players">'+
-    [...data.profiles,...state.guests].map(name=>button('player:'+name,esc(name)+'<span>'+
+    [...data.profiles,...state.guests].map(name=>button('player:'+name,profileBadge(name,'match-profile-mini')+esc(name)+'<span>'+
       (selected.includes(name)?'✓':'+')+'</span>','player '+(selected.includes(name)?'checked':''))).join('')+
     '</div><br>'+button('guest','Add guest <span>＋</span>'));
   if(mode[3]) html+=panel('Checkout','<div class="rules">'+Scoring.checkouts.map(out=>
@@ -1551,7 +1595,7 @@ function game(){
     const darts=view.darts;
     const turnTotal=darts.reduce((sum,d)=>sum+d.n*d.m,0);
     const roundHistory=view.history.filter(d=>d.player===view.current&&d.round===view.round);
-    html+='<div class="score-hero"><div class="throwing-line"><span>NOW THROWING:</span><strong>'+esc(p.name)+
+    html+='<div class="score-hero"><div class="throwing-line"><span>NOW THROWING:</span><strong>'+profileBadge(p.name,'match-profile-avatar')+esc(p.name)+
       '</strong></div><div class="big-score'+(typeof value==='string'?' word-score':'')+'">'+esc(value)+
       '</div><div class="caption">'+unit+'</div></div>';
     html+='<div class="turn-header"><span>THIS TURN · '+darts.length+'/3 DARTS</span><span>TOTAL <strong>'+turnTotal+'</strong></span></div>';
@@ -1571,7 +1615,7 @@ function game(){
     }).join('')+'</div>';
   }
   html+='<section class="panel standings"><h2>Standings</h2>'+view.players.map((player,i)=>
-    '<div class="score-row '+(!finished&&i===view.current?'active':'')+'"><span>'+(!finished&&i===view.current?'<span class="on-turn">AT BOARD</span>':'')+esc(player.name)+
+    '<div class="score-row '+(!finished&&i===view.current?'active':'')+'"><span>'+(!finished&&i===view.current?'<span class="on-turn">AT BOARD</span>':'')+profileBadge(player.name,'match-profile-mini')+esc(player.name)+
     (mode==='Killer'?' · #'+player.number+' · '+((player.marks[player.number]??0)===3?'Killer':(player.marks[player.number]??0)+'/3'):'')+
     (!player.active?' · Out':'')+(mode==='Cricket'?'<small class="marks">'+[15,16,17,18,19,20,25].map(n=>
       (n===25?'B':n)+' '+(player.marks[n]??0)+'/3').join(' · ')+'</small>':'')+
@@ -1822,8 +1866,10 @@ function savePlayerProfile(){
   if(!name)return say('Bitte einen Namen eingeben.');
   if([...data.profiles,...state.guests].some(n=>n!==state.editOriginal&&n.toLowerCase()===name.toLowerCase()))
     return say('Diesen Spielernamen gibt es schon.');
+  data.profileAppearance=data.profileAppearance||{};
   if(state.editOriginal!==null){
     const before=state.editOriginal;
+    if(before!==name)delete data.profileAppearance[before];
     const index=data.profiles.indexOf(before);
     if(index<0)return show('players');
     data.profiles[index]=name;
@@ -1840,6 +1886,7 @@ function savePlayerProfile(){
     data.profiles.push(name);
     state.selectedProfile=data.profiles.length-1;
   }
+  data.profileAppearance[name]={icon:state.editIcon,color:state.editColor};
   state.editOriginal=null;save();
   show('players');
 }
@@ -1849,9 +1896,8 @@ function playersManager(){
   const rows=data.profiles.map((name,i)=>{
     const p=lookup.get(name);
     const played=p?.played||0,wins=p?.wins||0;
-    const initial=name.trim().slice(0,1).toUpperCase();
     return '<button data-nav data-action="select-profile:'+i+'" class="profile-row '+(state.selectedProfile===i?'chosen':'')+'">'+
-      '<span class="profile-avatar">'+esc(initial)+'</span>'+
+      profileBadge(name)+
       '<span class="profile-identity"><strong>'+esc(name.toLocaleUpperCase('de-DE'))+'</strong></span>'+
       '<span class="profile-row-stats"><strong>'+played+' '+(played===1?'Spiel':'Spiele')+'</strong>'+
       '<small>'+wins+' '+(wins===1?'Sieg':'Siege')+'</small></span>'+
@@ -1869,6 +1915,23 @@ function playerDeleteScreen(){
     '<p>'+esc(name||'Spieler')+'</p>'+
     '<p class="stats-delete-warning">Das Profil wird entfernt. Bereits gespielte Matches und ihre Ergebnisse bleiben erhalten.</p>'+
     '</div>';
+}
+function profileIconsPage(){
+  return '<div class="profile-customize"><div class="profile-customize-top">'+profileBadgePreview()+
+  '<div><strong>'+esc(state.name.toLocaleUpperCase('de-DE'))+'</strong><small>LOGO WÄHLEN · 24 LOGOS</small></div></div>'+
+  '<div class="profile-customize-grid icons">'+profileIconOptions.map((item,i)=>
+    '<button data-nav data-action="choose-icon:'+i+'" class="profile-option '+(state.editIcon===i?'chosen':'')+'" aria-label="'+esc(item[0])+'">'+
+    '<span class="profile-option-icon">'+profileIconSvg(i)+'</span><small>'+esc(item[0])+'</small></button>').join('')+'</div></div>';
+}
+function profileColorsPage(){
+  return '<div class="profile-customize"><div class="profile-customize-top">'+profileBadgePreview()+
+  '<div><strong>'+esc(state.name.toLocaleUpperCase('de-DE'))+'</strong><small>FARBE WÄHLEN · 24 FARBEN</small></div></div>'+
+  '<div class="profile-customize-grid colors">'+profileColorOptions.map((color,i)=>
+    '<button data-nav data-action="choose-color:'+i+'" class="profile-color-option '+(state.editColor===i?'chosen':'')+'" style="--swatch:'+color+'" aria-label="Farbe '+(i+1)+'">'+
+    '<span class="profile-color-swatch"></span></button>').join('')+'</div></div>';
+}
+function profileBadgePreview(){
+  return '<span class="profile-avatar profile-preview-avatar" style="--profile-color:'+profileColorOptions[state.editColor]+'">'+profileIconSvg(state.editIcon)+'</span>';
 }
 function profileEditor(){
   // Same compact four-row keypad for new names and renaming. No lowercase/number mode.
@@ -1985,7 +2048,7 @@ async function startSoftwareUpdate(){
 function render(scroll=false){
   document.querySelector('.console').dataset.view=state.page;
   const matchPage=['game','menu','segment','correction'].includes(state.page);
-  const sectionHeadings={players:'Players',stats:'Statistics','stats-players':'Players','stats-player-detail':'Player','stats-records':'Records','stats-history':'History','stats-match-detail':'Match','stats-delete-confirm':'Löschen','player-delete':'Löschen',profile:'Players',settings:'Settings'};
+  const sectionHeadings={players:'Players',stats:'Statistics','stats-players':'Players','stats-player-detail':'Player','stats-records':'Records','stats-history':'History','stats-match-detail':'Match','stats-delete-confirm':'Löschen','player-delete':'Löschen',profile:'Players','profile-icons':'Players','profile-colors':'Players',settings:'Settings'};
   document.getElementById('match-heading').textContent=sectionHeadings[state.page]||
     (matchPage&&data.active?data.active.mode:'');
   const context=document.getElementById('match-context');
@@ -1994,7 +2057,7 @@ function render(scroll=false){
   const views={home:homeScreen,play:cards,'mode-info':selectedGameInfo,setup,game,segment,correction:history,grid:picker,number:picker,stats:statistics,
     'stats-players':statisticsPlayers,'stats-player-detail':statsPlayerDetails,'stats-records':statisticsRecords,'stats-history':statisticsHistory,
     'stats-match-detail':statisticsMatchDetail,'stats-delete-confirm':statisticsDeleteConfirm,
-    profile:profileEditor,'player-delete':playerDeleteScreen,
+    profile:profileEditor,'profile-icons':profileIconsPage,'profile-colors':profileColorsPage,'player-delete':playerDeleteScreen,
     'bermuda-number':()=>title('MATCH SETUP','Bermuda Triangle','Choose the target for the next round.')+
       '<div class="segments">'+Array.from({length:20},(_,i)=>button('bermuda-target:'+(i+1),i+1,'rule')).join('')+
       button('bermuda-target:25','Bull','rule')+button('bermuda-target:any','Any','rule')+'</div>',
@@ -2035,6 +2098,12 @@ function highlight(scroll){
   // The home screen is operated exclusively with its four physical keys.
   // No rotary selection exists, so none of its tiles should be highlighted.
   if(state.page==='home'||(state.page.startsWith('stats')&&!['stats-players','stats-history'].includes(state.page)))return;
+  if(state.page==='profile-icons'||state.page==='profile-colors'){
+    const desired=state.page==='profile-icons'?state.editIcon:state.editColor;
+    state.cursor=desired;
+    available.forEach((b,i)=>b.classList.toggle('focused',i===desired));
+    return;
+  }
   if(state.page==='players'){
     state.selectedProfile=available.length?Math.max(0,Math.min(state.selectedProfile,available.length-1)):0;
     state.cursor=state.selectedProfile;
@@ -2187,6 +2256,8 @@ function clickButton(b){
       state.cursor=state.selectedProfile;
       return render(false);
     case 'new-profile':return newPlayer();
+    case 'choose-icon':state.editIcon=Number(value);return render(false);
+    case 'choose-color':state.editColor=Number(value);return render(false);
     case 'letter':if(state.name.length<24) state.name+=value.toLocaleUpperCase('de-DE'); break;
     case 'erase':state.name=state.name.slice(0,-1); break;
     case 'profile-save':return savePlayerProfile();
@@ -2259,7 +2330,7 @@ document.addEventListener('click',event=>{
   if(b) clickButton(b);
 });
 const back={'mode-info':'play',play:'home',players:'home',stats:'home','stats-players':'stats','stats-player-detail':'stats-players','stats-records':'stats','stats-history':'stats','stats-match-detail':'stats-history','stats-delete-confirm':'stats-match-detail',settings:'home',setup:'play',game:'menu',menu:'game',correction:'game',rounds:'setup',grid:'setup',number:'setup',
-  saved:'play',about:'settings',profile:'players','player-delete':'players','bermuda-number':'setup','bermuda-multiplier':'bermuda-number'};
+  saved:'play',about:'settings',profile:'players','profile-icons':'profile','profile-colors':'profile-icons','player-delete':'players','bermuda-number':'setup','bermuda-multiplier':'bermuda-number'};
 document.addEventListener('keydown',event=>{
   const key=event.key;
   if(!['ArrowUp','ArrowDown','Enter','Escape','F2','F4','F5'].includes(key))return;
@@ -2274,6 +2345,12 @@ document.addEventListener('keydown',event=>{
     if(state.page==='players'){
       state.selectedProfile=state.cursor;
       highlight(true);
+      return;
+    }
+    if(state.page==='profile-icons'||state.page==='profile-colors'){
+      if(state.page==='profile-icons')state.editIcon=state.cursor;
+      else state.editColor=state.cursor;
+      render(false);
       return;
     }
     if(state.page==='play'&&selected?.startsWith('mode:')&&state.chosen!==selected.slice(5)){
