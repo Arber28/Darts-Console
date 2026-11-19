@@ -778,6 +778,21 @@ header{justify-content:space-between;gap:24px}
 .profile-keyboard .profile-key.focused,.profile-keyboard .profile-key:focus-visible{outline:2px solid #f8f8fb;outline-offset:-2px;border-color:#f8f8fb;background:#35373c}
 .profile-keyboard .profile-key-space{font-size:clamp(10px,1.8vw,17px);letter-spacing:.04em}
 @media(max-width:600px){.profile-editor-shell{gap:24px}.profile-keyboard .profile-key{min-height:65px}}
+
+/* Fixed right-aligned match and win columns, independent of name length. */
+.console[data-view="players"] .profile-row{
+  grid-template-columns:clamp(40px,7vw,66px) minmax(0,1fr) minmax(105px,auto);
+}
+.console[data-view="players"] .profile-row-stats{
+  display:flex;flex-direction:column;align-items:flex-end;justify-content:center;
+  gap:clamp(4px,.7dvh,9px);text-align:right;white-space:nowrap;
+}
+.console[data-view="players"] .profile-row-stats strong{
+  color:#e7e8eb;font-size:clamp(13px,2.1vw,21px);font-weight:600;
+}
+.console[data-view="players"] .profile-row-stats small{
+  color:#a6aab2;font-size:clamp(12px,1.8vw,18px);
+}
 </style>
 </head>
 <body>
@@ -1837,9 +1852,9 @@ function playersManager(){
     const initial=name.trim().slice(0,1).toUpperCase();
     return '<button data-nav data-action="select-profile:'+i+'" class="profile-row '+(state.selectedProfile===i?'chosen':'')+'">'+
       '<span class="profile-avatar">'+esc(initial)+'</span>'+
-      '<span class="profile-identity"><strong>'+esc(name.toLocaleUpperCase('de-DE'))+'</strong><small>'+
-      played+' '+(played===1?'Spiel':'Spiele')+' · '+wins+' '+(wins===1?'Sieg':'Siege')+'</small></span>'+
-      '<span class="profile-row-marker"></span>'+
+      '<span class="profile-identity"><strong>'+esc(name.toLocaleUpperCase('de-DE'))+'</strong></span>'+
+      '<span class="profile-row-stats"><strong>'+played+' '+(played===1?'Spiel':'Spiele')+'</strong>'+
+      '<small>'+wins+' '+(wins===1?'Sieg':'Siege')+'</small></span>'+
       '</button>';
   }).join('');
   return '<div class="profile-manager">'+
