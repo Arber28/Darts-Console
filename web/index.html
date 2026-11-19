@@ -1078,6 +1078,70 @@ header{justify-content:space-between;gap:24px}
 .console[data-view="game"] .dart-slot:disabled{opacity:1}
 .console[data-view="game"] .dart-slot.recorded:disabled{background:#ededee;color:#17181b}
 
+
+/* Compact live scoreboard: identity in header, score card contains only the score. */
+.console[data-view="game"] header{
+  grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) minmax(0,1fr);
+  padding:0 clamp(10px,2vw,24px);
+  gap:clamp(6px,1.1vw,14px);
+}
+.console[data-view="game"] #match-context{
+  display:flex;align-items:center;justify-content:center;gap:clamp(6px,1vw,13px);
+  min-width:0;white-space:nowrap;overflow:hidden;color:#f4f4f4;
+  font-size:clamp(15px,2.2vw,29px);letter-spacing:-.02em;
+}
+.console[data-view="game"] #match-context strong{
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;
+}
+.console[data-view="game"] .match-header-avatar{
+  width:clamp(25px,3.5vw,44px);height:clamp(25px,3.5vw,44px);
+  display:inline-grid;place-items:center;flex:none;
+  color:var(--profile-color);background:color-mix(in srgb,var(--profile-color) 14%,transparent);
+  border:1px solid var(--profile-color);border-radius:50%;
+}
+.console[data-view="game"] .match-header-avatar svg{width:68%;height:68%}
+.console[data-view="game"] #match-heading{text-align:right;white-space:nowrap}
+.console[data-view="game"] main{gap:clamp(7px,.9dvh,13px)}
+.console[data-view="game"] .score-hero{
+  box-sizing:border-box;
+  height:clamp(188px,24dvh,465px);
+  min-height:0;max-height:none;
+  display:flex;align-items:center;justify-content:center;
+  padding:clamp(6px,1.4dvh,22px) clamp(7px,1.3vw,18px);
+  margin:0;
+}
+.console[data-view="game"] .big-score{
+  display:flex;align-items:center;justify-content:center;
+  width:100%;height:100%;flex:1 1 auto;margin:0;
+  overflow:hidden;line-height:1;white-space:nowrap;
+}
+.console[data-view="game"] .dart-slots{gap:clamp(7px,1.2vw,16px);margin:0}
+.console[data-view="game"] .dart-slot{
+  min-height:clamp(73px,9.6dvh,175px);height:clamp(73px,9.6dvh,175px);
+  padding:6px 4px;display:grid;place-items:center;gap:0;
+}
+.console[data-view="game"] .dart-slot span{font-size:clamp(31px,6.8vw,88px)}
+.console[data-view="game"] .checkout-inline-label span:last-child{display:none}
+.console[data-view="game"] .standings-head{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-bottom:clamp(4px,.6dvh,10px);
+}
+.console[data-view="game"] .standings-head h2{margin:0}
+.console[data-view="game"] .turn-sum{
+  border:1px solid #575960;background:#282a2e;
+  border-radius:5px;padding:3px 10px;
+  color:#f0f0f0;font-size:clamp(17px,2.5vw,29px);
+  font-variant-numeric:tabular-nums;font-weight:750;
+}
+@media(max-width:600px){
+  .console[data-view="game"] header{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) minmax(0,1fr)}
+  .console[data-view="game"] .brand{font-size:clamp(11px,3vw,15px)}
+  .console[data-view="game"] #match-context{font-size:clamp(13px,3.3vw,19px)}
+  .console[data-view="game"] #match-heading{font-size:clamp(13px,3vw,17px)}
+  .console[data-view="game"] .score-hero{height:clamp(185px,24dvh,260px)}
+  .console[data-view="game"] .dart-slot{min-height:clamp(72px,9.6dvh,105px);height:clamp(72px,9.6dvh,105px)}
+}
+
 </style>
 </head>
 <body>
@@ -2033,6 +2097,13 @@ function announceVictory(previousWinner, delay=0){
   else celebrateWinner();
 }
 
+function turnPointsForDisplay(view,review,mode){
+  const darts=review?review.darts:view.darts;
+  if(!darts.length)return 0;
+  // The sum is the recorded dart value. Busts restore the score in Scoring.replay.
+  if(view.notice?.includes('busted'))return 0;
+  return darts.reduce((sum,dart)=>sum+dart.n*dart.m,0);
+}
 function game(){
   const match=data.active, view=derived(), p=view.players[view.current];
   const finished=view.winners!==null;
@@ -2067,10 +2138,7 @@ function game(){
     const turnTotal=darts.reduce((sum,d)=>sum+d.n*d.m,0);
     const roundHistory=review?review.indices.map(index=>({index})):
       view.history.filter(d=>d.player===view.current&&d.round===view.round);
-    html+='<div class="score-hero"><div class="throwing-line"><span>NOW THROWING:</span><strong>'+profileBadge(shown.name,'match-profile-avatar')+esc(shown.name)+
-      '</strong></div><div class="big-score'+(typeof value==='string'?' word-score':'')+'">'+esc(value)+
-      '</div><div class="caption">'+unit+'</div></div>';
-    html+='<div class="turn-header"><span>THIS TURN · '+darts.length+'/3 DARTS</span><span>TOTAL <strong>'+turnTotal+'</strong></span></div>';
+    html+='<div class="score-hero" aria-label="'+esc(shown.name)+' · '+esc(unit)+'"><div class="big-score'+(typeof value==='string'?' word-score':'')+'">'+esc(value)+'</div></div>';
     const tip=review?null:finishAdvice(mode,view,match);
     const suggested=tip && tip.route!=='NO DIRECT FINISH' ? tip.route.split(' → ') : [];
     if(suggested.length){
@@ -2082,12 +2150,12 @@ function game(){
       const suggestion=!darts[i] ? suggested[i-darts.length] : null;
       const recorded=Boolean(darts[i]);
       return button(recorded?'edit:'+roundHistory[i].index:'throw',
-        '<small>DART '+(i+1)+(suggestion?' · AIM':'')+'</small><span>'+
+        '<span>'+
         (recorded?esc(Scoring.label(darts[i].n,darts[i].m)):suggestion?esc(suggestion):'—')+'</span>',
         'dart-slot '+(recorded?'recorded':suggestion?'suggested':i===darts.length?'ready':'empty'),Boolean(review)||i>darts.length);
     }).join('')+'</div>';
   }
-  html+='<section class="panel standings"><h2>Standings</h2>'+view.players.map((player,i)=>
+  html+='<section class="panel standings"><div class="standings-head"><h2>Standings</h2>'+(!finished?'<span class="turn-sum" aria-label="Turn total">'+(review&&mode!=='301'&&mode!=='501'&&mode!=='701'?'':'+' )+esc(turnPointsForDisplay(view,review,mode))+'</span>':'')+'</div>'+view.players.map((player,i)=>
     '<div class="score-row '+(!finished&&i===(review?review.player:view.current)?'active':'')+'"><span>'+(!finished&&i===(review?review.player:view.current)?'<span class="on-turn">AT BOARD</span>':'')+profileBadge(player.name,'match-profile-mini')+esc(player.name)+
     (mode==='Killer'?' · #'+player.number+' · '+((player.marks[player.number]??0)===3?'Killer':(player.marks[player.number]??0)+'/3'):'')+
     (!player.active?' · Out':'')+(mode==='Cricket'?'<small class="marks">'+[15,16,17,18,19,20,25].map(n=>
@@ -2699,7 +2767,13 @@ function render(scroll=false){
     (matchPage&&data.active?data.active.mode:'');
   const context=document.getElementById('match-context');
   const currentView=matchPage&&data.active?derived():null;
-  context.textContent=currentView?'ROUND '+(state.page==='game'&&turnReview()?turnReview().round:currentView.round)+(Number(data.active.mode)?' · '+(data.active.options.out||'Double Out').toUpperCase():''):'';
+  if(state.page==='game'&&data.active&&currentView.winners===null){
+    const review=turnReview();
+    const player=currentView.players[review?review.player:currentView.current];
+    context.innerHTML=profileBadge(player.name,'match-header-avatar')+'<strong>'+esc(player.name)+'</strong>';
+  }else{
+    context.textContent=currentView?'ROUND '+currentView.round+(Number(data.active.mode)?' · '+(data.active.options.out||'Double Out').toUpperCase():''):'';
+  }
   const views={home:homeScreen,play:cards,'mode-info':selectedGameInfo,setup,game,segment,correction:history,grid:picker,number:picker,stats:statistics,
     'stats-players':statisticsPlayers,'stats-player-detail':statsPlayerDetails,'stats-records':statisticsRecords,'stats-history':statisticsHistory,
     'stats-match-detail':statisticsMatchDetail,'stats-delete-confirm':statisticsDeleteConfirm,
