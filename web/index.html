@@ -1462,6 +1462,69 @@ header{justify-content:space-between;gap:24px}
   .console[data-view="game"] .compact-player-name{font-size:clamp(8px,2.3vw,11px)}
 }
 
+
+/* Tall, slim player cards occupy the same vertical lane as the board. */
+.console[data-view="game"] .game-lower-grid{
+  grid-template-columns:minmax(0,4.4fr) minmax(0,1fr);
+  gap:clamp(7px,1vw,14px);
+}
+.console[data-view="game"] .compact-standings{
+  height:min(45dvh,620px);
+  max-height:min(45dvh,620px);
+  align-self:stretch;
+}
+.console[data-view="game"] .compact-players-list{
+  display:flex;flex-direction:column;
+  flex:1 1 auto;min-height:0;
+  gap:clamp(8px,1dvh,15px);padding:0;overflow:visible;
+}
+.console[data-view="game"] .compact-player{
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;flex:1 1 0;
+  min-height:0;min-width:0;
+  padding:clamp(8px,1.2dvh,16px) 2px;
+  gap:clamp(6px,.8dvh,12px);
+  text-align:center;
+}
+.console[data-view="game"] .compact-card-label{
+  display:block;order:0;text-align:center;
+  font-size:clamp(9px,1.2vw,15px);
+  letter-spacing:0;overflow-wrap:anywhere;
+}
+.console[data-view="game"] .compact-player-badge{
+  order:1;flex:0 0 auto;
+  width:clamp(28px,4.4vw,58px);height:clamp(28px,4.4vw,58px);
+}
+.console[data-view="game"] .compact-player-score{
+  order:2;font-size:clamp(25px,4vw,48px);text-align:center;
+}
+.console[data-view="game"] .compact-player-name{
+  order:3;text-align:center;
+  font-size:clamp(10px,1.3vw,17px);
+}
+.console[data-view="game"] .compact-player-extra{
+  order:4;text-align:center;
+}
+@media(max-width:600px){
+  .console[data-view="game"] .game-lower-grid{
+    grid-template-columns:minmax(0,4.1fr) minmax(0,1fr);
+    gap:6px;
+  }
+  .console[data-view="game"] .compact-standings{
+    height:43dvh;max-height:43dvh;
+  }
+  .console[data-view="game"] .compact-players-list{gap:6px;padding:0}
+  .console[data-view="game"] .compact-player{
+    min-height:0;flex:1 1 0;padding:7px 1px;gap:6px;
+  }
+  .console[data-view="game"] .compact-card-label{
+    font-size:clamp(8px,2vw,11px);
+  }
+  .console[data-view="game"] .compact-player-badge{width:30px;height:30px}
+  .console[data-view="game"] .compact-player-score{font-size:clamp(23px,5vw,30px)}
+  .console[data-view="game"] .compact-player-name{font-size:clamp(9px,2.3vw,12px)}
+}
+
 </style>
 </head>
 <body>
