@@ -1170,6 +1170,91 @@ header{justify-content:space-between;gap:24px}
 .saved-discard-copy{font-size:clamp(18px,2.3vw,27px);line-height:1.5;color:#bbc0c7}
 @media(max-width:600px){.console[data-view="game"] .match-board{width:min(100%,29dvh,330px);max-height:29dvh}}
 
+
+/* Side-by-side match layout: a larger board on the left and profile standings
+   in a narrow right-hand column. The main score and physical footer stay put. */
+.console[data-view="game"] .game-lower-grid{
+  display:grid;grid-template-columns:minmax(0,2.05fr) minmax(0,.95fr);
+  gap:clamp(8px,1.2vw,20px);
+  width:100%;min-width:0;align-items:start;flex:0 0 auto;
+}
+.console[data-view="game"] .game-lower-grid .match-board-area{
+  min-width:0;min-height:0;display:flex;justify-content:center;
+  align-items:flex-start;padding:0;margin:0;
+}
+.console[data-view="game"] .game-lower-grid .match-board{
+  display:block;width:100%;height:auto;
+  max-width:min(100%,46dvh);max-height:46dvh;
+  aspect-ratio:1;flex:0 0 auto;
+}
+.console[data-view="game"] .compact-standings{
+  min-width:0;max-height:46dvh;display:flex;flex-direction:column;
+  border:1px solid #35383d;background:#1d1f22;
+  border-radius:9px;padding:clamp(6px,1vw,14px);
+  box-sizing:border-box;
+}
+.console[data-view="game"] .compact-standings-head{
+  flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
+  gap:4px;padding:2px 2px clamp(6px,1dvh,12px);
+  font-size:clamp(10px,1.4vw,17px);font-weight:700;color:#bfc1c5;
+  letter-spacing:.05em;
+}
+.console[data-view="game"] .compact-turn-total{
+  color:#f3f3f4;font-size:clamp(14px,2vw,25px);
+  font-weight:750;font-variant-numeric:tabular-nums;letter-spacing:0;
+}
+.console[data-view="game"] .compact-players-list{
+  min-height:0;overflow-y:auto;scrollbar-width:thin;
+  display:flex;flex-direction:column;gap:clamp(5px,.8dvh,10px);
+}
+.console[data-view="game"] .compact-player{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:clamp(3px,.5dvh,7px);min-width:0;flex:0 0 auto;
+  border:1px solid #44464c;border-left:3px solid var(--player-accent);
+  border-radius:6px;background:#25272a;
+  padding:clamp(7px,1dvh,13px) 3px;box-sizing:border-box;
+}
+.console[data-view="game"] .compact-player.is-current{
+  background:#34363b;border-color:#e8e8e9;
+  border-left-color:var(--player-accent);
+}
+.console[data-view="game"] .compact-player.is-out{opacity:.5}
+.console[data-view="game"] .compact-player-badge{
+  width:clamp(26px,4vw,51px);height:clamp(26px,4vw,51px);
+  border:1px solid var(--profile-color);border-radius:50%;
+  background:color-mix(in srgb,var(--profile-color) 14%,transparent);
+  color:var(--profile-color);
+  display:grid;place-items:center;flex:0 0 auto;
+}
+.console[data-view="game"] .compact-player-badge svg{width:70%;height:70%}
+.console[data-view="game"] .compact-player-score{
+  font-size:clamp(23px,3.4vw,43px);font-weight:750;
+  line-height:1.05;font-variant-numeric:tabular-nums;
+}
+.console[data-view="game"] .compact-player-name{
+  font-size:clamp(10px,1.3vw,17px);font-weight:700;
+  line-height:1.1;max-width:100%;overflow-wrap:anywhere;text-align:center;
+}
+.console[data-view="game"] .compact-player-extra{
+  font-size:clamp(8px,1vw,13px);color:#c0c1c5;
+  text-align:center;overflow-wrap:anywhere;
+}
+@media(max-width:600px){
+  .console[data-view="game"] .game-lower-grid{
+    grid-template-columns:minmax(0,2fr) minmax(0,1fr);
+    gap:7px;
+  }
+  .console[data-view="game"] .game-lower-grid .match-board{
+    width:100%;max-width:100%;max-height:43dvh;
+  }
+  .console[data-view="game"] .compact-standings{max-height:43dvh;padding:5px;border-radius:6px}
+  .console[data-view="game"] .compact-player{padding:7px 2px}
+  .console[data-view="game"] .compact-player-badge{width:28px;height:28px}
+  .console[data-view="game"] .compact-player-score{font-size:clamp(19px,5vw,29px)}
+  .console[data-view="game"] .compact-player-name{font-size:clamp(9px,2.5vw,12px)}
+  .console[data-view="game"] .compact-standings-head{font-size:9px}
+}
+
 </style>
 </head>
 <body>
@@ -2215,6 +2300,35 @@ function savedDiscardScreen(){
     button('discard','DISCARD & START NEW','action danger-action')+'</section>';
 }
 
+
+/* Compact standings for the portrait split layout. No change to saved profiles
+   or the scoring engine: every score comes from replay(). */
+function compactMatchPlayers(view,mode,modeScore,review){
+  const active=review?review.player:view.current;
+  const turnTotal=turnPointsForDisplay(view,review,mode);
+  const rows=view.players.map((player,i)=>{
+    const selected=i===active;
+    const score=modeScore(player);
+    const cricket=mode==='Cricket'?
+      '<span class="compact-player-extra">'+[20,19,18,17,16,15,25].map(n=>
+        (n===25?'B':n)+':'+(player.marks[n]??0)).join(' ')+'</span>':'';
+    const killer=mode==='Killer'?
+      '<span class="compact-player-extra">#'+player.number+' · '+
+      (player.marks[player.number]??0)+'/3</span>':'';
+    return '<div class="compact-player '+(selected?'is-current ':'')+(!player.active?'is-out':'')+
+      '" style="--player-accent:'+(isGuestPlayer(player.name)?'#ffffff':profileColorOptions[profileAppearance(player.name).color])+'">'+
+      profileBadge(player.name,'compact-player-badge')+
+      '<strong class="compact-player-score">'+esc(score)+'</strong>'+
+      '<span class="compact-player-name">'+esc(player.name)+'</span>'+
+      (cricket||killer)+
+      '</div>';
+  }).join('');
+  return '<aside class="compact-standings" aria-label="Match players">'+
+    '<div class="compact-standings-head"><span>PLAYERS</span>'+
+    '<strong class="compact-turn-total">+'+esc(turnTotal)+'</strong></div>'+
+    '<div class="compact-players-list">'+rows+'</div></aside>';
+}
+
 function game(){
   const match=data.active, view=derived(), p=view.players[view.current];
   const finished=view.winners!==null;
@@ -2265,9 +2379,10 @@ function game(){
         (recorded?esc(Scoring.label(darts[i].n,darts[i].m)):suggestion?esc(suggestion):'—')+'</span>',
         'dart-slot '+(recorded?'recorded':suggestion?'suggested':i===darts.length?'ready':'empty'),Boolean(review)||i>darts.length);
     }).join('')+'</div>';
-    html+=matchBoard(mode,view,match,review,darts);
+    html+='<section class="game-lower-grid">'+matchBoard(mode,view,match,review,darts)+
+      compactMatchPlayers(view,mode,modeScore,review)+'</section>';
   }
-  html+='<section class="panel standings"><div class="standings-head"><h2>Standings</h2>'+(!finished?'<span class="turn-sum" aria-label="Turn total">'+(review&&mode!=='301'&&mode!=='501'&&mode!=='701'?'':'+' )+esc(turnPointsForDisplay(view,review,mode))+'</span>':'')+'</div>'+view.players.map((player,i)=>
+  if(finished)html+='<section class="panel standings"><div class="standings-head"><h2>Standings</h2>'+(!finished?'<span class="turn-sum" aria-label="Turn total">'+(review&&mode!=='301'&&mode!=='501'&&mode!=='701'?'':'+' )+esc(turnPointsForDisplay(view,review,mode))+'</span>':'')+'</div>'+view.players.map((player,i)=>
     '<div class="score-row '+(!finished&&i===(review?review.player:view.current)?'active':'')+'"><span>'+(!finished&&i===(review?review.player:view.current)?'<span class="on-turn">AT BOARD</span>':'')+profileBadge(player.name,'match-profile-mini')+esc(player.name)+
     (mode==='Killer'?' · #'+player.number+' · '+((player.marks[player.number]??0)===3?'Killer':(player.marks[player.number]??0)+'/3'):'')+
     (!player.active?' · Out':'')+(mode==='Cricket'?'<small class="marks">'+[15,16,17,18,19,20,25].map(n=>
