@@ -2463,7 +2463,7 @@ function render(scroll=false){
       button('game','Continue match','primary')+'<br><br>'+
       button('discard','Discard and start new')+button('play','Back to games'),
     players:playersManager,
-    settings:settingsHome,'settings-scoring':settingsScoring,'settings-display':settingsDisplay,
+    settings:settingsHome,
     'settings-network':settingsNetwork,'settings-wifi-password':settingsWifiPassword,'settings-system':settingsSystem,about:aboutConsole};
   // Keep the encoder selection stable across redraws. A score update may
   // disable the previously selected throw slot, so prefer the next free dart.
