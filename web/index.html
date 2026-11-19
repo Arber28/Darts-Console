@@ -902,6 +902,14 @@ header{justify-content:space-between;gap:24px}
 .console[data-view="profile-colors"] .profile-color-option.focused .profile-color-swatch {
   transform:none;
 }
+
+/* Profile wizard screens must share identical main padding.
+   Previously only the Name screen had a smaller top padding, causing a ~18px jump. */
+.console:is([data-view="profile"],[data-view="profile-icons"],[data-view="profile-colors"]) main{
+  padding:clamp(10px,2.5vw,26px);
+  padding-top:clamp(8px,1.5dvh,18px);
+  overflow-y:auto;
+}
 </style>
 </head>
 <body>
