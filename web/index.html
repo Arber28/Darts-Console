@@ -2221,7 +2221,6 @@ function settingsSection(title,body){
   return '<section class="settings-section"><h2>'+title+'</h2><div class="settings-section-body">'+body+'</div></section>';
 }
 function settingsHome(){
-  const {matches,profiles}=data;
   return '<div class="settings-page"><div class="settings-overview"><div><span>KONSOLE</span><strong>Darts Console</strong><small>Bereit für die nächste Runde.</small></div>'+
     '<div class="settings-overview-icon">'+icon('target')+'</div></div>'+
     settingsSection('SPIEL',
@@ -2240,12 +2239,12 @@ function settingsHome(){
     settingsSection('VERBINDUNG',settingsRow('settings-network','arrows','WLAN & Netzwerk','Verbindung und verfügbare Netzwerke'))+
     settingsSection('SYSTEM',settingsRow('settings-system','info','Software & Updates','Version prüfen und aktualisieren')+
       settingsRow('about','info','Über Darts Console','Hardware, Funktionen und Speicher'))+
-    '<div class="settings-counts"><span>'+profiles.length+' Spielerprofile</span><span>'+matches.length+' gespeicherte Matches</span></div></div>';
+    '</div>';
 }
 function settingsScoring(){
   return '<div class="settings-page">'+settingsSection('STANDARDREGELN',
       settingsRow('default-out','target','Standard-Checkout','Für neue 301-, 501- und 701-Spiele',data.out))+
-    '<p class="settings-footnote">Du kannst den Checkout für jedes neue Match separat ändern. Bereits gespeicherte Spiele bleiben unverändert.</p>'+
+    ''+
     '</div>';
 }
 function settingsDisplayInline(){
@@ -2303,7 +2302,7 @@ function settingsSystem(){
     (state.updateConfirm?settingsRow('update-confirm','target','Update bestätigen','Neue Version installieren')+
       settingsRow('update-cancel','arrows','Abbrechen','Ohne Änderungen zurück'):
       settingsRow('update-start','arrows',state.updateBusy?'Update läuft …':'Auf Updates prüfen','Neueste Version installieren')))+
-    '<p class="settings-footnote">Gespeicherte Spiele und Spielerprofile werden beim Update nicht absichtlich gelöscht.</p></div>';
+    '</div>';
 }
 function aboutConsole(){
   return '<div class="settings-page"><div class="about-brand">'+icon('target')+
@@ -2315,7 +2314,7 @@ function aboutConsole(){
       '<div><span>BEDIENUNG</span><strong>Raspberry Pi Pico · 4 Tasten + Encoder</strong></div>'+
       '<div><span>QUELLCODE</span><strong>GitHub · Arber28/Darts-Console</strong></div>'+
       '<div><span>DATEN</span><strong>Lokal im Browserprofil gespeichert</strong></div></div>')+
-    '<p class="settings-footnote">Die Konsole kann offline genutzt werden. WLAN wird für Updates benötigt; eine automatische Treffererkennung setzt zusätzlich die passende Kamera- und Autodarts-Einrichtung voraus.</p></div>';
+    '</div>';
 }
 function applyDisplaySettings(){
   const root=document.querySelector('.console');
