@@ -927,17 +927,11 @@ function shortcuts(){
     ['F2','Records',()=>show('stats-records')],
     ['F5','History',()=>show('stats-history')]
   ];
-  if(['stats-players','stats-records','stats-history'].includes(state.page))return [
-    ['Escape','Back',()=>show('stats')],
-    ['F4','Players',()=>show('stats-players')],
-    ['F2','Records',()=>show('stats-records')],
-    ['F5','History',()=>show('stats-history')]
-  ];
-  if(state.page==='stats-player-detail')return [
-    ['Escape','Back',()=>show('stats-players')],
-    ['F4','Players',()=>show('stats-players')],
-    ['F2','Records',()=>show('stats-records')],
-    ['F5','History',()=>show('stats-history')]
+  if(['stats-players','stats-records','stats-history','stats-player-detail'].includes(state.page))return [
+    ['Escape','Back',()=>show(state.page==='stats-player-detail'?'stats-players':'stats')],
+    ['F4','',()=>{}],
+    ['F2','',()=>{}],
+    ['F5','',()=>{}]
   ];
   if(state.page==='mode-info')return [
     ['Escape','Back',()=>show('play')],
