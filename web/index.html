@@ -910,6 +910,53 @@ header{justify-content:space-between;gap:24px}
   padding-top:clamp(8px,1.5dvh,18px);
   overflow-y:auto;
 }
+
+/* Settings dashboard: compact functional groups with consistent rotary navigation. */
+.console[data-view^="settings"] main,.console[data-view="about"] main{padding:clamp(12px,2.6vw,26px);padding-top:clamp(8px,1.5dvh,18px);overflow-y:auto}
+.settings-page{display:flex;flex-direction:column;gap:clamp(18px,2.3dvh,27px);max-width:1020px;margin:0 auto;padding-bottom:clamp(20px,4dvh,48px)}
+.settings-overview{display:flex;align-items:center;justify-content:space-between;padding:clamp(18px,3.4vw,37px);background:#202226;border:1px solid #44464d;border-radius:12px;gap:16px}
+.settings-overview>div:first-child{display:flex;flex-direction:column;gap:8px}
+.settings-overview span,.settings-version span,.settings-facts span{color:#a0a5af;font-size:clamp(10px,1.5vw,15px);font-weight:700;letter-spacing:.1em}
+.settings-overview strong{font-size:clamp(24px,4vw,40px)}
+.settings-overview small{color:#b5b9c1;font-size:clamp(12px,2vw,19px)}
+.settings-overview-icon{color:#e9ebee;width:clamp(45px,9vw,85px);height:clamp(45px,9vw,85px)}
+.settings-overview-icon svg{width:100%;height:100%}
+.settings-section h2{font-size:clamp(11px,1.8vw,18px);letter-spacing:.09em;color:#9297a1;margin:0 0 9px 4px}
+.settings-section-body{background:#202226;border:1px solid #393c43;border-radius:11px;overflow:hidden}
+.settings-row{display:grid;grid-template-columns:clamp(32px,5vw,53px) minmax(0,1fr) auto 13px;align-items:center;gap:clamp(8px,1.8vw,20px);width:100%;min-height:clamp(78px,10dvh,110px);border:0;border-bottom:1px solid #383b42;background:transparent;padding:clamp(12px,2vw,20px);color:#f0f1f3;text-align:left}
+.settings-row:last-child{border-bottom:0}
+.settings-row.focused{background:#33363c;outline:2px solid #eee;outline-offset:-2px;border-radius:6px}
+.settings-row-icon{display:grid;place-items:center;color:#aaafb8}
+.settings-row-icon svg{width:clamp(24px,3.8vw,38px);height:clamp(24px,3.8vw,38px)}
+.settings-row-copy{display:flex;flex-direction:column;gap:6px;min-width:0}
+.settings-row-copy strong{font-size:clamp(16px,2.8vw,28px)}
+.settings-row-copy small{font-size:clamp(11px,1.7vw,17px);color:#a9adb6;line-height:1.3}
+.settings-row-value{font-size:clamp(11px,1.8vw,19px);color:#d0d3d9;text-align:right;max-width:11ch}
+.settings-chevron{color:#9da3ad;font-size:clamp(18px,3vw,30px)}
+.settings-footnote,.settings-about-text{color:#afb3bc;font-size:clamp(13px,2.05vw,20px);line-height:1.55;padding:clamp(15px,2.6vw,25px);margin:0}
+.settings-counts{display:flex;justify-content:space-between;gap:12px;font-size:clamp(11px,1.8vw,18px);color:#999da5;padding:0 5px}
+.settings-network-status{display:flex;align-items:center;gap:14px;padding:clamp(18px,3vw,28px);border:1px solid #44474c;background:#222429;border-radius:12px}
+.settings-network-status>div{display:flex;flex-direction:column;gap:6px}
+.settings-network-status strong{font-size:clamp(19px,3vw,31px)}
+.settings-network-status small{color:#aaaeb7;font-size:clamp(12px,1.8vw,18px)}
+.network-status-dot{width:14px;height:14px;border-radius:50%;background:#777c86;flex:none}
+.network-status-dot.connected{background:#36b788}
+.network-password-label{display:flex;flex-direction:column;gap:10px;padding:clamp(14px,2.6vw,25px);font-size:clamp(15px,2vw,21px)}
+.network-password-label input{background:#111214;border:1px solid #5b6069;color:#fff;padding:15px;border-radius:8px;font-size:20px;width:100%}
+.settings-version{display:flex;flex-direction:column;gap:10px;padding:clamp(17px,3vw,30px)}
+.settings-version strong{font-size:clamp(22px,3.5vw,36px)}
+.settings-version small{font-size:clamp(12px,1.9vw,19px);color:#aeb2bb}
+.settings-update-status{font-size:clamp(12px,1.85vw,18px);padding:0 clamp(17px,3vw,30px);color:#b0b4bb}
+.about-brand{display:flex;align-items:center;flex-direction:column;gap:15px;padding:clamp(25px,4dvh,48px) 0}
+.about-brand svg{height:56px;width:56px}
+.about-brand strong{font-size:clamp(23px,4vw,41px);letter-spacing:.07em}
+.about-brand span{letter-spacing:.2em;color:#a4a7af;font-size:clamp(12px,1.7vw,16px)}
+.settings-facts{padding:clamp(12px,2vw,23px)}
+.settings-facts>div{display:flex;justify-content:space-between;align-items:center;gap:16px;border-bottom:1px solid #393b42;padding:clamp(12px,2dvh,22px) 0}
+.settings-facts>div:last-child{border-bottom:none}
+.settings-facts strong{font-size:clamp(13px,2vw,21px);text-align:right}
+.console.reduced-motion *, .console.reduced-motion *::before,.console.reduced-motion *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+.console.high-contrast .settings-section-body,.console.high-contrast .panel,.console.high-contrast .profile-manager-list{border-color:#878c95}
 </style>
 </head>
 <body>
@@ -964,16 +1011,17 @@ function profileIconSvg(index){const entry=profileIconOptions[index]||profileIco
 function profileBadge(name,cls='profile-avatar'){const a=profileAppearance(name);return '<span class="'+cls+'" style="--profile-color:'+profileColorOptions[a.color]+'">'+profileIconSvg(a.icon)+'</span>'}
 const defaults=['Emre','Arber','Adnan','Atakan','Amir','Ali'];
 const storage='darts-console-v1';
-let data={profiles:defaults, matches:[], active:null, unfinished:{}, out:'Double Out'};
+let data={profiles:defaults, matches:[], active:null, unfinished:{}, out:'Double Out', display:{reducedMotion:false, highContrast:false}};
 try {
   const previous=JSON.parse(localStorage.getItem(storage));
   if(previous) data={...data,...previous};
 } catch (error) {
   console.warn('Unable to load console state',error);
 }
+data.display={reducedMotion:false,highContrast:false,...data.display};
 const state={page:'home',filter:'quick',chosen:'501',players:['Arber','Emre'],
   guests:[], cursor:0, message:'', out:data.out, rounds:10, bull:false, grid:[], sequence:[], numbers:{}, selfHit:null,
-  selectedProfile:0, editOriginal:null, editIcon:0, editColor:0, updateConfirm:false, updateBusy:false, updateInfo:'Requires an internet connection on this laptop.'};
+  selectedProfile:0, editOriginal:null, editIcon:0, editColor:0, network:{state:'unknown',networks:[],message:'Status noch nicht geprüft.'}, networkBusy:false, networkSsid:'', networkPassword:'', updateConfirm:false, updateBusy:false, updateInfo:'Bereit zum Prüfen auf Updates.'};
 const main=document.getElementById('main');
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const currentMode=()=>modes.find(mode=>mode[0]===state.chosen);
@@ -1150,6 +1198,10 @@ function deletePlayerProfile(){
   save();show('players');
 }
 function shortcuts(){
+  if(['settings','settings-scoring','settings-display','settings-network','settings-system','about'].includes(state.page))return [
+    ['Escape','Back',()=>show(state.page==='settings'?'home':'settings')],
+    ['F4','',()=>{}],['F2','',()=>{}],['F5','',()=>{}]
+  ];
   if(state.page==='players')return [
     ['Escape','Back',()=>show('home')],
     ['F4','Neu',newPlayer],
@@ -1247,13 +1299,13 @@ function runShortcut(key){
   shortcuts().find(item=>item[0]===key)?.[2]();
 }
 function renderFooter(){
-  if(['players','profile','profile-icons','profile-colors','player-delete'].includes(state.page)){
+  if(['players','profile','profile-icons','profile-colors','player-delete','settings','settings-scoring','settings-display','settings-network','settings-system','about'].includes(state.page)){
     const labels=shortcuts().map(([key,label])=>label
       ?'<button class="softkey library-key" data-shortcut="'+key+'"><span>'+esc(label.toUpperCase())+'</span></button>'
       :'<span class="stats-empty-softkey" aria-hidden="true"></span>');
     labels.splice(2,0,'<div class="home-encoder" aria-hidden="true"><svg viewBox="0 0 60 60">'+
       '<circle cx="30" cy="30" r="23" fill="none" stroke="#fff" stroke-width="2.8"/>'+
-      (['players','profile','profile-icons','profile-colors'].includes(state.page)?'<circle cx="30" cy="30" r="8" fill="#fff"/>':'')+
+      (['players','profile','profile-icons','profile-colors','settings','settings-scoring','settings-display','settings-network','settings-system'].includes(state.page)?'<circle cx="30" cy="30" r="8" fill="#fff"/>':'')+
       '</svg></div>');
     document.querySelector('footer').innerHTML=labels.join('');
     return;
@@ -2083,6 +2135,126 @@ function fitMainScore(){
 }
 window.addEventListener('resize',fitMainScore);
 
+function settingsRow(action,iconName,label,detail,value=''){
+  return '<button data-nav data-action="'+action+'" class="settings-row">'+
+    '<span class="settings-row-icon">'+icon(iconName)+'</span>'+
+    '<span class="settings-row-copy"><strong>'+esc(label)+'</strong><small>'+esc(detail)+'</small></span>'+
+    (value?'<span class="settings-row-value">'+esc(value)+'</span>':'')+
+    '<span class="settings-chevron">›</span></button>';
+}
+function settingsSection(title,body){
+  return '<section class="settings-section"><h2>'+title+'</h2><div class="settings-section-body">'+body+'</div></section>';
+}
+function settingsHome(){
+  const {matches,profiles}=data;
+  return '<div class="settings-page"><div class="settings-overview"><div><span>KONSOLE</span><strong>Darts Console</strong><small>Bereit für die nächste Runde.</small></div>'+
+    '<div class="settings-overview-icon">'+icon('target')+'</div></div>'+
+    settingsSection('SPIEL',settingsRow('settings-scoring','target','Scoring','Standardregeln und Checkout',data.out))+
+    settingsSection('ANZEIGE',settingsRow('settings-display','settings','Darstellung','Animationen und Kontrast'))+
+    settingsSection('VERBINDUNG',settingsRow('settings-network','arrows','WLAN & Netzwerk','Verbindung und verfügbare Netzwerke'))+
+    settingsSection('SYSTEM',settingsRow('settings-system','info','Software & Updates','Version prüfen und aktualisieren')+
+      settingsRow('about','info','Über Darts Console','Hardware, Funktionen und Speicher'))+
+    '<div class="settings-counts"><span>'+profiles.length+' Spielerprofile</span><span>'+matches.length+' gespeicherte Matches</span></div></div>';
+}
+function settingsScoring(){
+  return '<div class="settings-page">'+settingsSection('STANDARDREGELN',
+      settingsRow('default-out','target','Standard-Checkout','Für neue 301-, 501- und 701-Spiele',data.out))+
+    '<p class="settings-footnote">Du kannst den Checkout für jedes neue Match separat ändern. Bereits gespeicherte Spiele bleiben unverändert.</p>'+
+    '</div>';
+}
+function settingsDisplay(){
+  return '<div class="settings-page">'+settingsSection('DARSTELLUNG',
+    settingsRow('setting-motion','settings','Animationen','Intro und Übergänge',data.display.reducedMotion?'Reduziert':'Aktiv')+
+    settingsRow('setting-contrast','info','Kontrast','Stärkere Trennlinien und Rahmen',data.display.highContrast?'Hoch':'Normal'))+
+    '<p class="settings-footnote">Diese Einstellungen gelten direkt für die Konsole und werden gespeichert.</p></div>';
+}
+function settingsNetwork(){
+  const n=state.network;
+  const available=n.networks||[];
+  const ready=n.state==='ready';
+  const status=n.state==='connected'?'Verbunden':n.state==='ready'?'WLAN verfügbar':n.state==='unsupported'?'Nicht eingerichtet':n.state==='error'?'Fehler':'Prüfe Verbindung';
+  return '<div class="settings-page"><div class="settings-network-status">'+
+    '<span class="network-status-dot '+(n.state==='connected'?'connected':'')+'"></span>'+
+    '<div><strong>'+status+'</strong><small>'+esc(n.message||'')+'</small></div></div>'+
+    settingsSection('WLAN',
+      '<div class="settings-network-actions">'+settingsRow('wifi-refresh','arrows','Netzwerke suchen','Verfügbare WLANs aktualisieren')+'</div>'+
+      (available.length?available.map(net=>settingsRow('wifi-select:'+encodeURIComponent(net.ssid),'arrows',net.ssid,
+        net.security?'Gesichertes Netzwerk':'Offenes Netzwerk',net.active?'Verbunden':net.signal+' %')).join(''):
+        '<p class="settings-footnote">'+(n.state==='unsupported'?'Für direkte WLAN-Verbindungen muss der Netzwerkdienst auf dem Laptop installiert sein.':'Noch keine Netzwerke gefunden.')+'</p>'))+
+    (state.networkSsid?settingsSection('VERBINDEN',
+      '<p class="settings-footnote">Netzwerk: <strong>'+esc(state.networkSsid)+'</strong></p>'+
+      '<label class="network-password-label">WLAN-Passwort<input id="wifi-password" type="password" autocomplete="off" placeholder="Passwort" value="" /></label>'+
+      settingsRow('wifi-connect','target','Verbinden','Passwort wird nicht in der Konsole gespeichert')):'')+
+    '</div>';
+}
+function settingsSystem(){
+  return '<div class="settings-page">'+settingsSection('SOFTWARE',
+    '<div class="settings-version"><span>UPDATE-KANAL</span><strong>GitHub · main</strong><small>Updates benötigen auf dem Dart-Laptop eine Internetverbindung.</small></div>'+
+    '<p class="settings-update-status" role="status">'+esc(state.updateInfo)+'</p>'+
+    (state.updateConfirm?settingsRow('update-confirm','target','Update bestätigen','Neue Version installieren')+
+      settingsRow('update-cancel','arrows','Abbrechen','Ohne Änderungen zurück'):
+      settingsRow('update-start','arrows',state.updateBusy?'Update läuft …':'Auf Updates prüfen','Neueste Version installieren')))+
+    '<p class="settings-footnote">Gespeicherte Spiele und Spielerprofile werden beim Update nicht absichtlich gelöscht.</p></div>';
+}
+function aboutConsole(){
+  return '<div class="settings-page"><div class="about-brand">'+icon('target')+
+    '<strong>DARTS CONSOLE</strong><span>DIY SCORING SYSTEM</span></div>'+
+    settingsSection('DAS PROJEKT','<p class="settings-about-text">Darts Console ist eine selbst entwickelte Bedienoberfläche für ein automatisches Dart-Scoring-System. Sie läuft auf einem Linux-Laptop mit hochkant eingebautem Display. Vier feste Tasten und ein klickbarer Drehregler bilden die Bedienkonsole.</p>')+
+    settingsSection('FUNKTIONEN','<p class="settings-about-text">Spielmodi, manuelle Trefferkorrektur, Spielerprofile mit Logo und Farbe, Spielhistorie, Ranglisten und Statistiken. Die automatische Treffererkennung ist für die Anbindung an Autodarts vorgesehen.</p>')+
+    settingsSection('TECHNIK','<div class="settings-facts"><div><span>BETRIEBSSYSTEM</span><strong>Debian Linux · Kiosk</strong></div>'+
+      '<div><span>ANZEIGE</span><strong>Chromium · Hochkant</strong></div>'+
+      '<div><span>BEDIENUNG</span><strong>Raspberry Pi Pico · 4 Tasten + Encoder</strong></div>'+
+      '<div><span>QUELLCODE</span><strong>GitHub · Arber28/Darts-Console</strong></div>'+
+      '<div><span>DATEN</span><strong>Lokal im Browserprofil gespeichert</strong></div></div>')+
+    '<p class="settings-footnote">Die Konsole kann offline genutzt werden. WLAN wird für Updates benötigt; eine automatische Treffererkennung setzt zusätzlich die passende Kamera- und Autodarts-Einrichtung voraus.</p></div>';
+}
+function applyDisplaySettings(){
+  const root=document.querySelector('.console');
+  if(root){
+    root.classList.toggle('reduced-motion',!!data.display.reducedMotion);
+    root.classList.toggle('high-contrast',!!data.display.highContrast);
+  }
+}
+async function refreshWifi(){
+  state.networkBusy=true;
+  state.network={state:'unknown',networks:[],message:'Suche läuft …'};
+  render(false);
+  try{
+    const response=await fetch('/api/network/scan',{cache:'no-store'});
+    const json=await response.json();
+    if(!response.ok)throw Error(json.error||'WLAN-Dienst nicht verfügbar');
+    state.network={state:json.connected?'connected':'ready',networks:json.networks||[],message:json.connected?'Verbunden mit '+json.connected:'Netzwerke gefunden'};
+  }catch(e){
+    state.network={state:'unsupported',networks:[],message:'Direkte WLAN-Einrichtung ist in diesem Browser noch nicht verfügbar.'};
+  }
+  state.networkBusy=false;
+  if(state.page==='settings-network')render(false);
+}
+async function connectWifi(){
+  const field=document.querySelector('#wifi-password');
+  const password=field?.value||'';
+  if(!state.networkSsid)return;
+  if(!password && state.network.networks?.some(n=>n.ssid===state.networkSsid&&n.security)){
+    return say('Bitte das WLAN-Passwort eingeben.');
+  }
+  state.networkBusy=true;
+  try{
+    const res=await fetch('/api/network/connect',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-Darts-Network':'requested'},
+      body:JSON.stringify({ssid:state.networkSsid,password})
+    });
+    const json=await res.json();
+    if(!res.ok)throw Error(json.error||'Verbindung fehlgeschlagen');
+    state.networkSsid='';
+    state.network={state:'connected',networks:[],message:'Verbindung hergestellt.'};
+    await refreshWifi();
+  }catch(e){
+    state.network={...state.network,state:'error',message:e.message};
+  }
+  state.networkBusy=false;
+  if(state.page==='settings-network')render(false);
+}
 function updatePanel(){
   let html=panel('Software update',
     '<p>Install the latest version from the GitHub main branch. Saved matches and player profiles are preserved.</p>'+
@@ -2154,8 +2326,9 @@ async function startSoftwareUpdate(){
 
 function render(scroll=false){
   document.querySelector('.console').dataset.view=state.page;
+  applyDisplaySettings();
   const matchPage=['game','menu','segment','correction'].includes(state.page);
-  const sectionHeadings={players:'Players',stats:'Statistics','stats-players':'Players','stats-player-detail':'Player','stats-records':'Records','stats-history':'History','stats-match-detail':'Match','stats-delete-confirm':'Löschen','player-delete':'Löschen',profile:'Players','profile-icons':'Players','profile-colors':'Players',settings:'Settings'};
+  const sectionHeadings={players:'Players',stats:'Statistics','stats-players':'Players','stats-player-detail':'Player','stats-records':'Records','stats-history':'History','stats-match-detail':'Match','stats-delete-confirm':'Löschen','player-delete':'Löschen',profile:'Players','profile-icons':'Players','profile-colors':'Players',settings:'Settings','settings-scoring':'Scoring','settings-display':'Darstellung','settings-network':'Netzwerk','settings-system':'Software',about:'About'};
   document.getElementById('match-heading').textContent=sectionHeadings[state.page]||
     (matchPage&&data.active?data.active.mode:'');
   const context=document.getElementById('match-context');
@@ -2178,9 +2351,8 @@ function render(scroll=false){
       button('game','Continue match','primary')+'<br><br>'+
       button('discard','Discard and start new')+button('play','Back to games'),
     players:playersManager,
-    settings:()=>panel('Scoring',button('default-out','Default checkout <span>'+esc(data.out)+'</span>')+
-      '<p>Manual entry is available from the match screen.</p>')+updatePanel()+button('about','About'),
-    about:()=>title('CONSOLE','About')+panel('Darts Console','<p>Offline darts scoring for a portrait display and Raspberry Pi Pico controls.</p>')};
+    settings:settingsHome,'settings-scoring':settingsScoring,'settings-display':settingsDisplay,
+    'settings-network':settingsNetwork,'settings-system':settingsSystem,about:aboutConsole};
   // Keep the encoder selection stable across redraws. A score update may
   // disable the previously selected throw slot, so prefer the next free dart.
   const previousAction=controls()[state.cursor]?.dataset.action;
@@ -2324,6 +2496,15 @@ function clickButton(b){
   state.message='';
   switch(action){
     case 'home':return show('home');
+    case 'settings-scoring':return show('settings-scoring');
+    case 'settings-display':return show('settings-display');
+    case 'settings-network':show('settings-network');return refreshWifi();
+    case 'settings-system':return show('settings-system');
+    case 'setting-motion':data.display.reducedMotion=!data.display.reducedMotion;save();break;
+    case 'setting-contrast':data.display.highContrast=!data.display.highContrast;save();break;
+    case 'wifi-refresh':return refreshWifi();
+    case 'wifi-select':state.networkSsid=decodeURIComponent(value);return render(false);
+    case 'wifi-connect':return connectWifi();
     case 'mode-info':return show('mode-info');
     case 'stats-player':
       state.statsPlayer=decodeURIComponent(value);
@@ -2436,7 +2617,7 @@ document.addEventListener('click',event=>{
   const b=event.target.closest('button[data-nav]');
   if(b) clickButton(b);
 });
-const back={'mode-info':'play',play:'home',players:'home',stats:'home','stats-players':'stats','stats-player-detail':'stats-players','stats-records':'stats','stats-history':'stats','stats-match-detail':'stats-history','stats-delete-confirm':'stats-match-detail',settings:'home',setup:'play',game:'menu',menu:'game',correction:'game',rounds:'setup',grid:'setup',number:'setup',
+const back={'mode-info':'play',play:'home',players:'home',stats:'home','stats-players':'stats','stats-player-detail':'stats-players','stats-records':'stats','stats-history':'stats','stats-match-detail':'stats-history','stats-delete-confirm':'stats-match-detail',settings:'home','settings-scoring':'settings','settings-display':'settings','settings-network':'settings','settings-system':'settings',setup:'play',game:'menu',menu:'game',correction:'game',rounds:'setup',grid:'setup',number:'setup',
   saved:'play',about:'settings',profile:'players','profile-icons':'profile','profile-colors':'profile-icons','player-delete':'players','bermuda-number':'setup','bermuda-multiplier':'bermuda-number'};
 document.addEventListener('keydown',event=>{
   const key=event.key;
