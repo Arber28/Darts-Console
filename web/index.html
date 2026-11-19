@@ -625,6 +625,37 @@ header{justify-content:space-between;gap:24px}
 .stats-player-hero>span{font-size:12px;color:#a6aab2;letter-spacing:.14em}
 .stats-player-hero h1{font-size:clamp(40px,6.5vw,65px)}
 .stats-record-featured{border-color:#bd984c}
+
+/* Player ranking: compact tabular list, medals only on the top-three rank numbers. */
+.console[data-view="stats-players"] .stats-panel{padding:clamp(14px,2.5vw,25px)}
+.console[data-view="stats-players"] .stats-section-title{margin-bottom:clamp(10px,1.4dvh,18px)}
+.stats-list{width:100%;display:flex;flex-direction:column}
+.stats-list-head,.stats-list-row{
+  display:grid;grid-template-columns:clamp(34px,6vw,60px) minmax(0,1fr) minmax(58px,.65fr) minmax(42px,.5fr) 12px;
+  align-items:center;gap:clamp(5px,1.2vw,12px);min-width:0
+}
+.stats-list-head{padding:clamp(8px,1.2dvh,14px) clamp(8px,1.8vw,18px);border-bottom:1px solid #555962;color:#989da7;font-size:clamp(10px,1.55vw,15px);font-weight:650;letter-spacing:.07em}
+.stats-list-head span:nth-child(n+3){text-align:right}
+.stats-list-row{color:#ededf0;background:transparent;border:0;border-bottom:1px solid #373a40;border-radius:0;width:100%;text-align:left;padding:clamp(13px,2.1dvh,20px) clamp(8px,1.8vw,18px);min-height:clamp(61px,8dvh,82px);font-variant-numeric:tabular-nums}
+.stats-list-row:last-child{border-bottom:0}
+.stats-list-rank{display:grid;place-items:center;width:clamp(28px,4.5vw,44px);height:clamp(28px,4.5vw,44px);font-size:clamp(12px,1.85vw,19px);font-weight:750;color:#9ca1aa}
+.stats-list-rank.medal-gold{color:#efcb72;background:#453720;border:1px solid #a88743;border-radius:6px}
+.stats-list-rank.medal-silver{color:#d6dce3;background:#373d44;border:1px solid #8795a4;border-radius:6px}
+.stats-list-rank.medal-bronze{color:#dfa77d;background:#493126;border:1px solid #a57551;border-radius:6px}
+.stats-list-name{font-weight:650;font-size:clamp(15px,2.5vw,25px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stats-list-avg,.stats-list-played{text-align:right;font-size:clamp(15px,2.4vw,23px)}
+.stats-list-arrow{font-size:clamp(20px,3vw,30px);color:#8d929b;text-align:right}
+.stats-list-row.focused{background:#34363b;outline:1px solid #e8e8e8;outline-offset:-1px;border-radius:5px}
+.stats-list-row:active{background:#3c3e45}
+/* Player profile: shorter, evenly spaced statistics panels. */
+.console[data-view="stats-player-detail"] .stats-player-dashboard{gap:clamp(12px,2dvh,20px)}
+.console[data-view="stats-player-detail"] .stats-player-hero{padding:clamp(4px,1dvh,10px) 0}
+.console[data-view="stats-player-detail"] .stats-player-hero h1{margin:clamp(5px,1dvh,10px) 0 0;font-size:clamp(36px,5.8vw,60px)}
+.stats-profile-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(10px,1.8vw,18px)}
+.stats-profile-stat{display:flex;flex-direction:column;justify-content:space-between;min-height:clamp(115px,15dvh,155px);padding:clamp(14px,2.5vw,24px);background:#202226;border:1px solid #393c42;border-radius:10px;gap:16px}
+.stats-profile-stat span{color:#aeb2bc;font-size:clamp(11px,1.8vw,18px);font-weight:600;letter-spacing:.045em}
+.stats-profile-stat strong{font-size:clamp(29px,5vw,51px);line-height:1.08;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+.stats-profile-highlight{border-color:#777b83}
 </style>
 </head>
 <body>
@@ -705,7 +736,7 @@ function show(page,withNav=false){
   state.message='';
   // Info pages place their action button at the bottom. Do not let
   // keyboard selection scroll past the heading on initial entry.
-  render(page!=='mode-info');
+  render(page!=='mode-info'&&page!=='stats-players');
   if(changed){
     const workspace=document.querySelector('.workspace');
     if(workspace)workspace.scrollTop=0;
@@ -1419,17 +1450,19 @@ function medalClass(index,eligible){
   return eligible&&index<3?['medal-gold','medal-silver','medal-bronze'][index]:'';
 }
 function statsRankingTable(rows,selectable=false){
-  return '<div class="stats-leaderboard">'+rows.map((p,i)=>{
-    const medal=medalClass(i,p.played>0&&p.darts>0);
-    const start='<div class="stats-leaderboard-row '+medal+'">';
-    const inside='<span class="stats-place">'+(medal?['Ⅰ','Ⅱ','Ⅲ'][i]:String(i+1).padStart(2,'0'))+'</span>'+
-      '<span class="stats-leaderboard-name"><strong>'+esc(p.name)+'</strong><small>'+p.played+' Spiele · '+p.wins+' Siege</small></span>'+
-      '<span class="stats-leaderboard-avg"><strong>'+avgOf(p)+'</strong><small>AVG</small></span>';
-    return selectable?
-      '<button data-nav data-action="stats-player:'+encodeURIComponent(p.name)+'" class="stats-player-button '+medal+'">'+inside+
-      '<span class="stats-chevron" aria-hidden="true">›</span></button>':
-      start+inside+'</div>';
-  }).join('')+'</div>';
+  return '<div class="stats-list">'+
+    '<div class="stats-list-head"><span>#</span><span>SPIELER</span><span>AVG</span><span>SPIELE</span><span></span></div>'+
+    rows.map((p,i)=>{
+      const medal=medalClass(i,p.played>0&&p.darts>0);
+      const inner='<span class="stats-list-rank '+medal+'">'+String(i+1).padStart(2,'0')+'</span>'+
+        '<span class="stats-list-name">'+esc(p.name)+'</span>'+
+        '<span class="stats-list-avg">'+avgOf(p)+'</span>'+
+        '<span class="stats-list-played">'+p.played+'</span>'+
+        '<span class="stats-list-arrow" aria-hidden="true">›</span>';
+      return selectable?
+        '<button data-nav data-action="stats-player:'+encodeURIComponent(p.name)+'" class="stats-list-row '+medal+'">'+inner+'</button>':
+        '<div class="stats-list-row '+medal+'">'+inner+'</div>';
+    }).join('')+'</div>';
 }
 function statsMatches(games){
   return '<div class="stats-history-list">'+(games.length?games.map((g,i)=>
@@ -1461,7 +1494,6 @@ function statisticsPlayers(){
   return '<div class="stats-dashboard"><section class="stats-panel">'+
     '<div class="stats-section-title"><h2>Spieler</h2><span>3-DART AVG</span></div>'+
     statsRankingTable(ranking,true)+
-    '<p class="stats-footnote">Gold, Silber und Bronze kennzeichnen die besten drei Spieler mit erfasstem Countdown-Average. Spieler antippen oder mit dem Drehregler auswählen.</p>'+
     '</section></div>';
 }
 function statsPlayerDetails(){
@@ -1469,11 +1501,13 @@ function statsPlayerDetails(){
   const p=ranking.find(p=>p.name===state.statsPlayer);
   if(!p)return '<div class="stats-dashboard"><div class="stats-empty">Spieler nicht gefunden.</div></div>';
   const winrate=p.played?(p.wins/p.played*100).toFixed(0)+' %':'–';
-  return '<div class="stats-dashboard"><div class="stats-player-hero"><span>SPIELERPROFIL</span><h1>'+esc(p.name)+'</h1></div>'+
-    '<div class="stats-records">'+[
+  return '<div class="stats-dashboard stats-player-dashboard">'+
+    '<div class="stats-player-hero"><span>SPIELERPROFIL</span><h1>'+esc(p.name)+'</h1></div>'+
+    '<div class="stats-profile-grid">'+[
       ['MATCHES',p.played],['SIEGE',p.wins],['WINRATE',winrate],['3-DART AVG',avgOf(p)],
       ['180er',p.oneEighties],['BESTE AUFNAHME',p.bestTurn||'–']
-    ].map(([label,value])=>'<div class="stats-record"><span>'+label+'</span><strong>'+esc(value)+'</strong></div>').join('')+
+    ].map(([label,value],i)=>'<div class="stats-profile-stat '+(i===3?'stats-profile-highlight':'')+'">'+
+      '<span>'+label+'</span><strong>'+esc(value)+'</strong></div>').join('')+
     '</div></div>';
 }
 function statisticsRecords(){
