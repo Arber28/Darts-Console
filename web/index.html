@@ -583,6 +583,48 @@ header{justify-content:space-between;gap:24px}
 .stats-records{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(10px,2.2vw,22px)}
 .stats-record{background:#202226;border:1px solid #383b40;border-radius:10px;padding:clamp(20px,3.4vw,34px);display:flex;flex-direction:column;justify-content:space-between;min-height:clamp(150px,20dvh,230px);gap:20px}
 .stats-record span{font-size:clamp(11px,1.8vw,18px);color:#a1a5ad}.stats-record strong{font-size:clamp(37px,7vw,70px);letter-spacing:-.06em;font-variant-numeric:tabular-nums}
+
+/* Statistics refresh: legible records, medal leaderboard and an overview without duplicate lists. */
+.console[data-view^="stats"] .stats-dashboard{gap:clamp(14px,2.5dvh,26px)}
+.console[data-view="stats"] .stats-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+.console[data-view="stats"] .stats-kpi{min-height:clamp(125px,17dvh,200px);justify-content:space-between}
+.stats-kpi-icon{color:#969aa3}
+.stats-kpi-icon svg{height:clamp(22px,3.3vw,35px);width:clamp(22px,3.3vw,35px)}
+.stats-bars{display:flex;flex-direction:column;gap:clamp(17px,2.7dvh,28px);padding:7px 0}
+.stats-bar-row{display:grid;grid-template-columns:minmax(90px,1.3fr) minmax(80px,2fr) 24px;align-items:center;gap:clamp(10px,2vw,20px)}
+.stats-bar-row>span{font-size:clamp(13px,2.2vw,22px);font-weight:600;overflow-wrap:anywhere}
+.stats-bar-row strong{text-align:right;font-variant-numeric:tabular-nums}
+.stats-bar-track{background:#35383f;height:clamp(11px,1.4dvh,17px);border-radius:5px;overflow:hidden}
+.stats-bar-fill{background:#cfd2d8;height:100%;border-radius:5px}
+.stats-dashboard-note{color:#868b95;font-size:clamp(11px,1.6vw,16px);line-height:1.5}
+.stats-leaderboard{display:flex;flex-direction:column;gap:clamp(8px,1.2dvh,13px)}
+.stats-leaderboard-row,.stats-player-button{width:100%;border:1px solid #3b3e44;border-radius:9px;background:#26282d;color:#fff;display:grid;grid-template-columns:clamp(30px,5vw,54px) minmax(0,1fr) auto;align-items:center;gap:clamp(9px,1.9vw,18px);padding:clamp(14px,2.7vw,25px);text-align:left;min-height:clamp(76px,10dvh,110px)}
+.stats-player-button{grid-template-columns:clamp(30px,5vw,54px) minmax(0,1fr) auto 15px;cursor:pointer}
+.stats-place{font-weight:800;font-size:clamp(18px,3vw,30px);color:#9298a3}
+.stats-leaderboard-name{display:flex;flex-direction:column;min-width:0;gap:5px}
+.stats-leaderboard-name strong{font-size:clamp(17px,2.8vw,28px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stats-leaderboard-name small,.stats-leaderboard-avg small{font-size:clamp(11px,1.7vw,16px);color:#a5aab2}
+.stats-leaderboard-avg{display:flex;flex-direction:column;align-items:flex-end;gap:5px;font-variant-numeric:tabular-nums}
+.stats-leaderboard-avg strong{font-size:clamp(21px,3.4vw,34px)}
+.stats-chevron{color:#a1a7b2;font-size:30px}
+.stats-leaderboard-row.medal-gold,.stats-player-button.medal-gold{border-color:#bb953e;background:linear-gradient(90deg,#433920,#28292a 65%)}
+.stats-leaderboard-row.medal-silver,.stats-player-button.medal-silver{border-color:#aab1ba;background:linear-gradient(90deg,#373d44,#28292a 65%)}
+.stats-leaderboard-row.medal-bronze,.stats-player-button.medal-bronze{border-color:#a97550;background:linear-gradient(90deg,#403026,#28292a 65%)}
+.medal-gold .stats-place{color:#e9be58}.medal-silver .stats-place{color:#d5dbe3}.medal-bronze .stats-place{color:#d99d72}
+.stats-player-button.focused{outline:2px solid white;outline-offset:1px}
+.stats-history-list{display:flex;flex-direction:column;gap:clamp(9px,1.6dvh,16px)}
+.stats-history-row{border:1px solid #3d4047;background:#25272c;border-radius:9px;display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:12px;padding:clamp(14px,2.5vw,24px)}
+.stats-history-seq{font-size:clamp(14px,2vw,22px);font-weight:700;color:#a6acb5}
+.stats-history-game{display:flex;flex-direction:column;gap:6px;min-width:0}
+.stats-history-game strong{font-size:clamp(18px,3vw,28px)}
+.stats-history-game small{color:#a5abb4;font-size:clamp(11px,1.7vw,16px);overflow-wrap:anywhere}
+.stats-history-winner{display:flex;flex-direction:column;align-items:flex-end;gap:6px;min-width:0;text-align:right}
+.stats-history-winner small{font-size:clamp(9px,1.5vw,14px);color:#a1a7b0}
+.stats-history-winner strong{font-size:clamp(15px,2.6vw,24px);overflow-wrap:anywhere}
+.stats-player-hero{padding:clamp(18px,3vw,30px) 0}
+.stats-player-hero>span{font-size:12px;color:#a6aab2;letter-spacing:.14em}
+.stats-player-hero h1{font-size:clamp(40px,6.5vw,65px)}
+.stats-record-featured{border-color:#bd984c}
 </style>
 </head>
 <body>
@@ -773,13 +815,19 @@ function adjacentInfoMode(direction){
 function shortcuts(){
   if(state.page==='stats')return [
     ['Escape','Back',()=>show('home')],
-    ['F4','Ranking',()=>show('stats-ranking')],
+    ['F4','Players',()=>show('stats-players')],
     ['F2','Records',()=>show('stats-records')],
     ['F5','History',()=>show('stats-history')]
   ];
-  if(['stats-ranking','stats-records','stats-history'].includes(state.page))return [
+  if(['stats-players','stats-records','stats-history'].includes(state.page))return [
     ['Escape','Back',()=>show('stats')],
-    ['F4','Ranking',()=>show('stats-ranking')],
+    ['F4','Players',()=>show('stats-players')],
+    ['F2','Records',()=>show('stats-records')],
+    ['F5','History',()=>show('stats-history')]
+  ];
+  if(state.page==='stats-player-detail')return [
+    ['Escape','Back',()=>show('stats-players')],
+    ['F4','Players',()=>show('stats-players')],
     ['F2','Records',()=>show('stats-records')],
     ['F5','History',()=>show('stats-history')]
   ];
@@ -829,12 +877,13 @@ function runShortcut(key){
   shortcuts().find(item=>item[0]===key)?.[2]();
 }
 function renderFooter(){
-  if(['stats','stats-ranking','stats-records','stats-history'].includes(state.page)){
+  if(['stats','stats-players','stats-player-detail','stats-records','stats-history'].includes(state.page)){
     const keys=shortcuts();
     const buttons=keys.map(([key,label])=>
       '<button class="softkey library-key" data-shortcut="'+key+'"><span>'+esc(label.toUpperCase())+'</span></button>');
     buttons.splice(2,0,'<div class="home-encoder" aria-hidden="true">'+
-      '<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="23" fill="none" stroke="#fff" stroke-width="2.8"/></svg></div>');
+      '<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="23" fill="none" stroke="#fff" stroke-width="2.8"/>'+
+      (state.page==='stats-players'?'<circle cx="30" cy="30" r="8" fill="#fff"/>':'')+'</svg></div>');
     document.querySelector('footer').innerHTML=buttons.join('');
     return;
   }
@@ -1358,55 +1407,88 @@ function statsData(){
 }
 const avgOf=p=>p.darts?(3*p.points/p.darts).toFixed(1):'–';
 function statsTopCards(summary){
-  return '<div class="stats-kpis">'+
-    [['MATCHES',summary.matches],['3-DART AVG',summary.avg],['180s',summary.oneEighties]]
-    .map(([label,value])=>'<div class="stats-kpi"><strong>'+value+'</strong><span>'+label+'</span></div>').join('')+
-  '</div>';
+  return '<div class="stats-kpis">'+[
+    ['MATCHES',summary.matches,'target'],
+    ['3-DART AVG',summary.avg,'chart'],
+    ['180er',summary.oneEighties,'dart'],
+    ['BESTE AUFNAHME',summary.bestTurn||'–','trophy']
+  ].map(([label,value,symbol])=>'<div class="stats-kpi"><div class="stats-kpi-icon">'+icon(symbol)+'</div><strong>'+
+    esc(value)+'</strong><span>'+label+'</span></div>').join('')+'</div>';
 }
-function statsRankingTable(rows,limit){
-  const list=limit?rows.slice(0,limit):rows;
-  return '<div class="stats-table-wrap"><table class="stats-table"><thead><tr>'+
-    '<th>#</th><th>SPIELER</th><th>AVG</th><th>SIEGE</th></tr></thead><tbody>'+
-    list.map((p,i)=>'<tr><td class="stats-rank">'+String(i+1).padStart(2,'0')+'</td>'+
-      '<td class="stats-name">'+esc(p.name)+'</td><td>'+avgOf(p)+'</td>'+
-      '<td>'+p.wins+'</td></tr>').join('')+
-    '</tbody></table></div>';
+function medalClass(index,eligible){
+  return eligible&&index<3?['medal-gold','medal-silver','medal-bronze'][index]:'';
 }
-function statsMatches(games,limit){
-  const list=limit?games.slice(0,limit):games;
-  return '<div class="stats-match-list">'+(list.length?list.map(g=>
-    '<div class="stats-match"><div><strong>'+esc(g.mode)+'</strong><span>'+esc(g.date)+' · '+
-    esc(g.players.join(' · '))+'</span></div><div class="stats-winner">'+esc(g.winner)+'</div></div>').join(''):
+function statsRankingTable(rows,selectable=false){
+  return '<div class="stats-leaderboard">'+rows.map((p,i)=>{
+    const medal=medalClass(i,p.played>0&&p.darts>0);
+    const start='<div class="stats-leaderboard-row '+medal+'">';
+    const inside='<span class="stats-place">'+(medal?['Ⅰ','Ⅱ','Ⅲ'][i]:String(i+1).padStart(2,'0'))+'</span>'+
+      '<span class="stats-leaderboard-name"><strong>'+esc(p.name)+'</strong><small>'+p.played+' Spiele · '+p.wins+' Siege</small></span>'+
+      '<span class="stats-leaderboard-avg"><strong>'+avgOf(p)+'</strong><small>AVG</small></span>';
+    return selectable?
+      '<button data-nav data-action="stats-player:'+encodeURIComponent(p.name)+'" class="stats-player-button '+medal+'">'+inside+
+      '<span class="stats-chevron" aria-hidden="true">›</span></button>':
+      start+inside+'</div>';
+  }).join('')+'</div>';
+}
+function statsMatches(games){
+  return '<div class="stats-history-list">'+(games.length?games.map((g,i)=>
+    '<div class="stats-history-row"><span class="stats-history-seq">'+String(i+1).padStart(2,'0')+'</span>'+
+    '<div class="stats-history-game"><strong>'+esc(g.mode)+'</strong><small>'+esc(g.date)+' · '+esc(g.players.join(' / '))+'</small></div>'+
+    '<span class="stats-history-winner"><small>GEWINNER</small><strong>'+esc(g.winner)+'</strong></span></div>').join(''):
     '<div class="stats-empty">Noch keine abgeschlossenen Matches.</div>')+'</div>';
 }
-function statistics(){
-  const {games,ranking,summary}=statsData();
-  return '<div class="stats-dashboard">'+
-    statsTopCards(summary)+
-    '<section class="stats-panel"><div class="stats-section-title"><h2>Ranking</h2><span>3-Dart Average</span></div>'+
-    statsRankingTable(ranking,6)+'</section>'+
-    '<section class="stats-panel"><div class="stats-section-title"><h2>Letzte Matches</h2><span>ERGEBNISSE</span></div>'+
-    statsMatches(games,3)+'</section></div>';
+function statsActivity(games){
+  // The chart only plots actual completed matches, grouped by recorded game mode.
+  const totals=new Map();
+  for(const game of games)totals.set(game.mode,(totals.get(game.mode)||0)+1);
+  const rows=[...totals].sort((a,b)=>b[1]-a[1]).slice(0,5);
+  if(!rows.length)return '<div class="stats-empty">Nach den ersten abgeschlossenen Matches erscheint hier die Verteilung nach Spielmodus.</div>';
+  const max=rows[0][1];
+  return '<div class="stats-bars">'+rows.map(([mode,count])=>
+    '<div class="stats-bar-row"><span>'+esc(mode)+'</span><div class="stats-bar-track"><div class="stats-bar-fill" style="width:'+
+    (100*count/max).toFixed(1)+'%"></div></div><strong>'+count+'</strong></div>').join('')+'</div>';
 }
-function statisticsRanking(){
+function statistics(){
+  const {games,summary}=statsData();
+  return '<div class="stats-dashboard stats-overview">'+statsTopCards(summary)+
+    '<section class="stats-panel"><div class="stats-section-title"><h2>Spielmodi</h2><span>GESPIELTE MATCHES</span></div>'+
+    statsActivity(games)+'</section>'+
+    '<div class="stats-dashboard-note">Statistiken aus gespeicherten Matches · 3-Dart Average nur für 301, 501 und 701</div></div>';
+}
+function statisticsPlayers(){
   const {ranking}=statsData();
   return '<div class="stats-dashboard"><section class="stats-panel">'+
-    '<div class="stats-section-title"><h2>Spielerrangliste</h2><span>301 · 501 · 701</span></div>'+
-    statsRankingTable(ranking)+
-    '<p class="stats-footnote">Average aus erfassten Darts in Countdown-Spielen. Ohne erfasste Darts wird „–“ angezeigt.</p>'+
+    '<div class="stats-section-title"><h2>Spieler</h2><span>3-DART AVG</span></div>'+
+    statsRankingTable(ranking,true)+
+    '<p class="stats-footnote">Gold, Silber und Bronze kennzeichnen die besten drei Spieler mit erfasstem Countdown-Average. Spieler antippen oder mit dem Drehregler auswählen.</p>'+
     '</section></div>';
+}
+function statsPlayerDetails(){
+  const {ranking}=statsData();
+  const p=ranking.find(p=>p.name===state.statsPlayer);
+  if(!p)return '<div class="stats-dashboard"><div class="stats-empty">Spieler nicht gefunden.</div></div>';
+  const winrate=p.played?(p.wins/p.played*100).toFixed(0)+' %':'–';
+  return '<div class="stats-dashboard"><div class="stats-player-hero"><span>SPIELERPROFIL</span><h1>'+esc(p.name)+'</h1></div>'+
+    '<div class="stats-records">'+[
+      ['MATCHES',p.played],['SIEGE',p.wins],['WINRATE',winrate],['3-DART AVG',avgOf(p)],
+      ['180er',p.oneEighties],['BESTE AUFNAHME',p.bestTurn||'–']
+    ].map(([label,value])=>'<div class="stats-record"><span>'+label+'</span><strong>'+esc(value)+'</strong></div>').join('')+
+    '</div></div>';
 }
 function statisticsRecords(){
   const {ranking,summary}=statsData();
+  const best=ranking.find(p=>p.darts);
+  const bestWins=ranking.length?Math.max(...ranking.map(p=>p.wins)):0;
   const records=[
-    ['HÖCHSTE AUFNAHME',summary.bestTurn?String(summary.bestTurn):'–'],
-    ['180er GESAMT',String(summary.oneEighties)],
-    ['BESTER AVERAGE',ranking.find(p=>p.darts)?avgOf(ranking.find(p=>p.darts)):'–'],
-    ['MEISTE SIEGE',ranking.length?String(Math.max(...ranking.map(p=>p.wins))):'–']
+    ['HÖCHSTE AUFNAHME',summary.bestTurn||'–'],
+    ['180er GESAMT',summary.oneEighties],
+    ['BESTER AVERAGE',best?avgOf(best):'–'],
+    ['MEISTE SIEGE',bestWins||'–']
   ];
   return '<div class="stats-dashboard"><div class="stats-records">'+
-    records.map(([label,value])=>'<div class="stats-record"><span>'+label+'</span><strong>'+value+'</strong></div>').join('')+
-    '</div><p class="stats-footnote">180er und beste Aufnahme werden aus den gespeicherten Drei-Dart-Aufnahmen der Countdown-Spiele ermittelt.</p></div>';
+    records.map(([label,value],i)=>'<div class="stats-record '+(i===0?'stats-record-featured':'')+'"><span>'+label+'</span><strong>'+esc(value)+'</strong></div>').join('')+
+    '</div><p class="stats-footnote">Alle Werte werden aus abgeschlossenen Matches berechnet. Average, 180er und Aufnahmen beziehen sich auf Countdown-Spiele.</p></div>';
 }
 function statisticsHistory(){
   const {games}=statsData();
@@ -1522,14 +1604,14 @@ async function startSoftwareUpdate(){
 function render(scroll=false){
   document.querySelector('.console').dataset.view=state.page;
   const matchPage=['game','menu','segment','correction'].includes(state.page);
-  const sectionHeadings={players:'Players',stats:'Statistics','stats-ranking':'Ranking','stats-records':'Records','stats-history':'History',settings:'Settings'};
+  const sectionHeadings={players:'Players',stats:'Statistics','stats-players':'Players','stats-player-detail':'Player','stats-records':'Records','stats-history':'History',settings:'Settings'};
   document.getElementById('match-heading').textContent=sectionHeadings[state.page]||
     (matchPage&&data.active?data.active.mode:'');
   const context=document.getElementById('match-context');
   const currentView=matchPage&&data.active?derived():null;
   context.textContent=currentView?'ROUND '+currentView.round+(Number(data.active.mode)?' · '+data.active.options.out.toUpperCase():''):'';
   const views={home:homeScreen,play:cards,'mode-info':selectedGameInfo,setup,game,segment,correction:history,grid:picker,number:picker,stats:statistics,
-    'stats-ranking':statisticsRanking,'stats-records':statisticsRecords,'stats-history':statisticsHistory,
+    'stats-players':statisticsPlayers,'stats-player-detail':statsPlayerDetails,'stats-records':statisticsRecords,'stats-history':statisticsHistory,
     profile:profileEditor,
     'bermuda-number':()=>title('MATCH SETUP','Bermuda Triangle','Choose the target for the next round.')+
       '<div class="segments">'+Array.from({length:20},(_,i)=>button('bermuda-target:'+(i+1),i+1,'rule')).join('')+
@@ -1571,7 +1653,7 @@ function highlight(scroll){
   document.querySelectorAll('button.focused').forEach(b=>b.classList.remove('focused'));
   // The home screen is operated exclusively with its four physical keys.
   // No rotary selection exists, so none of its tiles should be highlighted.
-  if(state.page==='home'||state.page.startsWith('stats'))return;
+  if(state.page==='home'||(state.page.startsWith('stats')&&state.page!=='stats-players'))return;
   available.forEach((b,i)=>b.classList.toggle('focused',i===state.cursor));
   if(scroll && available[state.cursor])available[state.cursor].scrollIntoView({block:'nearest'});
 }
@@ -1679,6 +1761,9 @@ function clickButton(b){
   switch(action){
     case 'home':return show('home');
     case 'mode-info':return show('mode-info');
+    case 'stats-player':
+      state.statsPlayer=decodeURIComponent(value);
+      return show('stats-player-detail');
     case 'quick': case 'all':
       state.filter=action;
       if(action==='quick'&&!modes.slice(0,6).some(m=>m[0]===state.chosen)) state.chosen='501';
@@ -1784,14 +1869,14 @@ document.addEventListener('click',event=>{
   const b=event.target.closest('button[data-nav]');
   if(b) clickButton(b);
 });
-const back={'mode-info':'play',play:'home',players:'home',stats:'home','stats-ranking':'stats','stats-records':'stats','stats-history':'stats',settings:'home',setup:'play',game:'menu',menu:'game',correction:'game',rounds:'setup',grid:'setup',number:'setup',
+const back={'mode-info':'play',play:'home',players:'home',stats:'home','stats-players':'stats','stats-player-detail':'stats-players','stats-records':'stats','stats-history':'stats',settings:'home',setup:'play',game:'menu',menu:'game',correction:'game',rounds:'setup',grid:'setup',number:'setup',
   saved:'play',about:'settings',profile:'players','bermuda-number':'setup','bermuda-multiplier':'bermuda-number'};
 document.addEventListener('keydown',event=>{
   const key=event.key;
   if(!['ArrowUp','ArrowDown','Enter','Escape','F2','F4','F5'].includes(key))return;
   event.preventDefault();
   if(event.repeat&&key!=='ArrowUp'&&key!=='ArrowDown') return;
-  if((state.page==='home'||state.page==='mode-info'||state.page.startsWith('stats'))&&(key==='ArrowUp'||key==='ArrowDown'||key==='Enter'))return;
+  if((state.page==='home'||state.page==='mode-info'||(state.page.startsWith('stats')&&state.page!=='stats-players'))&&(key==='ArrowUp'||key==='ArrowDown'||key==='Enter'))return;
   if(key==='ArrowUp'||key==='ArrowDown'){
     const items=controls();
     if(!items.length)return;
