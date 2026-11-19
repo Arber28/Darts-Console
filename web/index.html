@@ -624,7 +624,6 @@ header{justify-content:space-between;gap:24px}
 .stats-player-hero{padding:clamp(18px,3vw,30px) 0}
 .stats-player-hero>span{font-size:12px;color:#a6aab2;letter-spacing:.14em}
 .stats-player-hero h1{font-size:clamp(40px,6.5vw,65px)}
-.stats-record-featured{border-color:#bd984c}
 
 /* Player ranking: compact tabular list, medals only on the top-three rank numbers. */
 .console[data-view="stats-players"] .stats-panel{padding:clamp(14px,2.5vw,25px)}
@@ -655,7 +654,6 @@ header{justify-content:space-between;gap:24px}
 .stats-profile-stat{display:flex;flex-direction:column;justify-content:space-between;min-height:clamp(115px,15dvh,155px);padding:clamp(14px,2.5vw,24px);background:#202226;border:1px solid #393c42;border-radius:10px;gap:16px}
 .stats-profile-stat span{color:#aeb2bc;font-size:clamp(11px,1.8vw,18px);font-weight:600;letter-spacing:.045em}
 .stats-profile-stat strong{font-size:clamp(29px,5vw,51px);line-height:1.08;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
-.stats-profile-highlight{border-color:#777b83}
 </style>
 </head>
 <body>
@@ -1389,7 +1387,14 @@ function history(){
 
 function statsData(){
   const matches=[...data.matches,...(data.active&&Scoring.replay(data.active).winners!==null?[data.active]:[])]
-    .filter(match=>match&&Scoring.replay(match).winners!==null);
+    .filter(match=>match&&Scoring.replay(match).winners!==null)
+    .map((match,index)=>({match,index}))
+    .sort((a,b)=>{
+      // Newest first. Keep insertion order as tie-breaker for equal/missing timestamps.
+      const timeA=Number(a.match.started)||0;
+      const timeB=Number(b.match.started)||0;
+      return timeB-timeA||b.index-a.index;
+    }).map(entry=>entry.match);
   const players=new Map(data.profiles.map(name=>[name,{name,played:0,wins:0,points:0,darts:0,oneEighties:0,bestTurn:0}]));
   let points=0,darts=0,oneEighties=0,bestTurn=0;
   const games=matches.map(match=>{
@@ -1431,7 +1436,7 @@ function statsData(){
       }
     });
     return {mode:match.mode,date,players:match.players,winner};
-  }).reverse();
+  });
   const ranking=[...players.values()].sort((a,b)=>
     (b.darts?3*b.points/b.darts:-1)-(a.darts?3*a.points/a.darts:-1)||b.wins-a.wins||a.name.localeCompare(b.name));
   return {games,ranking,summary:{matches:matches.length,avg:darts?(3*points/darts).toFixed(1):'–',oneEighties,bestTurn}};
@@ -1506,7 +1511,7 @@ function statsPlayerDetails(){
     '<div class="stats-profile-grid">'+[
       ['MATCHES',p.played],['SIEGE',p.wins],['WINRATE',winrate],['3-DART AVG',avgOf(p)],
       ['180er',p.oneEighties],['BESTE AUFNAHME',p.bestTurn||'–']
-    ].map(([label,value],i)=>'<div class="stats-profile-stat '+(i===3?'stats-profile-highlight':'')+'">'+
+    ] .map(([label,value])=>'<div class="stats-profile-stat">'+
       '<span>'+label+'</span><strong>'+esc(value)+'</strong></div>').join('')+
     '</div></div>';
 }
@@ -1521,7 +1526,7 @@ function statisticsRecords(){
     ['MEISTE SIEGE',bestWins||'–']
   ];
   return '<div class="stats-dashboard"><div class="stats-records">'+
-    records.map(([label,value],i)=>'<div class="stats-record '+(i===0?'stats-record-featured':'')+'"><span>'+label+'</span><strong>'+esc(value)+'</strong></div>').join('')+
+    records.map(([label,value])=>'<div class="stats-record"><span>'+label+'</span><strong>'+esc(value)+'</strong></div>').join('')+
     '</div><p class="stats-footnote">Alle Werte werden aus abgeschlossenen Matches berechnet. Average, 180er und Aufnahmen beziehen sich auf Countdown-Spiele.</p></div>';
 }
 function statisticsHistory(){
