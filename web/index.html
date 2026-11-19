@@ -1073,7 +1073,6 @@ header{justify-content:space-between;gap:24px}
 .guest-profile-badge svg{color:#fff}
 
 /* Live-match controls share the same five hardware centers as every other view. */
-.console[data-view="game"] .turn-complete{padding:9px 10px;background:#27292d;border:1px solid #b8b9bc;border-radius:6px;font-size:clamp(12px,1.65vw,20px);font-weight:750;letter-spacing:.045em;text-align:center;color:#f0f0f0}
 .danger-action{border-color:#b26060!important;color:#f0a7a7!important}
 .console[data-view="game"] .dart-slot:disabled{opacity:1}
 .console[data-view="game"] .dart-slot.recorded:disabled{background:#ededee;color:#17181b}
@@ -1684,37 +1683,22 @@ function deletePlayerProfile(){
 /* The scoring engine advances immediately on the third dart. Keep the completed
    three-dart visit visible until NEXT is pressed. This is presentation metadata,
    not a modification to the scoring event stream. Persisted for kiosk reloads. */
-function turnReview(){
-  const review=data.active?.uiTurnReview;
-  if(!review || !Array.isArray(review.darts) || review.darts.length!==3)return null;
-  const view=derived();
-  if(view.winners!==null || data.active.events.length!==review.eventCount)return null;
-  if(view.current!==review.nextPlayer || view.round!==review.nextRound)return null;
-  return review;
-}
+/* Scoring.replay already advances after the third dart (and on an early
+   bust). There is no separate NEXT/turn confirmation state. */
+function turnReview(){return null}
 function clearTurnReview(){
   if(data.active)delete data.active.uiTurnReview;
 }
 function recordMatchDart(n,m){
-  if(!data.active||derived().winners!==null||turnReview())return false;
-  const before=derived();
-  const index=data.active.events.length;
+  if(!data.active||derived().winners!==null)return false;
+  const previousWinner=derived().winners;
+  clearTurnReview(); // migrate matches saved with the old NEXT gate
   Scoring.record(data.active,n,m);
-  const after=derived();
-  if(before.darts.length===2&&after.winners===null&&
-     (before.current!==after.current||before.round!==after.round)){
-    const darts=[...before.darts,{n,m}];
-    data.active.uiTurnReview={
-      player:before.current,round:before.round,darts,
-      indices:[...before.history.slice(-2).map(x=>x.index),index],
-      nextPlayer:after.current,nextRound:after.round,eventCount:data.active.events.length,
-      total:darts.reduce((sum,d)=>sum+d.n*d.m,0)
-    };
-  }else clearTurnReview();
   save();
   show('game');
-  if(after.winners!==null)announceVictory(before.winners);
-  else if(!turnReview())showThrowFeedback(n,m);
+  const completed=derived().winners!==null;
+  if(completed)announceVictory(previousWinner);
+  else showThrowFeedback(n,m);
   return true;
 }
 function leaveMatch(saveProgress){
@@ -1850,7 +1834,7 @@ function shortcuts(){
         clearTurnReview();
         Scoring.undo(data.active);save();show('game');
       }],
-      ['F5',turnReview()?'Next':'',()=>{if(turnReview()){clearTurnReview();save();show('game')}}]
+      ['F5',finished?'':'Manual',()=>{if(!finished)openThrow()}]
     ];
   }
   if(state.page==='menu')return [
@@ -1948,7 +1932,7 @@ function renderFooter(){
     const buttons=keys.map(([key,label])=>label
       ?'<button class="softkey library-key" data-shortcut="'+key+'"><span>'+esc(label.toUpperCase())+'</span></button>'
       :'<span class="stats-empty-softkey" aria-hidden="true"></span>');
-    const clickable=state.page==='saved'||state.page==='saved-discard-confirm'||state.page!=='game'||(derived().winners===null&&!turnReview());
+    const clickable=state.page!=='game'||derived().winners===null;
     buttons.splice(2,0,'<div class="home-encoder" aria-hidden="true">'+
       '<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="23" fill="none" stroke="#fff" stroke-width="2.8"/>'+
       (clickable?'<circle cx="30" cy="30" r="8" fill="#fff"/>':'')+'</svg></div>');
@@ -2495,7 +2479,6 @@ function game(){
       html+='<div class="checkout-inline-label"><span>◎ SUGGESTED '+(Number(mode)?'CHECKOUT':'TARGET')+'</span>'+
         '<span>GOLD = AIM · WHITE = HIT</span></div>';
     }
-    if(review)html+='<div class="turn-complete">TURN COMPLETE · PRESS NEXT TO CONTINUE</div>';
     html+='<div class="dart-slots">'+[0,1,2].map(i=>{
       const suggestion=!darts[i] ? suggested[i-darts.length] : null;
       const recorded=Boolean(darts[i]);
@@ -3111,6 +3094,8 @@ async function startSoftwareUpdate(){
 }
 
 function render(scroll=false){
+  // Drop only obsolete NEXT UI metadata, never event history or match scores.
+  if(data.active?.uiTurnReview){clearTurnReview();save()}
   document.querySelector('.console').dataset.view=state.page;
   applyDisplaySettings();
   const matchPage=['game','menu','segment','correction','match-leave-confirm'].includes(state.page);
@@ -3274,7 +3259,6 @@ function showThrowFeedback(n,m){
   else overlay.addEventListener('animationend',e=>{if(e.target===overlay)overlay.remove()},{once:true});
 }
 function openThrow(index=null){
-  if(index===null&&turnReview())return;
   state.edit=index;
   state.number=undefined;
   show('segment');
@@ -3421,10 +3405,6 @@ function clickButton(b){
     case 'hit': {
       const [n,m]=value.split(',').map(Number);
       return clickHitAction(n,m);
-    }
-    case 'next':{
-      if(!turnReview())return;
-      clearTurnReview();save();return show('game');
     }
     case 'finished-home':{
       parkMatch();
