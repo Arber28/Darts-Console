@@ -535,7 +535,7 @@ header{justify-content:space-between;gap:24px}
 .console[data-view="mode-info"] .library-key{font-size:clamp(10px,2vw,20px);padding:0 3px}
 
 /* Compact aligned section headers for Players, Statistics and Settings. */
-.console:is([data-view="players"],[data-view="stats"],[data-view="settings"]) header{
+ .console:is([data-view="players"],[data-view="stats"],[data-view="stats-ranking"],[data-view="stats-records"],[data-view="stats-history"],[data-view="settings"]) header{
   min-height:clamp(70px,10vw,108px);justify-content:space-between;gap:12px;
 }
 .console:is([data-view="players"],[data-view="stats"],[data-view="settings"]) #match-heading{
@@ -552,6 +552,37 @@ header{justify-content:space-between;gap:24px}
 .console[data-view="home"] .home-option:focus-visible{
   outline:none;box-shadow:none;border-color:var(--menu-color);background:#202226
 }
+
+/* Compact statistics dashboard, designed for the portrait kiosk. */
+.console[data-view^="stats"] header{justify-content:space-between;gap:10px}
+.console[data-view^="stats"] #match-heading{margin-left:auto;text-align:right;white-space:nowrap;font-weight:650;font-size:clamp(19px,3.3vw,36px);letter-spacing:-.045em}
+.console[data-view^="stats"] #match-context{display:none}
+.console[data-view^="stats"] main{padding:clamp(14px,3.1vw,32px);padding-top:clamp(8px,1.5dvh,18px);overflow-y:auto}
+.console[data-view^="stats"] footer{min-height:clamp(76px,10dvh,115px)}
+.stats-dashboard{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:clamp(12px,2.5dvh,25px);padding-bottom:14px}
+.stats-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(8px,1.7vw,16px)}
+.stats-kpi{background:#202226;border:1px solid #383b40;border-radius:10px;padding:clamp(12px,2.4vw,24px);min-width:0;display:flex;flex-direction:column;gap:8px}
+.stats-kpi strong{font-size:clamp(25px,4.9vw,51px);font-weight:750;letter-spacing:-.055em;line-height:1.1;font-variant-numeric:tabular-nums}
+.stats-kpi span{color:#a1a5ad;font-size:clamp(10px,1.6vw,15px);letter-spacing:.045em;font-weight:600}
+.stats-panel{background:#202226;border:1px solid #383b40;border-radius:10px;padding:clamp(15px,3.1vw,31px);min-width:0}
+.stats-section-title{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:clamp(12px,2dvh,23px)}
+.stats-section-title h2{font-size:clamp(19px,3.1vw,32px);margin:0;font-weight:700;letter-spacing:-.04em}
+.stats-section-title span{color:#a5a7b0;font-size:clamp(10px,1.65vw,15px)}
+.stats-table{width:100%;border-collapse:collapse;table-layout:fixed;text-align:left;font-variant-numeric:tabular-nums}
+.stats-table th{font-weight:650;color:#8f939e;font-size:clamp(10px,1.6vw,15px);padding:0 4px 12px;letter-spacing:.06em}
+.stats-table td{border-top:1px solid #393c42;padding:clamp(11px,1.9dvh,20px) 4px;font-size:clamp(14px,2.4vw,23px);white-space:nowrap}
+.stats-table th:nth-child(1){width:11%}.stats-table th:nth-child(2){width:43%}.stats-table th:nth-child(3){width:25%}.stats-table th:nth-child(4){width:21%}
+.stats-table td:nth-child(n+3),.stats-table th:nth-child(n+3){text-align:right}
+.stats-rank{color:#858b96}.stats-name{font-weight:650;overflow:hidden;text-overflow:ellipsis}
+.stats-match{display:flex;justify-content:space-between;align-items:center;gap:12px;border-top:1px solid #393c42;padding:clamp(11px,2dvh,18px) 0}
+.stats-match:first-child{border-top:0}
+.stats-match>div:first-child{min-width:0;display:flex;flex-direction:column;gap:6px}
+.stats-match strong{font-size:clamp(15px,2.4vw,24px)}.stats-match span{font-size:clamp(11px,1.8vw,16px);color:#a7aab2;line-height:1.35;overflow-wrap:anywhere}
+.stats-winner{font-size:clamp(15px,2.8vw,25px);font-weight:750;text-align:right;max-width:40%;overflow-wrap:anywhere}
+.stats-empty,.stats-footnote{font-size:clamp(12px,1.8vw,18px);color:#a2a6ad;line-height:1.5}
+.stats-records{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(10px,2.2vw,22px)}
+.stats-record{background:#202226;border:1px solid #383b40;border-radius:10px;padding:clamp(20px,3.4vw,34px);display:flex;flex-direction:column;justify-content:space-between;min-height:clamp(150px,20dvh,230px);gap:20px}
+.stats-record span{font-size:clamp(11px,1.8vw,18px);color:#a1a5ad}.stats-record strong{font-size:clamp(37px,7vw,70px);letter-spacing:-.06em;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -740,6 +771,18 @@ function adjacentInfoMode(direction){
   if(main)main.scrollTop=0;
 }
 function shortcuts(){
+  if(state.page==='stats')return [
+    ['Escape','Back',()=>show('home')],
+    ['F4','Ranking',()=>show('stats-ranking')],
+    ['F2','Records',()=>show('stats-records')],
+    ['F5','History',()=>show('stats-history')]
+  ];
+  if(['stats-ranking','stats-records','stats-history'].includes(state.page))return [
+    ['Escape','Back',()=>show('stats')],
+    ['F4','Ranking',()=>show('stats-ranking')],
+    ['F2','Records',()=>show('stats-records')],
+    ['F5','History',()=>show('stats-history')]
+  ];
   if(state.page==='mode-info')return [
     ['Escape','Back',()=>show('play')],
     ['F4','Vorheriges',()=>adjacentInfoMode(-1)],
@@ -786,6 +829,15 @@ function runShortcut(key){
   shortcuts().find(item=>item[0]===key)?.[2]();
 }
 function renderFooter(){
+  if(['stats','stats-ranking','stats-records','stats-history'].includes(state.page)){
+    const keys=shortcuts();
+    const buttons=keys.map(([key,label])=>
+      '<button class="softkey library-key" data-shortcut="'+key+'"><span>'+esc(label.toUpperCase())+'</span></button>');
+    buttons.splice(2,0,'<div class="home-encoder" aria-hidden="true">'+
+      '<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="23" fill="none" stroke="#fff" stroke-width="2.8"/></svg></div>');
+    document.querySelector('footer').innerHTML=buttons.join('');
+    return;
+  }
   if(state.page==='mode-info'){
     const keys=shortcuts();
     const buttons=keys.map(([key,label])=>
@@ -1254,26 +1306,113 @@ function history(){
       '<span>'+Scoring.label(event.n,event.m)+(accepted.has(i)?'':' · Skipped')+'</span>'):'').reverse().join('')||note('No recorded throws yet.'))+
     button('game','Back to match');
 }
-function statistics(){
-  const matches=[...data.matches,...(data.active&&derived().winners!==null?[data.active]:[])];
-  const totals=new Map(data.profiles.map(name=>[name,{played:0,won:0,points:0,darts:0}]));
-  const summaries=matches.map(match=>{
+
+function statsData(){
+  const matches=[...data.matches,...(data.active&&Scoring.replay(data.active).winners!==null?[data.active]:[])]
+    .filter(match=>match&&Scoring.replay(match).winners!==null);
+  const players=new Map(data.profiles.map(name=>[name,{name,played:0,wins:0,points:0,darts:0,oneEighties:0,bestTurn:0}]));
+  let points=0,darts=0,oneEighties=0,bestTurn=0;
+  const games=matches.map(match=>{
     const view=Scoring.replay(match);
-    if(view.winners===null) return '';
-    const winner=view.winners.map(i=>match.players[i]).join(' & ')||'Draw';
+    const winner=view.winners.map(i=>match.players[i]).join(' & ')||'Unentschieden';
+    const validDate=new Date(match.started);
+    const date=Number.isFinite(validDate.getTime())?validDate.toLocaleDateString('de-DE'):'–';
     match.players.forEach((name,i)=>{
-      const total=totals.get(name);
-      if(!total) return;
-      total.played++;
-      if(view.winners.includes(i)) total.won++;
-      view.history.filter(d=>d.player===i).forEach(d=>{total.darts++;total.points+=d.n*d.m});
+      if(!players.has(name))players.set(name,{name,played:0,wins:0,points:0,darts:0,oneEighties:0,bestTurn:0});
+      const entry=players.get(name);
+      entry.played++;
+      if(view.winners.includes(i))entry.wins++;
+      // 3-dart average is meaningful for countdown games, not for Cricket/Killer.
+      if(['301','501','701'].includes(match.mode)){
+        const throws=view.history.filter(d=>d.player===i);
+        for(const d of throws){entry.darts++;entry.points+=d.n*d.m;darts++;points+=d.n*d.m}
+        // Inspect the actual completed 3-dart turns, not arbitrary neighboring darts.
+        const turnDarts=new Map();
+        for(const evt of match.events||[]){
+          if(evt.type!=='throw'||evt.player!==i)continue;
+          const key=String(evt.round)+':'+String(evt.player)+':'+String(evt.slot===0?evt._index??'':evt._index??'');
+        }
+        const events=match.events||[];
+        for(let j=0;j<events.length;j++){
+          const e=events[j];
+          if(e.type!=='throw'||e.player!==i||e.slot!==0)continue;
+          const group=[e];
+          for(let k=j+1;k<events.length&&group.length<3;k++){
+            const next=events[k];
+            if(next.type==='throw'&&next.player===i&&next.round===e.round&&next.slot===group.length)group.push(next);
+            else if(next.type==='throw'||next.type==='next')break;
+          }
+          if(group.length===3){
+            const total=group.reduce((sum,d)=>sum+d.n*d.m,0);
+            entry.bestTurn=Math.max(entry.bestTurn,total);bestTurn=Math.max(bestTurn,total);
+            if(group.every(d=>d.n===20&&d.m===3)){entry.oneEighties++;oneEighties++}
+          }
+        }
+      }
     });
-    return '<div class="score-row"><span>'+esc(match.mode)+' · '+esc(new Date(match.started).toLocaleDateString())+
-      '<small class="marks">'+esc(match.players.join(', '))+'</small></span><strong>'+esc(winner)+'</strong></div>';
-  });
-  return panel('Players',[...totals].map(([name,t])=>'<div class="score-row"><span>'+esc(name)+
-      '</span><span>'+t.won+' / '+t.played+' wins · '+(t.darts?(3*t.points/t.darts).toFixed(1):'—')+' per 3 darts</span></div>').join(''))+
-    panel('Match history',summaries.reverse().join('')||'<p>No completed matches yet.</p>');
+    return {mode:match.mode,date,players:match.players,winner};
+  }).reverse();
+  const ranking=[...players.values()].sort((a,b)=>
+    (b.darts?3*b.points/b.darts:-1)-(a.darts?3*a.points/a.darts:-1)||b.wins-a.wins||a.name.localeCompare(b.name));
+  return {games,ranking,summary:{matches:matches.length,avg:darts?(3*points/darts).toFixed(1):'–',oneEighties,bestTurn}};
+}
+const avgOf=p=>p.darts?(3*p.points/p.darts).toFixed(1):'–';
+function statsTopCards(summary){
+  return '<div class="stats-kpis">'+
+    [['MATCHES',summary.matches],['3-DART AVG',summary.avg],['180s',summary.oneEighties]]
+    .map(([label,value])=>'<div class="stats-kpi"><strong>'+value+'</strong><span>'+label+'</span></div>').join('')+
+  '</div>';
+}
+function statsRankingTable(rows,limit){
+  const list=limit?rows.slice(0,limit):rows;
+  return '<div class="stats-table-wrap"><table class="stats-table"><thead><tr>'+
+    '<th>#</th><th>SPIELER</th><th>AVG</th><th>SIEGE</th></tr></thead><tbody>'+
+    list.map((p,i)=>'<tr><td class="stats-rank">'+String(i+1).padStart(2,'0')+'</td>'+
+      '<td class="stats-name">'+esc(p.name)+'</td><td>'+avgOf(p)+'</td>'+
+      '<td>'+p.wins+'</td></tr>').join('')+
+    '</tbody></table></div>';
+}
+function statsMatches(games,limit){
+  const list=limit?games.slice(0,limit):games;
+  return '<div class="stats-match-list">'+(list.length?list.map(g=>
+    '<div class="stats-match"><div><strong>'+esc(g.mode)+'</strong><span>'+esc(g.date)+' · '+
+    esc(g.players.join(' · '))+'</span></div><div class="stats-winner">'+esc(g.winner)+'</div></div>').join(''):
+    '<div class="stats-empty">Noch keine abgeschlossenen Matches.</div>')+'</div>';
+}
+function statistics(){
+  const {games,ranking,summary}=statsData();
+  return '<div class="stats-dashboard">'+
+    statsTopCards(summary)+
+    '<section class="stats-panel"><div class="stats-section-title"><h2>Ranking</h2><span>3-Dart Average</span></div>'+
+    statsRankingTable(ranking,6)+'</section>'+
+    '<section class="stats-panel"><div class="stats-section-title"><h2>Letzte Matches</h2><span>ERGEBNISSE</span></div>'+
+    statsMatches(games,3)+'</section></div>';
+}
+function statisticsRanking(){
+  const {ranking}=statsData();
+  return '<div class="stats-dashboard"><section class="stats-panel">'+
+    '<div class="stats-section-title"><h2>Spielerrangliste</h2><span>301 · 501 · 701</span></div>'+
+    statsRankingTable(ranking)+
+    '<p class="stats-footnote">Average aus erfassten Darts in Countdown-Spielen. Ohne erfasste Darts wird „–“ angezeigt.</p>'+
+    '</section></div>';
+}
+function statisticsRecords(){
+  const {ranking,summary}=statsData();
+  const records=[
+    ['HÖCHSTE AUFNAHME',summary.bestTurn?String(summary.bestTurn):'–'],
+    ['180er GESAMT',String(summary.oneEighties)],
+    ['BESTER AVERAGE',ranking.find(p=>p.darts)?avgOf(ranking.find(p=>p.darts)):'–'],
+    ['MEISTE SIEGE',ranking.length?String(Math.max(...ranking.map(p=>p.wins))):'–']
+  ];
+  return '<div class="stats-dashboard"><div class="stats-records">'+
+    records.map(([label,value])=>'<div class="stats-record"><span>'+label+'</span><strong>'+value+'</strong></div>').join('')+
+    '</div><p class="stats-footnote">180er und beste Aufnahme werden aus den gespeicherten Drei-Dart-Aufnahmen der Countdown-Spiele ermittelt.</p></div>';
+}
+function statisticsHistory(){
+  const {games}=statsData();
+  return '<div class="stats-dashboard"><section class="stats-panel">'+
+    '<div class="stats-section-title"><h2>Match History</h2><span>'+games.length+' MATCHES</span></div>'+
+    statsMatches(games)+'</section></div>';
 }
 function profileEditor(){
   const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 -';
@@ -1383,13 +1522,14 @@ async function startSoftwareUpdate(){
 function render(scroll=false){
   document.querySelector('.console').dataset.view=state.page;
   const matchPage=['game','menu','segment','correction'].includes(state.page);
-  const sectionHeadings={players:'Players',stats:'Statistics',settings:'Settings'};
+  const sectionHeadings={players:'Players',stats:'Statistics','stats-ranking':'Ranking','stats-records':'Records','stats-history':'History',settings:'Settings'};
   document.getElementById('match-heading').textContent=sectionHeadings[state.page]||
     (matchPage&&data.active?data.active.mode:'');
   const context=document.getElementById('match-context');
   const currentView=matchPage&&data.active?derived():null;
   context.textContent=currentView?'ROUND '+currentView.round+(Number(data.active.mode)?' · '+data.active.options.out.toUpperCase():''):'';
   const views={home:homeScreen,play:cards,'mode-info':selectedGameInfo,setup,game,segment,correction:history,grid:picker,number:picker,stats:statistics,
+    'stats-ranking':statisticsRanking,'stats-records':statisticsRecords,'stats-history':statisticsHistory,
     profile:profileEditor,
     'bermuda-number':()=>title('MATCH SETUP','Bermuda Triangle','Choose the target for the next round.')+
       '<div class="segments">'+Array.from({length:20},(_,i)=>button('bermuda-target:'+(i+1),i+1,'rule')).join('')+
@@ -1431,7 +1571,7 @@ function highlight(scroll){
   document.querySelectorAll('button.focused').forEach(b=>b.classList.remove('focused'));
   // The home screen is operated exclusively with its four physical keys.
   // No rotary selection exists, so none of its tiles should be highlighted.
-  if(state.page==='home')return;
+  if(state.page==='home'||state.page.startsWith('stats'))return;
   available.forEach((b,i)=>b.classList.toggle('focused',i===state.cursor));
   if(scroll && available[state.cursor])available[state.cursor].scrollIntoView({block:'nearest'});
 }
@@ -1644,14 +1784,14 @@ document.addEventListener('click',event=>{
   const b=event.target.closest('button[data-nav]');
   if(b) clickButton(b);
 });
-const back={'mode-info':'play',play:'home',players:'home',stats:'home',settings:'home',setup:'play',game:'menu',menu:'game',correction:'game',rounds:'setup',grid:'setup',number:'setup',
+const back={'mode-info':'play',play:'home',players:'home',stats:'home','stats-ranking':'stats','stats-records':'stats','stats-history':'stats',settings:'home',setup:'play',game:'menu',menu:'game',correction:'game',rounds:'setup',grid:'setup',number:'setup',
   saved:'play',about:'settings',profile:'players','bermuda-number':'setup','bermuda-multiplier':'bermuda-number'};
 document.addEventListener('keydown',event=>{
   const key=event.key;
   if(!['ArrowUp','ArrowDown','Enter','Escape','F2','F4','F5'].includes(key))return;
   event.preventDefault();
   if(event.repeat&&key!=='ArrowUp'&&key!=='ArrowDown') return;
-  if((state.page==='home'||state.page==='mode-info')&&(key==='ArrowUp'||key==='ArrowDown'||key==='Enter'))return;
+  if((state.page==='home'||state.page==='mode-info'||state.page.startsWith('stats'))&&(key==='ArrowUp'||key==='ArrowDown'||key==='Enter'))return;
   if(key==='ArrowUp'||key==='ArrowDown'){
     const items=controls();
     if(!items.length)return;
