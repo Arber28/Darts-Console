@@ -546,10 +546,11 @@ header{justify-content:space-between;gap:24px}
 .console:is([data-view="players"],[data-view="stats"],[data-view="settings"]) main{
   padding-top:clamp(9px,1.6vw,18px);
 }
+.console[data-view="home"] .home-option,
 .console[data-view="home"] .home-option.focused,
 .console[data-view="home"] .home-option:focus,
 .console[data-view="home"] .home-option:focus-visible{
-  outline:none;box-shadow:none;border-color:#383a40;background:#202226
+  outline:none;box-shadow:none;border-color:var(--menu-color);background:#202226
 }
 </style>
 </head>
