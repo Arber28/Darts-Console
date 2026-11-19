@@ -818,6 +818,14 @@ header{justify-content:space-between;gap:24px}
 .match-profile-mini{width:clamp(24px,3vw,34px);height:clamp(24px,3vw,34px);margin-right:10px}
 .match-profile-avatar svg,.match-profile-mini svg{width:67%;height:67%}
 @media(max-width:600px){.profile-customize-grid{gap:7px}.profile-option{min-height:87px}.profile-color-option{min-height:80px}}
+
+/* All profile workflows show Name > Logo > Color, for create and edit alike. */
+.profile-progress{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(7px,1.2vw,15px);width:100%;margin-bottom:clamp(4px,1dvh,12px)}
+.profile-progress-step{display:flex;align-items:center;justify-content:center;gap:clamp(5px,1vw,12px);min-width:0;min-height:clamp(39px,5.5dvh,58px);border-bottom:2px solid #464951;color:#8d929c;font-size:clamp(11px,1.8vw,18px);letter-spacing:.07em}
+.profile-progress-step span{font-size:clamp(10px,1.5vw,15px);font-variant-numeric:tabular-nums}
+.profile-progress-step strong{font-weight:700}
+.profile-progress-step.current{border-color:#f4f5f6;color:#f4f5f6}
+.profile-progress-step.done{border-color:#47b38d;color:#d1d5db}
 </style>
 </head>
 <body>
@@ -1073,7 +1081,7 @@ function shortcuts(){
     ['Escape','Back',()=>show('players')],
     ['F4','Löschen',()=>{state.name=state.name.slice(0,-1);render(false)}],
     ['F2','Leerzeichen',()=>{if(state.name.length<24)state.name+=' ';render(false)}],
-    ['F5','Weiter',()=>show('profile-icons')]
+    ['F5','Weiter',advanceToProfileIcons]
   ];
   if(state.page==='profile-icons')return [
     ['Escape','Back',()=>show('profile')],
@@ -1916,15 +1924,30 @@ function playerDeleteScreen(){
     '<p class="stats-delete-warning">Das Profil wird entfernt. Bereits gespielte Matches und ihre Ergebnisse bleiben erhalten.</p>'+
     '</div>';
 }
+function advanceToProfileIcons(){
+  const name=(state.name||'').trim().toLocaleUpperCase('de-DE');
+  if(!name)return say('Bitte zuerst einen Spielernamen eingeben.');
+  if([...data.profiles,...state.guests].some(n=>n!==state.editOriginal&&n.toLocaleUpperCase('de-DE')===name))
+    return say('Diesen Spielernamen gibt es schon.');
+  state.name=name;
+  show('profile-icons');
+}
+function profileProgress(step){
+  const parts=['NAME','LOGO','FARBE'];
+  return '<div class="profile-progress" aria-label="Schritt '+step+' von 3">'+
+    parts.map((part,i)=>'<div class="profile-progress-step '+(i+1===step?'current':i+1<step?'done':'')+'">'+
+      '<span>'+String(i+1).padStart(2,'0')+'</span><strong>'+part+'</strong></div>').join('')+
+    '</div>';
+}
 function profileIconsPage(){
-  return '<div class="profile-customize"><div class="profile-customize-top">'+profileBadgePreview()+
+  return '<div class="profile-customize">'+profileProgress(2)+'<div class="profile-customize-top">'+profileBadgePreview()+
   '<div><strong>'+esc(state.name.toLocaleUpperCase('de-DE'))+'</strong><small>LOGO WÄHLEN · 24 LOGOS</small></div></div>'+
   '<div class="profile-customize-grid icons">'+profileIconOptions.map((item,i)=>
     '<button data-nav data-action="choose-icon:'+i+'" class="profile-option '+(state.editIcon===i?'chosen':'')+'" aria-label="'+esc(item[0])+'">'+
     '<span class="profile-option-icon">'+profileIconSvg(i)+'</span><small>'+esc(item[0])+'</small></button>').join('')+'</div></div>';
 }
 function profileColorsPage(){
-  return '<div class="profile-customize"><div class="profile-customize-top">'+profileBadgePreview()+
+  return '<div class="profile-customize">'+profileProgress(3)+'<div class="profile-customize-top">'+profileBadgePreview()+
   '<div><strong>'+esc(state.name.toLocaleUpperCase('de-DE'))+'</strong><small>FARBE WÄHLEN · 24 FARBEN</small></div></div>'+
   '<div class="profile-customize-grid colors">'+profileColorOptions.map((color,i)=>
     '<button data-nav data-action="choose-color:'+i+'" class="profile-color-option '+(state.editColor===i?'chosen':'')+'" style="--swatch:'+color+'" aria-label="Farbe '+(i+1)+'">'+
@@ -1937,7 +1960,7 @@ function profileEditor(){
   // Same compact four-row keypad for new names and renaming. No lowercase/number mode.
   const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const keyboard=[...chars,' ','-'];
-  return '<div class="profile-editor-shell">'+
+  return '<div class="profile-editor-shell">'+profileProgress(1)+
     '<div class="profile-name-preview"><span class="profile-name-label">'+
       (state.editOriginal===null?'NEUER SPIELER':'SPIELER BEARBEITEN')+'</span>'+
       '<strong>'+esc(state.name.toLocaleUpperCase('de-DE')||'NAME')+
