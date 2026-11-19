@@ -654,6 +654,25 @@ header{justify-content:space-between;gap:24px}
 .stats-profile-stat{display:flex;flex-direction:column;justify-content:space-between;min-height:clamp(115px,15dvh,155px);padding:clamp(14px,2.5vw,24px);background:#202226;border:1px solid #393c42;border-radius:10px;gap:16px}
 .stats-profile-stat span{color:#aeb2bc;font-size:clamp(11px,1.8vw,18px);font-weight:600;letter-spacing:.045em}
 .stats-profile-stat strong{font-size:clamp(29px,5vw,51px);line-height:1.08;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+/* All record tiles show the athlete(s) responsible for each achievement. */
+.console[data-view="stats-records"] .stats-record{
+  min-height:clamp(160px,20dvh,225px);
+  gap:clamp(7px,1.2dvh,15px);
+  justify-content:space-between;
+}
+.console[data-view="stats-records"] .stats-record strong{
+  margin-top:auto;
+  font-size:clamp(30px,6.3vw,64px);
+  overflow-wrap:anywhere;
+}
+.stats-record-owner{
+  display:block;
+  color:#c8cbd2;
+  font-size:clamp(12px,2.1vw,20px);
+  font-weight:600;
+  line-height:1.25;
+  overflow-wrap:anywhere;
+}
 </style>
 </head>
 <body>
@@ -1395,6 +1414,8 @@ function statsData(){
       const timeB=Number(b.match.started)||0;
       return timeB-timeA||b.index-a.index;
     }).map(entry=>entry.match);
+  // Number matches chronologically while displaying newest first.
+  const chronologicalNumber=new Map([...matches].reverse().map((match,i)=>[match,i+1]));
   const players=new Map(data.profiles.map(name=>[name,{name,played:0,wins:0,points:0,darts:0,oneEighties:0,bestTurn:0}]));
   let points=0,darts=0,oneEighties=0,bestTurn=0;
   const games=matches.map(match=>{
@@ -1435,7 +1456,7 @@ function statsData(){
         }
       }
     });
-    return {mode:match.mode,date,players:match.players,winner};
+    return {number:chronologicalNumber.get(match),mode:match.mode,date,players:match.players,winner};
   });
   const ranking=[...players.values()].sort((a,b)=>
     (b.darts?3*b.points/b.darts:-1)-(a.darts?3*a.points/a.darts:-1)||b.wins-a.wins||a.name.localeCompare(b.name));
@@ -1471,7 +1492,7 @@ function statsRankingTable(rows,selectable=false){
 }
 function statsMatches(games){
   return '<div class="stats-history-list">'+(games.length?games.map((g,i)=>
-    '<div class="stats-history-row"><span class="stats-history-seq">'+String(i+1).padStart(2,'0')+'</span>'+
+    '<div class="stats-history-row"><span class="stats-history-seq">'+String(g.number).padStart(2,'0')+'</span>'+
     '<div class="stats-history-game"><strong>'+esc(g.mode)+'</strong><small>'+esc(g.date)+' · '+esc(g.players.join(' / '))+'</small></div>'+
     '<span class="stats-history-winner"><small>GEWINNER</small><strong>'+esc(g.winner)+'</strong></span></div>').join(''):
     '<div class="stats-empty">Noch keine abgeschlossenen Matches.</div>')+'</div>';
@@ -1516,18 +1537,35 @@ function statsPlayerDetails(){
     '</div></div>';
 }
 function statisticsRecords(){
-  const {ranking,summary}=statsData();
-  const best=ranking.find(p=>p.darts);
-  const bestWins=ranking.length?Math.max(...ranking.map(p=>p.wins)):0;
+  const {ranking}=statsData();
+  const active=ranking.filter(p=>p.played>0);
+  const max=(list,measure)=>{
+    if(!list.length)return {value:null,holders:[]};
+    const highest=Math.max(...list.map(measure));
+    return {value:highest,holders:list.filter(p=>measure(p)===highest).map(p=>p.name)};
+  };
+  const bestTurn=max(active.filter(p=>p.bestTurn>0),p=>p.bestTurn);
+  const best180=max(active.filter(p=>p.oneEighties>0),p=>p.oneEighties);
+  const avgPlayers=active.filter(p=>p.darts>0);
+  const bestAverage=max(avgPlayers,p=>3*p.points/p.darts);
+  const mostWins=max(active.filter(p=>p.wins>0),p=>p.wins);
+  const bestWinrate=max(active,p=>p.wins/p.played);
+  const mostPlayed=max(active,p=>p.played);
   const records=[
-    ['HÖCHSTE AUFNAHME',summary.bestTurn||'–'],
-    ['180er GESAMT',summary.oneEighties],
-    ['BESTER AVERAGE',best?avgOf(best):'–'],
-    ['MEISTE SIEGE',bestWins||'–']
+    ['HÖCHSTE AUFNAHME',bestTurn.value,bestTurn.holders,'integer'],
+    ['MEISTE 180er',best180.value,best180.holders,'integer'],
+    ['BESTER 3-DART AVG',bestAverage.value,bestAverage.holders,'decimal'],
+    ['MEISTE SIEGE',mostWins.value,mostWins.holders,'integer'],
+    ['BESTE SIEGQUOTE',bestWinrate.value,bestWinrate.holders,'percent'],
+    ['MEISTE MATCHES',mostPlayed.value,mostPlayed.holders,'integer']
   ];
+  const format=(value,type)=>value===null?'–':
+    type==='decimal'?value.toFixed(1):type==='percent'?(value*100).toFixed(0)+' %':String(value);
   return '<div class="stats-dashboard"><div class="stats-records">'+
-    records.map(([label,value])=>'<div class="stats-record"><span>'+label+'</span><strong>'+esc(value)+'</strong></div>').join('')+
-    '</div><p class="stats-footnote">Alle Werte werden aus abgeschlossenen Matches berechnet. Average, 180er und Aufnahmen beziehen sich auf Countdown-Spiele.</p></div>';
+    records.map(([label,value,holders,type])=>
+      '<div class="stats-record"><span>'+label+'</span><strong>'+format(value,type)+'</strong>'+
+      '<small class="stats-record-owner">'+(holders.length?esc(holders.join(' · ')):'Noch kein Rekord')+'</small></div>'
+    ).join('')+'</div></div>';
 }
 function statisticsHistory(){
   const {games}=statsData();
