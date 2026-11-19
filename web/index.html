@@ -1638,6 +1638,29 @@ header{justify-content:space-between;gap:24px}
   }
 }
 
+
+/* Prominent active-player name in the fixed match header. */
+.console[data-view="game"] header{
+  grid-template-columns:minmax(0,1fr) minmax(0,1.65fr) minmax(0,.8fr);
+}
+.console[data-view="game"] #match-context{
+  font-size:clamp(21px,3.25vw,40px);
+  font-weight:750;
+  letter-spacing:-.025em;
+}
+.console[data-view="game"] #match-context strong{
+  font-size:inherit;
+  font-weight:750;
+}
+@media(max-width:600px){
+  .console[data-view="game"] header{
+    grid-template-columns:minmax(0,1fr) minmax(0,1.65fr) minmax(0,.8fr);
+  }
+  .console[data-view="game"] #match-context{
+    font-size:clamp(18px,4vw,26px);
+  }
+}
+
 </style>
 </head>
 <body>
