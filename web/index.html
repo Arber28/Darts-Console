@@ -1019,6 +1019,28 @@ header{justify-content:space-between;gap:24px}
 .console.subtle-contrast .settings-section-body,.console.subtle-contrast .panel,.console.subtle-contrast .profile-manager-list{border-color:#292c32}
 .console.subtle-contrast .settings-row,.console.subtle-contrast .settings-display-row{border-bottom-color:#2a2d33}
 .console.high-contrast .settings-row,.console.high-contrast .settings-display-row{border-bottom-color:#686d76}
+
+/* Global, hardware-stable header typography: identical on every view. */
+.console[data-view] > header .brand{
+  flex:0 1 auto;
+  min-width:0;
+  font-size:clamp(15px,2vw,25px);
+  font-weight:650;
+  line-height:1.15;
+  letter-spacing:-.03em;
+  white-space:nowrap;
+}
+.console[data-view] > header #match-heading{
+  flex:0 0 auto;
+  min-width:0;
+  margin-left:auto;
+  font-size:clamp(19px,3.3vw,36px);
+  font-weight:650;
+  line-height:1.15;
+  letter-spacing:-.045em;
+  white-space:nowrap;
+  text-align:right;
+}
 </style>
 </head>
 <body>
