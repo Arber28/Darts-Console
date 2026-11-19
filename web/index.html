@@ -678,8 +678,13 @@ function cards(){
 }
 function toggleGameFilter(){
   state.filter=state.filter==='quick'?'all':'quick';
-  if(state.filter==='quick'&&!modes.slice(0,6).some(m=>m[0]===state.chosen))state.chosen='501';
-  render(true);
+  const visible=state.filter==='quick'?modes.slice(0,6):modes;
+  if(!visible.some(m=>m[0]===state.chosen))state.chosen=visible[0][0];
+  state.cursor=visible.findIndex(m=>m[0]===state.chosen);
+  // Changing the number of rows must never retain the old list scroll offset.
+  // Draw without scrollIntoView, then reset the scroll container explicitly.
+  render(false);
+  main.scrollTop=0;
 }
 function randomGame(){
   const available=state.filter==='quick'?modes.slice(0,6):modes;
