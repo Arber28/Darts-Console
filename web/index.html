@@ -1255,6 +1255,131 @@ header{justify-content:space-between;gap:24px}
   .console[data-view="game"] .compact-standings-head{font-size:9px}
 }
 
+
+/* Match layout A: a single coherent surface, weighted 70/30.
+   The header, scoring card, dart slots and fixed physical keys are unchanged. */
+.console[data-view="game"] .game-lower-grid{
+  grid-template-columns:minmax(0,7fr) minmax(0,3fr);
+  gap:clamp(8px,1.5vw,18px);
+  align-items:stretch;
+  background:#1c1e21;
+  border:1px solid #393b40;
+  border-radius:12px;
+  padding:clamp(10px,1.5vw,20px);
+  box-sizing:border-box;
+  min-height:0;
+}
+.console[data-view="game"] .game-lower-grid .match-board-area{
+  display:flex;align-items:center;justify-content:center;
+  min-width:0;min-height:0;
+  border:0;background:transparent;
+  padding:clamp(4px,.6vw,10px);
+}
+.console[data-view="game"] .game-lower-grid .match-board{
+  width:100%;max-width:min(100%,46dvh);
+  max-height:46dvh;
+  aspect-ratio:1;height:auto;
+  display:block;
+}
+.console[data-view="game"] .compact-standings{
+  max-height:46dvh;
+  min-width:0;min-height:0;
+  padding:0;
+  background:transparent;border:0;
+  border-radius:0;
+  display:flex;flex-direction:column;
+}
+.console[data-view="game"] .compact-standings-head{
+  height:clamp(35px,4dvh,55px);
+  padding:0 clamp(1px,.35vw,7px);
+  gap:4px;flex-shrink:0;
+  border-bottom:1px solid #414349;
+  font-size:clamp(10px,1.5vw,18px);
+  color:#b9bbc0;
+}
+.console[data-view="game"] .compact-turn-total{
+  background:#2d3035;border-radius:4px;
+  padding:4px 7px;color:#f1f1f1;
+  font-size:clamp(14px,2.1vw,25px);
+}
+.console[data-view="game"] .compact-players-list{
+  padding:clamp(8px,.8dvh,14px) 0 0;
+  gap:clamp(7px,.75dvh,12px);
+  min-height:0;
+  overflow-y:auto;
+  scrollbar-width:thin;
+}
+.console[data-view="game"] .compact-player{
+  position:relative;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  grid-template-rows:auto auto;
+  align-items:center;justify-content:stretch;
+  column-gap:clamp(5px,.8vw,12px);
+  row-gap:clamp(1px,.25dvh,4px);
+  text-align:left;
+  border:1px solid #484a51;
+  border-left:3px solid var(--player-accent);
+  border-radius:7px;
+  background:#26282c;
+  padding:clamp(8px,1dvh,14px) clamp(5px,.8vw,12px);
+  min-height:clamp(68px,8dvh,120px);
+}
+.console[data-view="game"] .compact-player.is-current{
+  background:#32343a;
+  border-color:#e8e8eb;
+  border-left-color:var(--player-accent);
+}
+.console[data-view="game"] .compact-player-badge{
+  grid-column:1;
+  grid-row:1/3;
+  width:clamp(27px,4vw,52px);
+  height:clamp(27px,4vw,52px);
+}
+.console[data-view="game"] .compact-player-score{
+  grid-column:2;grid-row:1;
+  font-size:clamp(25px,4vw,49px);
+  line-height:1;
+  min-width:0;
+}
+.console[data-view="game"] .compact-player-name{
+  grid-column:2;grid-row:2;
+  text-align:left;
+  font-size:clamp(10px,1.5vw,18px);
+  color:#bfc1c6;
+  font-weight:700;
+  overflow-wrap:anywhere;
+}
+.console[data-view="game"] .compact-player-extra{
+  grid-column:1/-1;
+  text-align:left;
+  font-size:clamp(8px,1vw,12px);
+}
+@media(max-width:600px){
+  .console[data-view="game"] .game-lower-grid{
+    grid-template-columns:minmax(0,7fr) minmax(0,3fr);
+    gap:7px;padding:7px;border-radius:9px;
+  }
+  .console[data-view="game"] .game-lower-grid .match-board-area{padding:2px 0}
+  .console[data-view="game"] .game-lower-grid .match-board{
+    width:100%;max-width:100%;max-height:43dvh;
+  }
+  .console[data-view="game"] .compact-standings{max-height:43dvh}
+  .console[data-view="game"] .compact-standings-head{height:29px;font-size:9px}
+  .console[data-view="game"] .compact-turn-total{font-size:13px;padding:2px 4px}
+  .console[data-view="game"] .compact-players-list{gap:6px;padding-top:6px}
+  .console[data-view="game"] .compact-player{
+    grid-template-columns:auto minmax(0,1fr);
+    column-gap:5px;
+    min-height:65px;
+    padding:7px 3px;
+    border-radius:5px;
+  }
+  .console[data-view="game"] .compact-player-badge{width:26px;height:26px}
+  .console[data-view="game"] .compact-player-score{font-size:clamp(20px,5.4vw,31px)}
+  .console[data-view="game"] .compact-player-name{font-size:clamp(9px,2.6vw,13px)}
+}
+
 </style>
 </head>
 <body>
