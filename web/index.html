@@ -546,6 +546,11 @@ header{justify-content:space-between;gap:24px}
 .console:is([data-view="players"],[data-view="stats"],[data-view="settings"]) main{
   padding-top:clamp(9px,1.6vw,18px);
 }
+.console[data-view="home"] .home-option.focused,
+.console[data-view="home"] .home-option:focus,
+.console[data-view="home"] .home-option:focus-visible{
+  outline:none;box-shadow:none;border-color:#383a40;background:#202226
+}
 </style>
 </head>
 <body>
@@ -1418,6 +1423,9 @@ function highlight(scroll){
   const available=controls();
   state.cursor=available.length?Math.max(0,Math.min(state.cursor,available.length-1)):0;
   document.querySelectorAll('button.focused').forEach(b=>b.classList.remove('focused'));
+  // The home screen is operated exclusively with its four physical keys.
+  // No rotary selection exists, so none of its tiles should be highlighted.
+  if(state.page==='home')return;
   available.forEach((b,i)=>b.classList.toggle('focused',i===state.cursor));
   if(scroll && available[state.cursor])available[state.cursor].scrollIntoView({block:'nearest'});
 }
