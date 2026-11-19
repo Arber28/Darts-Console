@@ -608,7 +608,16 @@ function show(page,withNav=false){
   state.page=page;
   if(changed)state.cursor=0;
   state.message='';
-  render(true);
+  // Info pages place their action button at the bottom. Do not let
+  // keyboard selection scroll past the heading on initial entry.
+  render(page!=='mode-info');
+  if(changed){
+    const workspace=document.querySelector('.workspace');
+    if(workspace)workspace.scrollTop=0;
+    if(main)main.scrollTop=0;
+    const info=main?.querySelector('.mode-info');
+    if(info)info.scrollTop=0;
+  }
 }
 function homeScreen(){
   const options=[
