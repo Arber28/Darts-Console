@@ -736,6 +736,29 @@ header{justify-content:space-between;gap:24px}
 .console[data-view] footer > :nth-child(3){grid-column:3}
 .console[data-view] footer > :nth-child(4){grid-column:4}
 .console[data-view] footer > :nth-child(5){grid-column:5}
+
+/* Dedicated profile manager: compact and hardware-first. */
+.console[data-view="players"] main{padding:clamp(12px,2.5vw,28px);padding-top:clamp(8px,1.5dvh,18px);overflow-y:auto}
+.profile-manager{max-width:1060px;margin:auto}
+.profile-manager-meta{display:flex;align-items:center;justify-content:space-between;color:#a2a7b1;font-size:clamp(11px,1.7vw,17px);letter-spacing:.08em;font-weight:650;margin:0 0 clamp(12px,2dvh,20px)}
+.profile-manager-meta strong{color:#dedfe4;font-size:inherit}
+.profile-manager-list{display:flex;flex-direction:column;background:#202226;border:1px solid #373a40;border-radius:13px;padding:clamp(6px,1.1vw,12px)}
+.profile-row{width:100%;display:grid;grid-template-columns:clamp(40px,7vw,66px) minmax(0,1fr) auto;gap:clamp(10px,2vw,23px);align-items:center;min-height:clamp(76px,10dvh,108px);border:0;border-bottom:1px solid #393b41;background:transparent;color:white;padding:clamp(10px,1.8vw,17px);text-align:left;border-radius:6px}
+.profile-row:last-child{border-bottom:0}
+.profile-row.focused,.profile-row.chosen{background:#303338}
+.profile-row.focused{outline:2px solid #e6e6e9;outline-offset:-2px}
+.profile-avatar{width:clamp(40px,7vw,66px);height:clamp(40px,7vw,66px);display:grid;place-items:center;border-radius:50%;background:#393d43;border:1px solid #555960;color:#f4f4f5;font-weight:750;font-size:clamp(18px,3vw,30px)}
+.profile-identity{display:flex;flex-direction:column;gap:clamp(5px,.7dvh,10px);min-width:0}
+.profile-identity strong{font-size:clamp(19px,3.2vw,32px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.profile-identity small{font-size:clamp(12px,1.9vw,19px);color:#a8abb4}
+.profile-row-marker{color:#aeb3bc;font-size:clamp(9px,1.4vw,14px);font-weight:700;letter-spacing:.09em}
+.profile-manager-tip{font-size:clamp(11px,1.6vw,16px);color:#878c94;text-align:center;margin-top:clamp(17px,2.6dvh,28px)}
+.console[data-view="players"] footer [data-shortcut="F5"],
+.console[data-view="player-delete"] footer [data-shortcut="F5"]{color:#ff7474}
+.profile-editor{padding:clamp(6px,2vw,26px) 0 clamp(8px,2dvh,22px)}
+.profile-editor h1{font-size:clamp(36px,6.5vw,65px);overflow-wrap:anywhere;margin:clamp(12px,2dvh,22px) 0}
+.profile-editor-tip{color:#a9adb5;font-size:clamp(15px,2.3vw,23px)}
+.console[data-view="players"] #match-heading,.console[data-view="profile"] #match-heading,.console[data-view="player-delete"] #match-heading{font-size:clamp(19px,3.3vw,36px)}
 </style>
 </head>
 <body>
@@ -794,7 +817,7 @@ try {
 }
 const state={page:'home',filter:'quick',chosen:'501',players:['Arber','Emre'],
   guests:[], cursor:0, message:'', out:data.out, rounds:10, bull:false, grid:[], sequence:[], numbers:{}, selfHit:null,
-  updateConfirm:false, updateBusy:false, updateInfo:'Requires an internet connection on this laptop.'};
+  selectedProfile:0, editOriginal:null, updateConfirm:false, updateBusy:false, updateInfo:'Requires an internet connection on this laptop.'};
 const main=document.getElementById('main');
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const currentMode=()=>modes.find(mode=>mode[0]===state.chosen);
@@ -942,7 +965,48 @@ function adjacentInfoMode(direction){
   if(workspace)workspace.scrollTop=0;
   if(main)main.scrollTop=0;
 }
+function selectedProfileName(){return data.profiles[state.selectedProfile]||null}
+function newPlayer(){
+  state.editOriginal=null;state.name='';
+  show('profile');
+}
+function editPlayer(){
+  const name=selectedProfileName();
+  if(!name)return;
+  state.editOriginal=name;state.name=name;
+  show('profile');
+}
+function confirmPlayerDeletion(){
+  if(!selectedProfileName())return;
+  show('player-delete');
+}
+function deletePlayerProfile(){
+  const name=selectedProfileName();
+  if(!name)return show('players');
+  data.profiles=data.profiles.filter(n=>n!==name);
+  state.players=state.players.filter(n=>n!==name);
+  // Completed matches are intentionally retained: deleting a profile is not deleting match history.
+  state.selectedProfile=Math.min(state.selectedProfile,Math.max(0,data.profiles.length-1));
+  save();show('players');
+}
 function shortcuts(){
+  if(state.page==='players')return [
+    ['Escape','Back',()=>show('home')],
+    ['F4','Neu',newPlayer],
+    ['F2','Bearbeiten',editPlayer],
+    ['F5','Löschen',confirmPlayerDeletion]
+  ];
+  if(state.page==='player-delete')return [
+    ['Escape','Abbrechen',()=>show('players')],
+    ['F4','',()=>{}],['F2','',()=>{}],
+    ['F5','Löschen',deletePlayerProfile]
+  ];
+  if(state.page==='profile')return [
+    ['Escape','Back',()=>show('players')],
+    ['F4','Zeichen weg',()=>{state.name=state.name.slice(0,-1);render()}],
+    ['F2','',()=>{}],
+    ['F5','Speichern',savePlayerProfile]
+  ];
   if(state.page==='stats-match-detail')return [
     ['Escape','Back',()=>show('stats-history')],
     ['F4','',()=>{}],
@@ -1013,6 +1077,17 @@ function runShortcut(key){
   shortcuts().find(item=>item[0]===key)?.[2]();
 }
 function renderFooter(){
+  if(['players','profile','player-delete'].includes(state.page)){
+    const labels=shortcuts().map(([key,label])=>label
+      ?'<button class="softkey library-key" data-shortcut="'+key+'"><span>'+esc(label.toUpperCase())+'</span></button>'
+      :'<span class="stats-empty-softkey" aria-hidden="true"></span>');
+    labels.splice(2,0,'<div class="home-encoder" aria-hidden="true"><svg viewBox="0 0 60 60">'+
+      '<circle cx="30" cy="30" r="23" fill="none" stroke="#fff" stroke-width="2.8"/>'+
+      (state.page==='players'||state.page==='profile'?'<circle cx="30" cy="30" r="8" fill="#fff"/>':'')+
+      '</svg></div>');
+    document.querySelector('footer').innerHTML=labels.join('');
+    return;
+  }
   if(['stats','stats-players','stats-player-detail','stats-records','stats-history','stats-match-detail','stats-delete-confirm'].includes(state.page)){
     const keys=shortcuts();
     const buttons=keys.map(([key,label])=>label
@@ -1708,9 +1783,67 @@ function deleteHistoryMatch(){
   state.statsMatchNumber=null;
   show('stats-history');
 }
+function savePlayerProfile(){
+  const name=state.name.trim();
+  if(!name)return say('Bitte einen Namen eingeben.');
+  if([...data.profiles,...state.guests].some(n=>n!==state.editOriginal&&n.toLowerCase()===name.toLowerCase()))
+    return say('Diesen Spielernamen gibt es schon.');
+  if(state.editOriginal!==null){
+    const before=state.editOriginal;
+    const index=data.profiles.indexOf(before);
+    if(index<0)return show('players');
+    data.profiles[index]=name;
+    const renameMatch=match=>{
+      if(!match)return;
+      match.players=match.players.map(n=>n===before?name:n);
+    };
+    data.matches.forEach(renameMatch);
+    renameMatch(data.active);
+    Object.values(data.unfinished).forEach(renameMatch);
+    state.players=state.players.map(n=>n===before?name:n);
+    state.selectedProfile=index;
+  }else{
+    data.profiles.push(name);
+    state.selectedProfile=data.profiles.length-1;
+  }
+  state.editOriginal=null;save();
+  show('players');
+}
+function playersManager(){
+  const stats=statsData().ranking;
+  const lookup=new Map(stats.map(p=>[p.name,p]));
+  const rows=data.profiles.map((name,i)=>{
+    const p=lookup.get(name);
+    const played=p?.played||0,wins=p?.wins||0;
+    const initial=name.trim().slice(0,1).toUpperCase();
+    return '<button data-nav data-action="select-profile:'+i+'" class="profile-row '+(state.selectedProfile===i?'chosen':'')+'">'+
+      '<span class="profile-avatar">'+esc(initial)+'</span>'+
+      '<span class="profile-identity"><strong>'+esc(name)+'</strong><small>'+
+      played+' '+(played===1?'Spiel':'Spiele')+' · '+wins+' '+(wins===1?'Sieg':'Siege')+'</small></span>'+
+      '<span class="profile-row-marker">'+(state.selectedProfile===i?'AUSGEWÄHLT':'')+'</span>'+
+      '</button>';
+  }).join('');
+  return '<div class="profile-manager">'+
+    '<div class="profile-manager-meta"><span>SPIELERVERWALTUNG</span><strong>'+data.profiles.length+' PROFILE</strong></div>'+
+    '<div class="profile-manager-list">'+(rows||'<p class="stats-empty">Noch keine Spieler angelegt.</p>')+'</div>'+
+    '<div class="profile-manager-tip">Drehregler: Spieler wählen · Drücken: Auswahl bestätigen</div>'+
+    '</div>';
+}
+function playerDeleteScreen(){
+  const name=selectedProfileName();
+  return '<div class="stats-dashboard stats-delete-screen">'+
+    '<div class="stats-delete-symbol">?</div>'+
+    '<h1>Spieler wirklich löschen?</h1>'+
+    '<p>'+esc(name||'Spieler')+'</p>'+
+    '<p class="stats-delete-warning">Das Profil wird entfernt. Bereits gespielte Matches und ihre Ergebnisse bleiben erhalten.</p>'+
+    '</div>';
+}
 function profileEditor(){
   const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 -';
-  return title('PLAYERS','New player',esc(state.name||'Use the encoder to select characters.'))+
+  return '<div class="profile-editor"><div class="profile-manager-meta"><span>SPIELERVERWALTUNG</span><strong>'+
+    (state.editOriginal===null?'NEUES PROFIL':'PROFIL BEARBEITEN')+'</strong></div>'+
+    '<h1>'+esc(state.name||'Spielername')+'</h1>'+
+    '<p class="profile-editor-tip">Buchstaben mit dem Drehregler wählen und bestätigen.</p></div>'+
     '<div class="letters">'+[...chars].map(c=>button('letter:'+c,c===' '?'Space':c,'rule')).join('')+'</div><br>'+
     button('erase','Erase last character')+button('profile-save','Save player','primary');
 }
@@ -1816,7 +1949,7 @@ async function startSoftwareUpdate(){
 function render(scroll=false){
   document.querySelector('.console').dataset.view=state.page;
   const matchPage=['game','menu','segment','correction'].includes(state.page);
-  const sectionHeadings={players:'Players',stats:'Statistics','stats-players':'Players','stats-player-detail':'Player','stats-records':'Records','stats-history':'History','stats-match-detail':'Match','stats-delete-confirm':'Löschen',settings:'Settings'};
+  const sectionHeadings={players:'Players',stats:'Statistics','stats-players':'Players','stats-player-detail':'Player','stats-records':'Records','stats-history':'History','stats-match-detail':'Match','stats-delete-confirm':'Löschen','player-delete':'Löschen',profile:'Players',settings:'Settings'};
   document.getElementById('match-heading').textContent=sectionHeadings[state.page]||
     (matchPage&&data.active?data.active.mode:'');
   const context=document.getElementById('match-context');
@@ -1825,7 +1958,7 @@ function render(scroll=false){
   const views={home:homeScreen,play:cards,'mode-info':selectedGameInfo,setup,game,segment,correction:history,grid:picker,number:picker,stats:statistics,
     'stats-players':statisticsPlayers,'stats-player-detail':statsPlayerDetails,'stats-records':statisticsRecords,'stats-history':statisticsHistory,
     'stats-match-detail':statisticsMatchDetail,'stats-delete-confirm':statisticsDeleteConfirm,
-    profile:profileEditor,
+    profile:profileEditor,'player-delete':playerDeleteScreen,
     'bermuda-number':()=>title('MATCH SETUP','Bermuda Triangle','Choose the target for the next round.')+
       '<div class="segments">'+Array.from({length:20},(_,i)=>button('bermuda-target:'+(i+1),i+1,'rule')).join('')+
       button('bermuda-target:25','Bull','rule')+button('bermuda-target:any','Any','rule')+'</div>',
@@ -1838,8 +1971,7 @@ function render(scroll=false){
     saved:()=>title('SAVED MATCH',esc(state.chosen),'Round '+derived().round+' · '+data.active.players.map(esc).join(', '))+
       button('game','Continue match','primary')+'<br><br>'+
       button('discard','Discard and start new')+button('play','Back to games'),
-    players:()=>panel('Profiles','<div class="players">'+data.profiles.map(name=>
-      '<div class="player">'+esc(name)+'</div>').join('')+'</div>')+button('new-profile','Add player'),
+    players:playersManager,
     settings:()=>panel('Scoring',button('default-out','Default checkout <span>'+esc(data.out)+'</span>')+
       '<p>Manual entry is available from the match screen.</p>')+updatePanel()+button('about','About'),
     about:()=>title('CONSOLE','About')+panel('Darts Console','<p>Offline darts scoring for a portrait display and Raspberry Pi Pico controls.</p>')};
@@ -1867,6 +1999,10 @@ function highlight(scroll){
   // The home screen is operated exclusively with its four physical keys.
   // No rotary selection exists, so none of its tiles should be highlighted.
   if(state.page==='home'||(state.page.startsWith('stats')&&!['stats-players','stats-history'].includes(state.page)))return;
+  if(state.page==='players'){
+    available.forEach((b,i)=>b.classList.toggle('focused',i===state.selectedProfile));
+    return;
+  }
   available.forEach((b,i)=>b.classList.toggle('focused',i===state.cursor));
   if(scroll && available[state.cursor])available[state.cursor].scrollIntoView({block:'nearest'});
 }
@@ -2007,16 +2143,13 @@ function clickButton(b){
       state.players.push(state.guests.at(-1));
       break;
     }
-    case 'new-profile':state.name='';return show('profile');
+    case 'select-profile':
+      state.selectedProfile=Number(value);
+      return render(false);
+    case 'new-profile':return newPlayer();
     case 'letter':if(state.name.length<24) state.name+=value; break;
     case 'erase':state.name=state.name.slice(0,-1); break;
-    case 'profile-save': {
-      const name=state.name.trim();
-      if(!name||[...data.profiles,...state.guests].some(n=>n.toLowerCase()===name.toLowerCase())) return say('Enter a unique player name.');
-      data.profiles.push(name);
-      save();
-      return show('players');
-    }
+    case 'profile-save':return savePlayerProfile();
     case 'out':state.out=value;break;
     case 'update-start':
       if(state.updateBusy)return;
@@ -2086,7 +2219,7 @@ document.addEventListener('click',event=>{
   if(b) clickButton(b);
 });
 const back={'mode-info':'play',play:'home',players:'home',stats:'home','stats-players':'stats','stats-player-detail':'stats-players','stats-records':'stats','stats-history':'stats','stats-match-detail':'stats-history','stats-delete-confirm':'stats-match-detail',settings:'home',setup:'play',game:'menu',menu:'game',correction:'game',rounds:'setup',grid:'setup',number:'setup',
-  saved:'play',about:'settings',profile:'players','bermuda-number':'setup','bermuda-multiplier':'bermuda-number'};
+  saved:'play',about:'settings',profile:'players','player-delete':'players','bermuda-number':'setup','bermuda-multiplier':'bermuda-number'};
 document.addEventListener('keydown',event=>{
   const key=event.key;
   if(!['ArrowUp','ArrowDown','Enter','Escape','F2','F4','F5'].includes(key))return;
@@ -2098,6 +2231,11 @@ document.addEventListener('keydown',event=>{
     if(!items.length)return;
     state.cursor=(state.cursor+(key==='ArrowUp'?-1:1)+items.length)%items.length;
     const selected=items[state.cursor]?.dataset.action;
+    if(state.page==='players'){
+      state.selectedProfile=state.cursor;
+      highlight(true);
+      return;
+    }
     if(state.page==='play'&&selected?.startsWith('mode:')&&state.chosen!==selected.slice(5)){
       state.chosen=selected.slice(5);
       render(true);
