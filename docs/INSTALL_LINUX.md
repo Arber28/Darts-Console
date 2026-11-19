@@ -44,6 +44,49 @@ The smoke test runs headless Chromium within its own network namespace. Only loo
 
 To restore the tty1 login prompt, move the dedicated drop-in `/etc/systemd/system/getty@tty1.service.d/darts-console.conf` out of that directory, run `systemctl daemon-reload`, and restart tty1. Disable `darts-web.service` if the web server is no longer needed.
 
+
+## WLAN-Einrichtung über Settings
+
+Die Konsole bietet unter **Settings → WLAN & Netzwerk** eine lokale WLAN-Suche
+und Verbindung über den Drehregler. Die Verbindung wird nur auf dem Dart-Laptop
+ausgeführt, nicht in der externen GitHub-HTML-Vorschau.
+
+**Voraussetzung:** Der Laptop verwendet NetworkManager (CLI `nmcli`) und hat
+einen funktionsfähigen WLAN-Adapter. Prüfen, bevor du etwas installierst:
+
+```sh
+command -v nmcli
+nmcli device status
+```
+
+Falls NetworkManager nicht installiert ist, **nicht blind die
+Netzwerkkonfiguration wechseln**: Debian kann bereits über
+`/etc/network/interfaces` / ifupdown verwaltet werden. Zuerst prüfen, damit
+das vorhandene Ethernet und der SSH-Zugang nicht verloren gehen.
+
+Zum einmaligen Freischalten der WLAN-Funktion auf dem bestehenden System ist
+der aktuelle `deploy/install-kiosk.sh` erneut **als root** auszuführen
+(`su -`, dann im ausgecheckten Repository `git pull --ff-only origin main`
+und `sh deploy/install-kiosk.sh`). Der Installer kopiert den lokalen
+Netzwerkhelfer und die API und legt eine eng begrenzte sudoers-Regel an.
+
+**Wichtig:** Die eingebaute GitHub-Update-Schaltfläche aktualisiert weiterhin
+nur `web/index.html` und `web/scoring.js`, **nicht** die Python-API oder
+die Systemkonfiguration. Für die erste Freischaltung der WLAN-Funktion ist
+deshalb der Installer nötig. Ohne den lokalen Netzwerkdienst zeigt die
+Settings-Seite an, dass WLAN-Einrichtung nicht bereitsteht.
+
+Nach erfolgreicher Installation:
+- `systemctl status darts-web` prüfen;
+- in Settings WLAN-Netzwerke suchen, SSID auswählen;
+- Passwort über die Bildschirmtastatur eingeben und verbinden;
+- die Konsole speichert das eingegebene Passwort nicht in
+  `localStorage`; NetworkManager verwaltet die Verbindung nach dem
+  erfolgreichen Verbindungsaufbau selbst.
+
+Bei jedem Netzwerkwechsel sollte ein unabhängiger SSH- oder TTY-Zugang als
+Rettungsweg verfügbar sein.
+
 ## Pico controls
 
 Flash [CircuitPython](https://circuitpython.org/board/raspberry_pi_pico/), install `adafruit_hid` to `CIRCUITPY/lib/`, then copy [the firmware](../firmware/code.py) to `CIRCUITPY/code.py`. The device maps rotation, OK, Back, Undo, Correct and Next to arrow keys, Enter, Escape, F4, F2 and F5. See [Wiring](WIRING.md) for pins and [Camera detection](DETECTION.md) for the camera bench procedure.
