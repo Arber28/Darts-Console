@@ -1167,8 +1167,21 @@ function ensureMatchNumbers(){
   }
 }
 ensureMatchNumbers();
+function normalizeSetupPlayers(){
+  const all=[...data.profiles,...state.guests];
+  const valid=new Map(all.map(name=>[name.toLocaleUpperCase('de-DE'),name]));
+  state.players=[...new Set(state.players.map(name=>valid.get(String(name).toLocaleUpperCase('de-DE'))).filter(Boolean))];
+}
+function resetSetupGuests(){
+  const guests=new Set(state.guests.map(name=>name.toLocaleUpperCase('de-DE')));
+  state.players=state.players.filter(name=>!guests.has(String(name).toLocaleUpperCase('de-DE')));
+  state.guests=[];
+  normalizeSetupPlayers();
+}
 function show(page,withNav=false){
   const changed=state.page!==page;
+  if(state.page==='setup'&&page==='play')resetSetupGuests();
+  if(page==='setup')normalizeSetupPlayers();
   state.page=page;
   if(changed)state.cursor=page==='players'?state.selectedProfile:page==='profile-icons'?state.editIcon:page==='profile-colors'?state.editColor:0;
   state.message='';
@@ -1497,12 +1510,14 @@ function addSetupGuest(){
   highlight(true);
 }
 function toggleAllSetupPlayers(){
+  normalizeSetupPlayers();
   const all=[...data.profiles,...state.guests];
   const allSelected=all.length>0&&all.every(p=>state.players.includes(p));
   state.players=allSelected?[]:[...all];
   render(false);
 }
 function setup(){
+  normalizeSetupPlayers();
   const mode=currentMode();
   const selected=state.players;
   const all=[...data.profiles,...state.guests];
@@ -2756,9 +2771,13 @@ function clickButton(b){
       state.sequence.push({n:state.bermudaTarget,m:Number(value)});
       return show('setup');
     case 'remove-round':state.sequence.splice(Number(value),1);break;
-    case 'player':
-      state.players=state.players.includes(value)?state.players.filter(p=>p!==value):[...state.players,value];
+    case 'player':{
+      normalizeSetupPlayers();
+      const actual=[...data.profiles,...state.guests].find(p=>p.toLocaleUpperCase('de-DE')===value.toLocaleUpperCase('de-DE'));
+      if(!actual)return;
+      state.players=state.players.includes(actual)?state.players.filter(p=>p!==actual):[...state.players,actual];
       break;
+    }
     case 'guest':return addSetupGuest();
     case 'select-profile':
       state.selectedProfile=Number(value);
