@@ -1571,6 +1571,73 @@ header{justify-content:space-between;gap:24px}
   .console[data-view="game"] .compact-player-score{font-size:clamp(17px,2.8dvh,28px)}
 }
 
+
+/* Tall cards: spread title, large identity icon, score and name over the
+   available card height. Keep the fixed footer and no-scroll match layout. */
+.console[data-view="game"] .compact-player{
+  justify-content:space-evenly;
+  gap:0;
+  padding:clamp(6px,1dvh,14px) clamp(2px,.3vw,6px);
+}
+.console[data-view="game"] .compact-card-label{
+  flex:0 0 auto;
+  max-width:100%;width:100%;
+  line-height:1.12;
+  font-size:clamp(10px,1.3vw,16px);
+}
+.console[data-view="game"] .compact-player-badge{
+  box-sizing:border-box;
+  flex:0 1 auto;
+  width:min(80%,9dvh,94px);
+  height:auto;
+  aspect-ratio:1;
+  min-height:0;
+}
+.console[data-view="game"] .compact-player-badge svg{
+  width:76%;height:76%;
+}
+.console[data-view="game"] .compact-player-score{
+  flex:0 0 auto;
+  font-size:clamp(26px,4.1vw,52px);
+  line-height:1;
+}
+.console[data-view="game"] .compact-player-name{
+  flex:0 0 auto;
+  max-width:100%;
+  line-height:1.12;
+  font-size:clamp(11px,1.45vw,19px);
+  overflow-wrap:anywhere;
+}
+@media(max-width:600px){
+  .console[data-view="game"] .compact-player{
+    justify-content:space-evenly;
+    gap:0;padding:clamp(5px,.8dvh,10px) 2px;
+  }
+  .console[data-view="game"] .compact-card-label{
+    font-size:clamp(9px,2.35vw,13px);
+  }
+  .console[data-view="game"] .compact-player-badge{
+    width:min(84%,8dvh,76px);
+    height:auto;
+    aspect-ratio:1;
+  }
+  .console[data-view="game"] .compact-player-score{
+    font-size:clamp(23px,5.2vw,34px);
+  }
+  .console[data-view="game"] .compact-player-name{
+    font-size:clamp(10px,2.6vw,15px);
+  }
+}
+@media(max-height:740px){
+  .console[data-view="game"] .compact-player-badge{
+    width:min(77%,6.5dvh,55px);
+    height:auto;
+  }
+  .console[data-view="game"] .compact-card-label{
+    font-size:clamp(8px,1.7dvh,11px);
+  }
+}
+
 </style>
 </head>
 <body>
@@ -2630,7 +2697,7 @@ function compactMatchPlayers(view,mode,modeScore,review){
   };
   return '<aside class="compact-standings" aria-label="Current and next player">'+
     '<div class="compact-players-list">'+
-    playerCard(current,'NOW THROWING',true)+
+    playerCard(current,'THROWING',true)+
     (nextIndex!==null?playerCard(nextIndex,'UP NEXT',false):'')+
     '</div></aside>';
 }
