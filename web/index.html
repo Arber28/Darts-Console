@@ -1489,7 +1489,10 @@ function shortcuts(){
     ['Escape',derived().winners===null?'Miss':'Menu',()=>{
       if(derived().winners!==null)return show('menu');
       const before=derived().winners;
-      Scoring.record(data.active,0,0);save();show('game');showThrowFeedback(0,0);announceVictory(before,1700);
+      const previous=derived();
+      Scoring.record(data.active,0,0);save();show('game');
+      afterRecordedTurn(previous,derived(),data.active.mode);
+      announceVictory(before);
     }],
     ['F4','Undo',()=>{Scoring.undo(data.active);save();show('game')}],
     ['F2','Correct',()=>{
@@ -1497,7 +1500,8 @@ function shortcuts(){
       if(latest)openThrow(latest.index);
       else show('correction');
     }],
-    ['F5','Next',()=>{const before=derived().winners;Scoring.next(data.active);save();show('game');announceVictory(before)}]
+    ['F5','Next',()=>{const previous=derived();Scoring.next(data.active);save();show('game');
+      afterRecordedTurn(previous,derived(),data.active.mode);announceVictory(previous.winners)}]
   ];
   return [
     ['Escape',state.page==='play'?'Home':'Back',()=>{
@@ -1979,7 +1983,7 @@ function boardCoordinates(n,m,ordinal=0){
   const i=boardOrder.indexOf(n);
   if(i<0)return null;
   const angle=i*18+(ordinal%3-1)*2.7;
-  const radius=m===2?151:m===3?99:ordinal%2?123:61;
+  const radius=m===2?151:m===3?92:ordinal%2?123:61;
   return boardXY(radius,angle);
 }
 function boardSuggestedHits(mode,view,match){
