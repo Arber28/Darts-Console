@@ -673,6 +673,23 @@ header{justify-content:space-between;gap:24px}
   line-height:1.25;
   overflow-wrap:anywhere;
 }
+
+/* History selections and a deliberate two-step delete confirmation. */
+.stats-history-button{width:100%;color:#f5f5f6;font:inherit;text-align:left;cursor:pointer}
+.stats-history-button.focused{border-color:#ededf2;outline:2px solid #fff;outline-offset:1px}
+.stats-match-title{padding:clamp(15px,3vw,28px) 0}
+.stats-match-title>span{font-size:clamp(12px,2vw,20px);letter-spacing:.12em;color:#a9adb7}
+.stats-match-title h1{font-size:clamp(42px,8vw,84px);margin:14px 0}
+.stats-match-title p{font-size:clamp(15px,2.2vw,22px);color:#a6aab2}
+.stats-match-player{display:flex;justify-content:space-between;gap:12px;padding:clamp(16px,2dvh,25px) 0;border-top:1px solid #404349;align-items:center}
+.stats-match-player strong{font-size:clamp(18px,3vw,29px)}
+.stats-match-player span{font-size:clamp(11px,1.8vw,18px);color:#b1b5bd}
+.stats-delete-screen{margin-top:clamp(45px,9dvh,110px);text-align:center;align-items:center}
+.stats-delete-symbol{width:72px;height:72px;display:grid;place-items:center;border:2px solid #fff;border-radius:100%;font-size:39px;font-weight:600}
+.stats-delete-screen h1{font-size:clamp(28px,5.5vw,53px);line-height:1.16;max-width:20ch}
+.stats-delete-screen>p{font-size:clamp(17px,2.6vw,26px);color:#c7c9cf;line-height:1.5}
+.stats-delete-warning{max-width:31ch;color:#a8acb5!important}
+.console[data-view="stats-delete-confirm"] footer .softkey:last-child{color:#f3b6ac}
 </style>
 </head>
 <body>
@@ -746,6 +763,25 @@ function save(){
   try {localStorage.setItem(storage,JSON.stringify(data))}
   catch {state.message='Storage unavailable. Progress is available until this page closes.'}
 }
+// Assign immutable match numbers once, including the existing local history.
+// Deleted numbers are never reused.
+function ensureMatchNumbers(){
+  const all=[...data.matches,...(data.active&&Scoring.replay(data.active).winners!==null?[data.active]:[])];
+  const completed=all.filter(m=>m&&Scoring.replay(m).winners!==null);
+  let next=Math.max(1,Number(data.nextMatchNumber)||1);
+  for(const match of completed){
+    if(Number.isSafeInteger(match.historyNumber)&&match.historyNumber>0)
+      next=Math.max(next,match.historyNumber+1);
+  }
+  const unnumbered=completed.map((match,i)=>({match,i})).filter(x=>!Number.isSafeInteger(x.match.historyNumber)||x.match.historyNumber<=0)
+    .sort((a,b)=>(Number(a.match.started)||0)-(Number(b.match.started)||0)||a.i-b.i);
+  for(const {match} of unnumbered)match.historyNumber=next++;
+  if(data.nextMatchNumber!==next||unnumbered.length){
+    data.nextMatchNumber=next;
+    save();
+  }
+}
+ensureMatchNumbers();
 function show(page,withNav=false){
   const changed=state.page!==page;
   state.page=page;
@@ -753,7 +789,7 @@ function show(page,withNav=false){
   state.message='';
   // Info pages place their action button at the bottom. Do not let
   // keyboard selection scroll past the heading on initial entry.
-  render(page!=='mode-info'&&page!=='stats-players');
+  render(page!=='mode-info'&&page!=='stats-players'&&page!=='stats-history');
   if(changed){
     const workspace=document.querySelector('.workspace');
     if(workspace)workspace.scrollTop=0;
@@ -861,6 +897,18 @@ function adjacentInfoMode(direction){
   if(main)main.scrollTop=0;
 }
 function shortcuts(){
+  if(state.page==='stats-match-detail')return [
+    ['Escape','Back',()=>show('stats-history')],
+    ['F4','Players',()=>show('stats-players')],
+    ['F2','Records',()=>show('stats-records')],
+    ['F5','Löschen',()=>show('stats-delete-confirm')]
+  ];
+  if(state.page==='stats-delete-confirm')return [
+    ['Escape','Abbrechen',()=>show('stats-match-detail')],
+    ['F4','',()=>{}],
+    ['F2','',()=>{}],
+    ['F5','Löschen',deleteHistoryMatch]
+  ];
   if(state.page==='stats')return [
     ['Escape','Back',()=>show('home')],
     ['F4','Players',()=>show('stats-players')],
@@ -925,13 +973,13 @@ function runShortcut(key){
   shortcuts().find(item=>item[0]===key)?.[2]();
 }
 function renderFooter(){
-  if(['stats','stats-players','stats-player-detail','stats-records','stats-history'].includes(state.page)){
+  if(['stats','stats-players','stats-player-detail','stats-records','stats-history','stats-match-detail','stats-delete-confirm'].includes(state.page)){
     const keys=shortcuts();
     const buttons=keys.map(([key,label])=>
       '<button class="softkey library-key" data-shortcut="'+key+'"><span>'+esc(label.toUpperCase())+'</span></button>');
     buttons.splice(2,0,'<div class="home-encoder" aria-hidden="true">'+
       '<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="23" fill="none" stroke="#fff" stroke-width="2.8"/>'+
-      (state.page==='stats-players'?'<circle cx="30" cy="30" r="8" fill="#fff"/>':'')+'</svg></div>');
+      (['stats-players','stats-history'].includes(state.page)?'<circle cx="30" cy="30" r="8" fill="#fff"/>':'')+'</svg></div>');
     document.querySelector('footer').innerHTML=buttons.join('');
     return;
   }
@@ -1405,6 +1453,7 @@ function history(){
 }
 
 function statsData(){
+  ensureMatchNumbers();
   const matches=[...data.matches,...(data.active&&Scoring.replay(data.active).winners!==null?[data.active]:[])]
     .filter(match=>match&&Scoring.replay(match).winners!==null)
     .map((match,index)=>({match,index}))
@@ -1414,9 +1463,7 @@ function statsData(){
       const timeB=Number(b.match.started)||0;
       return timeB-timeA||b.index-a.index;
     }).map(entry=>entry.match);
-  // Number matches chronologically while displaying newest first.
-  const chronologicalNumber=new Map([...matches].reverse().map((match,i)=>[match,i+1]));
-  const players=new Map(data.profiles.map(name=>[name,{name,played:0,wins:0,points:0,darts:0,oneEighties:0,bestTurn:0}]));
+   const players=new Map(data.profiles.map(name=>[name,{name,played:0,wins:0,points:0,darts:0,oneEighties:0,bestTurn:0}]));
   let points=0,darts=0,oneEighties=0,bestTurn=0;
   const games=matches.map(match=>{
     const view=Scoring.replay(match);
@@ -1456,7 +1503,7 @@ function statsData(){
         }
       }
     });
-    return {number:chronologicalNumber.get(match),mode:match.mode,date,players:match.players,winner};
+    return {number:match.historyNumber,mode:match.mode,date,players:match.players,winner};
   });
   const ranking=[...players.values()].sort((a,b)=>
     (b.darts?3*b.points/b.darts:-1)-(a.darts?3*a.points/a.darts:-1)||b.wins-a.wins||a.name.localeCompare(b.name));
@@ -1491,10 +1538,11 @@ function statsRankingTable(rows,selectable=false){
     }).join('')+'</div>';
 }
 function statsMatches(games){
-  return '<div class="stats-history-list">'+(games.length?games.map((g,i)=>
-    '<div class="stats-history-row"><span class="stats-history-seq">'+String(g.number).padStart(2,'0')+'</span>'+
-    '<div class="stats-history-game"><strong>'+esc(g.mode)+'</strong><small>'+esc(g.date)+' · '+esc(g.players.join(' / '))+'</small></div>'+
-    '<span class="stats-history-winner"><small>GEWINNER</small><strong>'+esc(g.winner)+'</strong></span></div>').join(''):
+  return '<div class="stats-history-list">'+(games.length?games.map(g=>
+    '<button data-nav data-action="stats-match:'+g.number+'" class="stats-history-row stats-history-button">'+
+    '<span class="stats-history-seq">'+String(g.number).padStart(2,'0')+'</span>'+
+    '<span class="stats-history-game"><strong>'+esc(g.mode)+'</strong><small>'+esc(g.date)+' · '+esc(g.players.join(' / '))+'</small></span>'+
+    '<span class="stats-history-winner"><small>GEWINNER</small><strong>'+esc(g.winner)+'</strong></span></button>').join(''):
     '<div class="stats-empty">Noch keine abgeschlossenen Matches.</div>')+'</div>';
 }
 function statsActivity(games){
@@ -1572,6 +1620,47 @@ function statisticsHistory(){
   return '<div class="stats-dashboard"><section class="stats-panel">'+
     '<div class="stats-section-title"><h2>Match History</h2><span>'+games.length+' MATCHES</span></div>'+
     statsMatches(games)+'</section></div>';
+}
+function matchForHistory(){
+  ensureMatchNumbers();
+  return [...data.matches,...(data.active&&Scoring.replay(data.active).winners!==null?[data.active]:[])]
+    .find(m=>m.historyNumber===state.statsMatchNumber);
+}
+function statisticsMatchDetail(){
+  const match=matchForHistory();
+  if(!match)return '<div class="stats-dashboard"><p class="stats-empty">Dieses Match ist nicht mehr vorhanden.</p></div>';
+  const view=Scoring.replay(match);
+  const date=Number.isFinite(Number(match.started))?new Date(match.started).toLocaleString('de-DE'):'–';
+  const winner=view.winners.map(i=>match.players[i]).join(' & ');
+  return '<div class="stats-dashboard stats-match-detail">'+
+    '<div class="stats-match-title"><span>MATCH #'+String(match.historyNumber).padStart(2,'0')+'</span>'+
+    '<h1>'+esc(match.mode)+'</h1><p>'+esc(date)+'</p></div>'+
+    '<section class="stats-panel"><div class="stats-section-title"><h2>Ergebnis</h2></div>'+
+    match.players.map((name,i)=>'<div class="stats-match-player">'+
+      '<strong>'+esc(name)+'</strong>'+
+      (view.winners.includes(i)?'<span>GEWINNER</span>':'<span>TEILNEHMER</span>')+
+      '</div>').join('')+'</section>'+
+    '<p class="stats-footnote">Gewinner: '+esc(winner)+'</p></div>';
+}
+function statisticsDeleteConfirm(){
+  const match=matchForHistory();
+  if(!match)return '<div class="stats-dashboard"><p>Match nicht gefunden.</p></div>';
+  return '<div class="stats-dashboard stats-delete-screen">'+
+    '<div class="stats-delete-symbol">?</div>'+
+    '<h1>Möchtest du dieses Match wirklich löschen, du Loser?</h1>'+
+    '<p>Match #'+String(match.historyNumber).padStart(2,'0')+' · '+esc(match.mode)+'</p>'+
+    '<p class="stats-delete-warning">Das kannste nicht rückgängig machen. Auch Siege, Averages und Rekorde werden neu berechnet.</p>'+
+    '</div>';
+}
+function deleteHistoryMatch(){
+  const match=matchForHistory();
+  if(!match)return show('stats-history');
+  data.matches=data.matches.filter(m=>m!==match);
+  if(data.active===match)data.active=null;
+  // Keep nextMatchNumber unchanged: removed match numbers remain retired.
+  save();
+  state.statsMatchNumber=null;
+  show('stats-history');
 }
 function profileEditor(){
   const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 -';
@@ -1681,7 +1770,7 @@ async function startSoftwareUpdate(){
 function render(scroll=false){
   document.querySelector('.console').dataset.view=state.page;
   const matchPage=['game','menu','segment','correction'].includes(state.page);
-  const sectionHeadings={players:'Players',stats:'Statistics','stats-players':'Players','stats-player-detail':'Player','stats-records':'Records','stats-history':'History',settings:'Settings'};
+  const sectionHeadings={players:'Players',stats:'Statistics','stats-players':'Players','stats-player-detail':'Player','stats-records':'Records','stats-history':'History','stats-match-detail':'Match','stats-delete-confirm':'Löschen',settings:'Settings'};
   document.getElementById('match-heading').textContent=sectionHeadings[state.page]||
     (matchPage&&data.active?data.active.mode:'');
   const context=document.getElementById('match-context');
@@ -1689,6 +1778,7 @@ function render(scroll=false){
   context.textContent=currentView?'ROUND '+currentView.round+(Number(data.active.mode)?' · '+data.active.options.out.toUpperCase():''):'';
   const views={home:homeScreen,play:cards,'mode-info':selectedGameInfo,setup,game,segment,correction:history,grid:picker,number:picker,stats:statistics,
     'stats-players':statisticsPlayers,'stats-player-detail':statsPlayerDetails,'stats-records':statisticsRecords,'stats-history':statisticsHistory,
+    'stats-match-detail':statisticsMatchDetail,'stats-delete-confirm':statisticsDeleteConfirm,
     profile:profileEditor,
     'bermuda-number':()=>title('MATCH SETUP','Bermuda Triangle','Choose the target for the next round.')+
       '<div class="segments">'+Array.from({length:20},(_,i)=>button('bermuda-target:'+(i+1),i+1,'rule')).join('')+
@@ -1730,7 +1820,7 @@ function highlight(scroll){
   document.querySelectorAll('button.focused').forEach(b=>b.classList.remove('focused'));
   // The home screen is operated exclusively with its four physical keys.
   // No rotary selection exists, so none of its tiles should be highlighted.
-  if(state.page==='home'||(state.page.startsWith('stats')&&state.page!=='stats-players'))return;
+  if(state.page==='home'||(state.page.startsWith('stats')&&!['stats-players','stats-history'].includes(state.page)))return;
   available.forEach((b,i)=>b.classList.toggle('focused',i===state.cursor));
   if(scroll && available[state.cursor])available[state.cursor].scrollIntoView({block:'nearest'});
 }
@@ -1841,6 +1931,9 @@ function clickButton(b){
     case 'stats-player':
       state.statsPlayer=decodeURIComponent(value);
       return show('stats-player-detail');
+    case 'stats-match':
+      state.statsMatchNumber=Number(value);
+      return show('stats-match-detail');
     case 'quick': case 'all':
       state.filter=action;
       if(action==='quick'&&!modes.slice(0,6).some(m=>m[0]===state.chosen)) state.chosen='501';
@@ -1946,14 +2039,14 @@ document.addEventListener('click',event=>{
   const b=event.target.closest('button[data-nav]');
   if(b) clickButton(b);
 });
-const back={'mode-info':'play',play:'home',players:'home',stats:'home','stats-players':'stats','stats-player-detail':'stats-players','stats-records':'stats','stats-history':'stats',settings:'home',setup:'play',game:'menu',menu:'game',correction:'game',rounds:'setup',grid:'setup',number:'setup',
+const back={'mode-info':'play',play:'home',players:'home',stats:'home','stats-players':'stats','stats-player-detail':'stats-players','stats-records':'stats','stats-history':'stats','stats-match-detail':'stats-history','stats-delete-confirm':'stats-match-detail',settings:'home',setup:'play',game:'menu',menu:'game',correction:'game',rounds:'setup',grid:'setup',number:'setup',
   saved:'play',about:'settings',profile:'players','bermuda-number':'setup','bermuda-multiplier':'bermuda-number'};
 document.addEventListener('keydown',event=>{
   const key=event.key;
   if(!['ArrowUp','ArrowDown','Enter','Escape','F2','F4','F5'].includes(key))return;
   event.preventDefault();
   if(event.repeat&&key!=='ArrowUp'&&key!=='ArrowDown') return;
-  if((state.page==='home'||state.page==='mode-info'||(state.page.startsWith('stats')&&state.page!=='stats-players'))&&(key==='ArrowUp'||key==='ArrowDown'||key==='Enter'))return;
+  if((state.page==='home'||state.page==='mode-info'||(state.page.startsWith('stats')&&!['stats-players','stats-history'].includes(state.page)))&&(key==='ArrowUp'||key==='ArrowDown'||key==='Enter'))return;
   if(key==='ArrowUp'||key==='ArrowDown'){
     const items=controls();
     if(!items.length)return;
