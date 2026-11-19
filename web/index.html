@@ -533,6 +533,19 @@ header{justify-content:space-between;gap:24px}
 /* Info uses four physical buttons; encoder inactive. */
 .console[data-view="mode-info"] footer{min-height:clamp(76px,10dvh,115px)}
 .console[data-view="mode-info"] .library-key{font-size:clamp(10px,2vw,20px);padding:0 3px}
+
+/* Compact aligned section headers for Players, Statistics and Settings. */
+.console:is([data-view="players"],[data-view="stats"],[data-view="settings"]) header{
+  min-height:clamp(70px,10vw,108px);justify-content:space-between;gap:12px;
+}
+.console:is([data-view="players"],[data-view="stats"],[data-view="settings"]) #match-heading{
+  margin-left:auto;text-align:right;white-space:nowrap;
+  font-size:clamp(19px,3.3vw,36px);font-weight:650;letter-spacing:-.045em;line-height:1.1;
+}
+.console:is([data-view="players"],[data-view="stats"],[data-view="settings"]) #match-context{display:none}
+.console:is([data-view="players"],[data-view="stats"],[data-view="settings"]) main{
+  padding-top:clamp(9px,1.6vw,18px);
+}
 </style>
 </head>
 <body>
@@ -1247,8 +1260,7 @@ function statistics(){
     return '<div class="score-row"><span>'+esc(match.mode)+' · '+esc(new Date(match.started).toLocaleDateString())+
       '<small class="marks">'+esc(match.players.join(', '))+'</small></span><strong>'+esc(winner)+'</strong></div>';
   });
-  return title('RESULTS','Statistics','Completed matches and recorded dart averages.')+
-    panel('Players',[...totals].map(([name,t])=>'<div class="score-row"><span>'+esc(name)+
+  return panel('Players',[...totals].map(([name,t])=>'<div class="score-row"><span>'+esc(name)+
       '</span><span>'+t.won+' / '+t.played+' wins · '+(t.darts?(3*t.points/t.darts).toFixed(1):'—')+' per 3 darts</span></div>').join(''))+
     panel('Match history',summaries.reverse().join('')||'<p>No completed matches yet.</p>');
 }
@@ -1360,7 +1372,9 @@ async function startSoftwareUpdate(){
 function render(scroll=false){
   document.querySelector('.console').dataset.view=state.page;
   const matchPage=['game','menu','segment','correction'].includes(state.page);
-  document.getElementById('match-heading').textContent=matchPage&&data.active?data.active.mode:'';
+  const sectionHeadings={players:'Players',stats:'Statistics',settings:'Settings'};
+  document.getElementById('match-heading').textContent=sectionHeadings[state.page]||
+    (matchPage&&data.active?data.active.mode:'');
   const context=document.getElementById('match-context');
   const currentView=matchPage&&data.active?derived():null;
   context.textContent=currentView?'ROUND '+currentView.round+(Number(data.active.mode)?' · '+data.active.options.out.toUpperCase():''):'';
@@ -1378,9 +1392,9 @@ function render(scroll=false){
     saved:()=>title('SAVED MATCH',esc(state.chosen),'Round '+derived().round+' · '+data.active.players.map(esc).join(', '))+
       button('game','Continue match','primary')+'<br><br>'+
       button('discard','Discard and start new')+button('play','Back to games'),
-    players:()=>title('PLAYER LIST','Players','Saved profiles')+panel('Profiles','<div class="players">'+data.profiles.map(name=>
+    players:()=>panel('Profiles','<div class="players">'+data.profiles.map(name=>
       '<div class="player">'+esc(name)+'</div>').join('')+'</div>')+button('new-profile','Add player'),
-    settings:()=>title('CONSOLE','Settings')+panel('Scoring',button('default-out','Default checkout <span>'+esc(data.out)+'</span>')+
+    settings:()=>panel('Scoring',button('default-out','Default checkout <span>'+esc(data.out)+'</span>')+
       '<p>Manual entry is available from the match screen.</p>')+updatePanel()+button('about','About'),
     about:()=>title('CONSOLE','About')+panel('Darts Console','<p>Offline darts scoring for a portrait display and Raspberry Pi Pico controls.</p>')};
   // Keep the encoder selection stable across redraws. A score update may
