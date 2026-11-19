@@ -1071,6 +1071,13 @@ header{justify-content:space-between;gap:24px}
 /* Guest identity: fixed white outline and exclusive user-plus icon. */
 .guest-profile-badge{--profile-color:#fff!important;color:#fff!important;border-color:#fff!important;background:rgba(255,255,255,.12)!important}
 .guest-profile-badge svg{color:#fff}
+
+/* Live-match controls share the same five hardware centers as every other view. */
+.console[data-view="game"] .turn-complete{padding:9px 10px;background:#27292d;border:1px solid #b8b9bc;border-radius:6px;font-size:clamp(12px,1.65vw,20px);font-weight:750;letter-spacing:.045em;text-align:center;color:#f0f0f0}
+.danger-action{border-color:#b26060!important;color:#f0a7a7!important}
+.console[data-view="game"] .dart-slot:disabled{opacity:1}
+.console[data-view="game"] .dart-slot.recorded:disabled{background:#ededee;color:#17181b}
+
 </style>
 </head>
 <body>
@@ -1371,6 +1378,66 @@ function deletePlayerProfile(){
   state.selectedProfile=Math.min(state.selectedProfile,Math.max(0,data.profiles.length-1));
   save();show('players');
 }
+
+/* The scoring engine advances immediately on the third dart. Keep the completed
+   three-dart visit visible until NEXT is pressed. This is presentation metadata,
+   not a modification to the scoring event stream. Persisted for kiosk reloads. */
+function turnReview(){
+  const review=data.active?.uiTurnReview;
+  if(!review || !Array.isArray(review.darts) || review.darts.length!==3)return null;
+  const view=derived();
+  if(view.winners!==null || data.active.events.length!==review.eventCount)return null;
+  if(view.current!==review.nextPlayer || view.round!==review.nextRound)return null;
+  return review;
+}
+function clearTurnReview(){
+  if(data.active)delete data.active.uiTurnReview;
+}
+function recordMatchDart(n,m){
+  if(!data.active||derived().winners!==null||turnReview())return false;
+  const before=derived();
+  const index=data.active.events.length;
+  Scoring.record(data.active,n,m);
+  const after=derived();
+  if(before.darts.length===2&&after.winners===null&&
+     (before.current!==after.current||before.round!==after.round)){
+    const darts=[...before.darts,{n,m}];
+    data.active.uiTurnReview={
+      player:before.current,round:before.round,darts,
+      indices:[...before.history.slice(-2).map(x=>x.index),index],
+      nextPlayer:after.current,nextRound:after.round,eventCount:data.active.events.length,
+      total:darts.reduce((sum,d)=>sum+d.n*d.m,0)
+    };
+  }else clearTurnReview();
+  save();
+  show('game');
+  if(after.winners!==null)announceVictory(before.winners);
+  else if(!turnReview())showThrowFeedback(n,m);
+  return true;
+}
+function leaveMatch(saveProgress){
+  if(!data.active)return show('home');
+  if(saveProgress){
+    parkMatch();
+  }else{
+    data.active=null;
+  }
+  save();
+  show('home');
+}
+function matchOptionsScreen(){
+  return title('MATCH OPTIONS','MATCH PAUSED')+
+    button('game','RESUME MATCH','primary')+
+    button('correction','CORRECT EARLIER THROW','action')+
+    button('match-save-exit','SAVE & EXIT TO MAIN MENU','action')+
+    button('match-leave-confirm','END MATCH WITHOUT SAVING','action danger-action');
+}
+function matchLeaveConfirmScreen(){
+  return title('END MATCH','DISCARD THIS MATCH?')+
+    '<div class="panel"><p>The unfinished match will not be saved. Previous completed matches and statistics are unaffected.</p></div>'+
+    button('menu','KEEP PLAYING','primary')+
+    button('match-discard','DISCARD & MAIN MENU','action danger-action');
+}
 function shortcuts(){
   if(state.page==='settings-wifi-password')return [
     ['Escape','Back',()=>{state.networkPassword='';show('settings-network')}],
@@ -1462,19 +1529,42 @@ function shortcuts(){
     ['F2','Statistics',()=>show('stats')],
     ['F5','Settings',()=>show('settings')]
   ];
-  if(state.page==='game')return [
-    ['Escape',derived().winners===null?'Miss':'Menu',()=>{
-      if(derived().winners!==null)return show('menu');
-      const before=derived().winners;
-      Scoring.record(data.active,0,0);save();show('game');showThrowFeedback(0,0);announceVictory(before,1700);
+  if(state.page==='game'){
+    const finished=derived().winners!==null;
+    return [
+      ['Escape',finished?'':'Menu',()=>{if(!finished)show('menu')}],
+      ['F4',finished?'':'Miss',()=>{if(!finished)recordMatchDart(0,0)}],
+      ['F2',finished?'':'Undo',()=>{
+        if(finished||!data.active)return;
+        clearTurnReview();
+        Scoring.undo(data.active);save();show('game');
+      }],
+      ['F5',turnReview()?'Next':'',()=>{if(turnReview()){clearTurnReview();save();show('game')}}]
+    ];
+  }
+  if(state.page==='menu')return [
+    ['Escape','Back',()=>show('game')],
+    ['F4','Correct',()=>show('correction')],
+    ['F2','Save & exit',()=>leaveMatch(true)],
+    ['F5','End match',()=>show('match-leave-confirm')]
+  ];
+  if(state.page==='match-leave-confirm')return [
+    ['Escape','Back',()=>show('menu')],
+    ['F4','',()=>{}],['F2','',()=>{}],
+    ['F5','Discard',()=>leaveMatch(false)]
+  ];
+  if(state.page==='segment')return [
+    ['Escape','Back',()=>{
+      if(state.number!==undefined){state.number=undefined;render(false)}
+      else show(state.edit===null?'game':'correction');
     }],
-    ['F4','Undo',()=>{Scoring.undo(data.active);save();show('game')}],
-    ['F2','Correct',()=>{
-      const latest=derived().history.at(-1);
-      if(latest)openThrow(latest.index);
-      else show('correction');
-    }],
-    ['F5','Next',()=>{const before=derived().winners;Scoring.next(data.active);save();show('game');announceVictory(before)}]
+    ['F4','Miss',()=>{if(state.edit!==null||!turnReview())clickHitAction(0,0)}],
+    ['F2','',()=>{}],['F5','',()=>{}]
+  ];
+  if(state.page==='correction')return [
+    ['Escape','Back',()=>show('menu')],
+    ['F4','Undo',()=>{clearTurnReview();Scoring.undo(data.active);save();show('correction')}],
+    ['F2','',()=>{}],['F5','',()=>{}]
   ];
   return [
     ['Escape',state.page==='play'?'Home':'Back',()=>{
@@ -1487,7 +1577,8 @@ function shortcuts(){
   ];
 }
 function runShortcut(key){
-  shortcuts().find(item=>item[0]===key)?.[2]();
+  const item=shortcuts().find(item=>item[0]===key);
+  if(item&&item[1])item[2]();
 }
 function renderFooter(){
   if(['setup','players','profile','profile-icons','profile-colors','player-delete','settings','settings-scoring','settings-display','settings-network','settings-system','settings-wifi-password','about'].includes(state.page)){
@@ -1541,11 +1632,25 @@ function renderFooter(){
       :'<div class="home-encoder" aria-hidden="true"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="23" fill="none" stroke="#fff" stroke-width="2.8"/></svg></div>').join('');
     return;
   }
-  const buttons=shortcuts().map(([key,label])=>
-    '<button class="softkey" data-shortcut="'+key+'"><span>'+label+'</span><small>'+
-    ({Escape:'BACK',F4:'UNDO',F2:'CORRECT',F5:'NEXT'}[key])+'</small></button>');
-  buttons.splice(2,0,'<div class="encoder-hint"><span class="encoder-dot"></span><span>Turn to select<small>Press to confirm</small></span></div>');
+  if(['game','menu','segment','correction','match-leave-confirm'].includes(state.page)){
+    const keys=shortcuts();
+    const buttons=keys.map(([key,label])=>label
+      ?'<button class="softkey library-key" data-shortcut="'+key+'"><span>'+esc(label.toUpperCase())+'</span></button>'
+      :'<span class="stats-empty-softkey" aria-hidden="true"></span>');
+    const clickable=state.page!=='game'||(derived().winners===null&&!turnReview());
+    buttons.splice(2,0,'<div class="home-encoder" aria-hidden="true">'+
+      '<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="23" fill="none" stroke="#fff" stroke-width="2.8"/>'+
+      (clickable?'<circle cx="30" cy="30" r="8" fill="#fff"/>':'')+'</svg></div>');
+    document.querySelector('footer').innerHTML=buttons.join('');
+    return;
+  }
+  const buttons=shortcuts().map(([key,label])=>label
+    ?'<button class="softkey" data-shortcut="'+key+'"><span>'+esc(label)+'</span></button>'
+    :'<span class="stats-empty-softkey" aria-hidden="true"></span>');
+  buttons.splice(2,0,'<div class="home-encoder" aria-hidden="true"><svg viewBox="0 0 60 60">'+
+    '<circle cx="30" cy="30" r="23" fill="none" stroke="#fff" stroke-width="2.8"/></svg></div>');
   document.querySelector('footer').innerHTML=buttons.join('');
+
 }
 function addSetupGuest(){
   let number=state.guests.length+1;
@@ -1931,6 +2036,7 @@ function announceVictory(previousWinner, delay=0){
 function game(){
   const match=data.active, view=derived(), p=view.players[view.current];
   const finished=view.winners!==null;
+  const review=!finished?turnReview():null;
   const mode=match.mode;
   const modeScore=player=>{
     if(mode==='Around the Clock') return player.target>20?(match.options.bull&&player.target===21?'Bull':'Done'):player.target;
@@ -1955,31 +2061,34 @@ function game(){
       button('finished-home','←  Back to main menu','action winner-home')+'</div>';
   }
   else {
-    const value=modeScore(p);
-    const darts=view.darts;
+    const shown=review?view.players[review.player]:p;
+    const value=modeScore(shown);
+    const darts=review?review.darts:view.darts;
     const turnTotal=darts.reduce((sum,d)=>sum+d.n*d.m,0);
-    const roundHistory=view.history.filter(d=>d.player===view.current&&d.round===view.round);
-    html+='<div class="score-hero"><div class="throwing-line"><span>NOW THROWING:</span><strong>'+profileBadge(p.name,'match-profile-avatar')+esc(p.name)+
+    const roundHistory=review?review.indices.map(index=>({index})):
+      view.history.filter(d=>d.player===view.current&&d.round===view.round);
+    html+='<div class="score-hero"><div class="throwing-line"><span>NOW THROWING:</span><strong>'+profileBadge(shown.name,'match-profile-avatar')+esc(shown.name)+
       '</strong></div><div class="big-score'+(typeof value==='string'?' word-score':'')+'">'+esc(value)+
       '</div><div class="caption">'+unit+'</div></div>';
     html+='<div class="turn-header"><span>THIS TURN · '+darts.length+'/3 DARTS</span><span>TOTAL <strong>'+turnTotal+'</strong></span></div>';
-    const tip=finishAdvice(mode,view,match);
+    const tip=review?null:finishAdvice(mode,view,match);
     const suggested=tip && tip.route!=='NO DIRECT FINISH' ? tip.route.split(' → ') : [];
     if(suggested.length){
       html+='<div class="checkout-inline-label"><span>◎ SUGGESTED '+(Number(mode)?'CHECKOUT':'TARGET')+'</span>'+
         '<span>GOLD = AIM · WHITE = HIT</span></div>';
     }
+    if(review)html+='<div class="turn-complete">TURN COMPLETE · PRESS NEXT TO CONTINUE</div>';
     html+='<div class="dart-slots">'+[0,1,2].map(i=>{
       const suggestion=!darts[i] ? suggested[i-darts.length] : null;
       const recorded=Boolean(darts[i]);
       return button(recorded?'edit:'+roundHistory[i].index:'throw',
         '<small>DART '+(i+1)+(suggestion?' · AIM':'')+'</small><span>'+
         (recorded?esc(Scoring.label(darts[i].n,darts[i].m)):suggestion?esc(suggestion):'—')+'</span>',
-        'dart-slot '+(recorded?'recorded':suggestion?'suggested':i===darts.length?'ready':'empty'),i>darts.length);
+        'dart-slot '+(recorded?'recorded':suggestion?'suggested':i===darts.length?'ready':'empty'),Boolean(review)||i>darts.length);
     }).join('')+'</div>';
   }
   html+='<section class="panel standings"><h2>Standings</h2>'+view.players.map((player,i)=>
-    '<div class="score-row '+(!finished&&i===view.current?'active':'')+'"><span>'+(!finished&&i===view.current?'<span class="on-turn">AT BOARD</span>':'')+profileBadge(player.name,'match-profile-mini')+esc(player.name)+
+    '<div class="score-row '+(!finished&&i===(review?review.player:view.current)?'active':'')+'"><span>'+(!finished&&i===(review?review.player:view.current)?'<span class="on-turn">AT BOARD</span>':'')+profileBadge(player.name,'match-profile-mini')+esc(player.name)+
     (mode==='Killer'?' · #'+player.number+' · '+((player.marks[player.number]??0)===3?'Killer':(player.marks[player.number]??0)+'/3'):'')+
     (!player.active?' · Out':'')+(mode==='Cricket'?'<small class="marks">'+[15,16,17,18,19,20,25].map(n=>
       (n===25?'B':n)+' '+(player.marks[n]??0)+'/3').join(' · ')+'</small>':'')+
@@ -1988,7 +2097,7 @@ function game(){
     '<div class="rule">'+n+' · '+esc(view.owners[i]===null?'Open':view.players[view.owners[i]].name)+'</div>').join('')+'</div><br>';
   if(view.notice) html+=note(view.notice);
   if(view.skipped) html+=note(view.skipped+' recorded event(s) no longer fit after a correction. Open Corrections to review.');
-  if(!finished)html+='<div class="match-actions">'+button('menu','<span class="match-options-title">⚙ &nbsp; MATCH OPTIONS</span><span class="match-options-subtitle">Pause · Resume · Leave match &nbsp; ›</span>','action match-options')+'</div>';
+
   return html;
 }
 function segment(){
@@ -2584,13 +2693,13 @@ async function startSoftwareUpdate(){
 function render(scroll=false){
   document.querySelector('.console').dataset.view=state.page;
   applyDisplaySettings();
-  const matchPage=['game','menu','segment','correction'].includes(state.page);
+  const matchPage=['game','menu','segment','correction','match-leave-confirm'].includes(state.page);
   const sectionHeadings={players:'Players',stats:'Statistics','stats-players':'Players','stats-player-detail':'Player','stats-records':'Records','stats-history':'History','stats-match-detail':'Match','stats-delete-confirm':'Löschen','player-delete':'Löschen',profile:'Players','profile-icons':'Players','profile-colors':'Players',settings:'Settings','settings-scoring':'Scoring','settings-display':'Darstellung','settings-network':'Netzwerk','settings-wifi-password':'WLAN','settings-system':'Software',about:'About'};
   document.getElementById('match-heading').textContent=sectionHeadings[state.page]||
     (matchPage&&data.active?data.active.mode:'');
   const context=document.getElementById('match-context');
   const currentView=matchPage&&data.active?derived():null;
-  context.textContent=currentView?'ROUND '+currentView.round+(Number(data.active.mode)?' · '+data.active.options.out.toUpperCase():''):'';
+  context.textContent=currentView?'ROUND '+(state.page==='game'&&turnReview()?turnReview().round:currentView.round)+(Number(data.active.mode)?' · '+(data.active.options.out||'Double Out').toUpperCase():''):'';
   const views={home:homeScreen,play:cards,'mode-info':selectedGameInfo,setup,game,segment,correction:history,grid:picker,number:picker,stats:statistics,
     'stats-players':statisticsPlayers,'stats-player-detail':statsPlayerDetails,'stats-records':statisticsRecords,'stats-history':statisticsHistory,
     'stats-match-detail':statisticsMatchDetail,'stats-delete-confirm':statisticsDeleteConfirm,
@@ -2603,7 +2712,7 @@ function render(scroll=false){
         state.bermudaTarget===25&&i===3)).join('')+'</div>',
     rounds:()=>title('MATCH SETUP','Rounds','Choose the match length.')+'<div class="letters">'+
       Array.from({length:30},(_,i)=>button('round-count:'+(i+1),i+1,'rule')).join('')+'</div>',
-    menu:()=>title('MATCH OPTIONS','Match menu')+button('game','Resume match')+button('play','Game library'),
+    menu:matchOptionsScreen,'match-leave-confirm':matchLeaveConfirmScreen,
     saved:()=>title('SAVED MATCH',esc(state.chosen),'Round '+derived().round+' · '+data.active.players.map(esc).join(', '))+
       button('game','Continue match','primary')+'<br><br>'+
       button('discard','Discard and start new')+button('play','Back to games'),
@@ -2741,9 +2850,21 @@ function showThrowFeedback(n,m){
   else overlay.addEventListener('animationend',e=>{if(e.target===overlay)overlay.remove()},{once:true});
 }
 function openThrow(index=null){
+  if(index===null&&turnReview())return;
   state.edit=index;
   state.number=undefined;
   show('segment');
+}
+function clickHitAction(n,m){
+  if(!data.active)return;
+  const previousWinner=derived().winners;
+  const newThrow=state.edit===null;
+  if(newThrow)return recordMatchDart(n,m);
+  clearTurnReview();
+  Scoring.correct(data.active,state.edit,n,m);
+  save();
+  show('game');
+  announceVictory(previousWinner);
 }
 function clickButton(b){
   if(!b||b.disabled)return;
@@ -2867,29 +2988,24 @@ function clickButton(b){
       state.numbers[state.numberPlayer]=Number(value);
       return show('setup');
     case 'begin':return begin();
+    case 'match-save-exit':return leaveMatch(true);
+    case 'match-leave-confirm':return show('match-leave-confirm');
+    case 'match-discard':return leaveMatch(false);
     case 'throw':return openThrow();
     case 'edit':return openThrow(Number(value));
     case 'segment':state.number=Number(value);return show('segment');
     case 'hit': {
       const [n,m]=value.split(',').map(Number);
-      const previousWinner=derived().winners;
-      const newThrow=state.edit===null;
-      if(newThrow) Scoring.record(data.active,n,m);
-      else Scoring.correct(data.active,state.edit,n,m);
-      save();
-      show('game');
-      if(newThrow)showThrowFeedback(n,m);
-      announceVictory(previousWinner,newThrow?1700:0);
-      return;
+      return clickHitAction(n,m);
     }
     case 'next':{
-      const before=derived().winners;
-      Scoring.next(data.active);save();show('game');announceVictory(before);return;
+      if(!turnReview())return;
+      clearTurnReview();save();return show('game');
     }
     case 'finished-home':{
       parkMatch();
       save();
-      return show('play');
+      return show('home');
     }
     case 'rematch':{
       const old=data.active;
@@ -2907,7 +3023,7 @@ document.addEventListener('click',event=>{
   const b=event.target.closest('button[data-nav]');
   if(b) clickButton(b);
 });
-const back={'mode-info':'play',play:'home',players:'home',stats:'home','stats-players':'stats','stats-player-detail':'stats-players','stats-records':'stats','stats-history':'stats','stats-match-detail':'stats-history','stats-delete-confirm':'stats-match-detail',settings:'home','settings-scoring':'settings','settings-display':'settings','settings-network':'settings','settings-wifi-password':'settings-network','settings-system':'settings',setup:'play',game:'menu',menu:'game',correction:'game',rounds:'setup',grid:'setup',number:'setup',
+const back={'match-leave-confirm':'menu','mode-info':'play',play:'home',players:'home',stats:'home','stats-players':'stats','stats-player-detail':'stats-players','stats-records':'stats','stats-history':'stats','stats-match-detail':'stats-history','stats-delete-confirm':'stats-match-detail',settings:'home','settings-scoring':'settings','settings-display':'settings','settings-network':'settings','settings-wifi-password':'settings-network','settings-system':'settings',setup:'play',game:'menu',menu:'game',correction:'game',rounds:'setup',grid:'setup',number:'setup',
   saved:'play',about:'settings',profile:'players','profile-icons':'profile','profile-colors':'profile-icons','player-delete':'players','bermuda-number':'setup','bermuda-multiplier':'bermuda-number'};
 document.addEventListener('keydown',event=>{
   const key=event.key;
