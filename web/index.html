@@ -1119,7 +1119,7 @@ const profileColorOptions=["#F04452","#F26B38","#F39A29","#E6BA24","#B5CE35","#7
 function profileAppearance(name){const a=data.profileAppearance?.[name]||{};const i=Number.isInteger(a.icon)?a.icon:Math.max(0,data.profiles.indexOf(name))%profileIconOptions.length;const c=Number.isInteger(a.color)?a.color:Math.max(0,data.profiles.indexOf(name))%profileColorOptions.length;return {icon:Math.max(0,Math.min(23,i)),color:Math.max(0,Math.min(23,c))}}
 function profileIconSvg(index){const entry=profileIconOptions[index]||profileIconOptions[0];return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="'+entry[2]+'"/></svg>'}
 function profileBadge(name,cls='profile-avatar'){const a=profileAppearance(name);return '<span class="'+cls+'" style="--profile-color:'+profileColorOptions[a.color]+'">'+profileIconSvg(a.icon)+'</span>'}
-const defaults=['Emre','Arber','Adnan','Atakan','Amir','Ali'];
+const defaults=['EMRE','ARBER','ADNAN','ATAKAN','AMIR','ALI'];
 const storage='darts-console-v1';
 let data={profiles:defaults, matches:[], active:null, unfinished:{}, out:'Double Out', display:{reducedMotion:false, highContrast:false}};
 try {
@@ -1128,10 +1128,41 @@ try {
 } catch (error) {
   console.warn('Unable to load console state',error);
 }
+// Migrate older mixed-case profiles and match history to one canonical name.
+const canonicalPlayerName=name=>String(name??'').trim().toLocaleUpperCase('de-DE');
+function migrateUppercasePlayers(){
+  let changed=false;
+  const original=Array.isArray(data.profiles)?data.profiles:defaults;
+  const profiles=[...new Set(original.map(canonicalPlayerName).filter(Boolean))];
+  if(JSON.stringify(original)!==JSON.stringify(profiles)){data.profiles=profiles;changed=true;}
+  const appearances=data.profileAppearance||{};
+  const updated={};
+  for(const [name,appearance] of Object.entries(appearances)){
+    const key=canonicalPlayerName(name);
+    if(key&&!Object.hasOwn(updated,key))updated[key]=appearance;
+    if(name!==key)changed=true;
+  }
+  if(changed)data.profileAppearance=updated;
+  const migrateMatch=match=>{
+    if(!match||!Array.isArray(match.players))return;
+    const players=match.players.map(canonicalPlayerName);
+    if(JSON.stringify(match.players)!==JSON.stringify(players)){
+      match.players=players;changed=true;
+    }
+  };
+  if(Array.isArray(data.matches))data.matches.forEach(migrateMatch);
+  migrateMatch(data.active);
+  if(data.unfinished&&typeof data.unfinished==='object')
+    Object.values(data.unfinished).forEach(migrateMatch);
+  if(changed){
+    try{localStorage.setItem(storage,JSON.stringify(data));}catch(e){console.warn('Unable to save uppercase player migration',e);}
+  }
+}
+migrateUppercasePlayers();
 data.display={reducedMotion:false,highContrast:false,clarity:null,...data.display};
 if(!['Dezent','Standard','Klar'].includes(data.display.clarity))
   data.display.clarity=data.display.highContrast?'Klar':'Standard';
-const state={page:'home',filter:'quick',chosen:'501',players:['Arber','Emre'],
+const state={page:'home',filter:'quick',chosen:'501',players:['ARBER','EMRE'],
   guests:[], cursor:0, message:'', out:data.out, rounds:10, bull:false, grid:[], sequence:[], numbers:{}, selfHit:null,
   selectedProfile:0, editOriginal:null, editIcon:0, editColor:0, settingsCheckoutOpen:false, settingsDisplayOpen:false, network:{state:'unknown',networks:[],message:'Status noch nicht geprüft.'}, networkBusy:false, networkSsid:'', networkPassword:'', networkKeyboardMode:0, updateConfirm:false, updateBusy:false, updateInfo:'Bereit zum Prüfen auf Updates.'};
 const main=document.getElementById('main');
@@ -1500,8 +1531,8 @@ function renderFooter(){
 }
 function addSetupGuest(){
   let number=state.guests.length+1;
-  while([...data.profiles,...state.guests].includes('Guest '+number))number++;
-  const guest='Guest '+number;
+  while([...data.profiles,...state.guests].includes('GAST '+number))number++;
+  const guest='GAST '+number;
   state.guests.push(guest);
   if(!state.players.includes(guest))state.players.push(guest);
   render(false);
@@ -2177,7 +2208,7 @@ function deleteHistoryMatch(){
   show('stats-history');
 }
 function savePlayerProfile(){
-  const name=state.name.trim().toLocaleUpperCase('de-DE');
+  const name=canonicalPlayerName(state.name);
   if(!name)return say('Bitte einen Namen eingeben.');
   if([...data.profiles,...state.guests].some(n=>n!==state.editOriginal&&n.toLowerCase()===name.toLowerCase()))
     return say('Diesen Spielernamen gibt es schon.');
