@@ -863,6 +863,45 @@ header{justify-content:space-between;gap:24px}
 }
 .console[data-view="profile-colors"] .profile-color-option.focused .profile-color-swatch{transform:scale(1.09)}
 .profile-color-check{width:43%;height:43%;filter:drop-shadow(0 1px 2px #0006)}
+
+/* Unified vertical coordinates throughout Name, Logo and Color steps. */
+.console[data-view="profile"] .profile-editor-shell,
+.console[data-view="profile-icons"] .profile-customize,
+.console[data-view="profile-colors"] .profile-customize {
+  width:100%;max-width:940px;margin-inline:auto;
+  display:grid;
+  grid-template-rows:auto clamp(155px,19dvh,215px) auto;
+  align-content:start;row-gap:clamp(14px,2dvh,24px);
+}
+.console[data-view="profile"] .profile-name-preview,
+.console[data-view="profile-icons"] .profile-customize-top,
+.console[data-view="profile-colors"] .profile-customize-top {
+  box-sizing:border-box;height:100%;min-height:0;margin:0;align-self:stretch;
+}
+.console[data-view="profile"] .profile-name-preview {
+  justify-content:center;padding:0;gap:clamp(8px,1.2dvh,15px);
+}
+.console[data-view="profile-icons"] .profile-customize-top,
+.console[data-view="profile-colors"] .profile-customize-top {
+  justify-content:flex-start;border-bottom:1px solid #46484f;
+  padding:0 0 clamp(10px,1.2dvh,16px);
+}
+.console[data-view="profile"] .profile-keyboard,
+.console[data-view="profile-icons"] .profile-customize-grid,
+.console[data-view="profile-colors"] .profile-customize-grid {
+  align-self:start;margin:0;
+}
+/* Selected color: white circular outline with no rectangular card frame. */
+.console[data-view="profile-colors"] .profile-color-option.chosen .profile-color-swatch {
+  box-shadow:0 0 0 3px #fff;
+}
+.console[data-view="profile-colors"] .profile-color-option.focused,
+.console[data-view="profile-colors"] .profile-color-option:focus-visible {
+  outline:none;border:0;box-shadow:none;
+}
+.console[data-view="profile-colors"] .profile-color-option.focused .profile-color-swatch {
+  transform:none;
+}
 </style>
 </head>
 <body>
