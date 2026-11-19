@@ -1725,6 +1725,68 @@ header{justify-content:space-between;gap:24px}
   }
 }
 
+
+/* End-match confirmation uses the pause menu's visual hierarchy. */
+.console[data-view="match-leave-confirm"] main{
+  padding:clamp(16px,3vw,36px);
+  overflow-y:auto;
+}
+.console[data-view="match-leave-confirm"] .match-menu-page{
+  width:100%;max-width:900px;
+  margin:clamp(6px,2dvh,32px) auto 0;
+  display:flex;flex-direction:column;
+  gap:clamp(20px,3dvh,38px);
+}
+.console[data-view="match-leave-confirm"] .match-menu-heading h1{
+  font-size:clamp(32px,5.5vw,61px);
+  line-height:1.07;letter-spacing:-.04em;
+  margin:clamp(8px,1.2dvh,14px) 0 0;
+}
+.console[data-view="match-leave-confirm"] .match-menu-heading .eyebrow{
+  font-size:clamp(13px,1.75vw,20px);
+}
+.console[data-view="match-leave-confirm"] .match-confirm-note{
+  border-left:3px solid #a75d64;
+  background:#1d1f22;border-radius:0 6px 6px 0;
+  padding:clamp(12px,2vw,22px);
+  color:#bfc0c5;line-height:1.45;
+  font-size:clamp(15px,2.15vw,24px);
+  margin:0;
+}
+.console[data-view="match-leave-confirm"] .match-menu-actions{
+  display:flex;flex-direction:column;
+  gap:clamp(12px,1.8dvh,22px);
+}
+.console[data-view="match-leave-confirm"] .match-menu-actions > button,
+.console[data-view="match-leave-confirm"] .match-menu-danger > button{
+  width:100%;min-height:clamp(76px,9dvh,130px);
+  box-sizing:border-box;padding:clamp(15px,2vw,26px);
+  border-radius:8px;text-align:left;
+  font-size:clamp(17px,2.7vw,30px);
+  font-weight:700;
+}
+.console[data-view="match-leave-confirm"] .match-menu-actions > button.primary{
+  background:#eeeeef;color:#151619;
+}
+.console[data-view="match-leave-confirm"] .match-menu-danger{
+  padding-top:clamp(16px,2.5dvh,34px);
+  border-top:1px solid #3f4146;
+}
+.console[data-view="match-leave-confirm"] .match-menu-danger .danger-action{
+  background:#261f22;border-color:#a75d64!important;color:#efabb0!important;
+}
+.console[data-view="match-leave-confirm"] footer [data-shortcut="F5"],
+.console[data-view="match-leave-confirm"] footer [data-shortcut="F5"] span{
+  color:#f19aa2!important;
+}
+@media(max-width:600px){
+  .console[data-view="match-leave-confirm"] .match-menu-actions > button,
+  .console[data-view="match-leave-confirm"] .match-menu-danger > button{
+    min-height:clamp(64px,8dvh,108px);
+    font-size:clamp(16px,4vw,24px);
+  }
+}
+
 </style>
 </head>
 <body>
@@ -2070,10 +2132,15 @@ function matchOptionsScreen(){
     '</div></div></section>';
 }
 function matchLeaveConfirmScreen(){
-  return title('END MATCH','DISCARD THIS MATCH?')+
-    '<div class="panel"><p>The unfinished match will not be saved. Previous completed matches and statistics are unaffected.</p></div>'+
-    button('menu','KEEP PLAYING','primary')+
-    button('match-discard','DISCARD & MAIN MENU','action danger-action');
+  return '<section class="match-menu-page match-confirm-page">'+
+    '<div class="match-menu-heading"><div class="eyebrow">END MATCH</div>'+
+    '<h1>DISCARD THIS MATCH?</h1></div>'+
+    '<p class="match-confirm-note">This unfinished match will be discarded. Your completed matches and statistics will stay untouched.</p>'+
+    '<div class="match-menu-actions">'+
+    button('game','KEEP PLAYING','primary')+
+    '<div class="match-menu-danger">'+
+    button('match-discard','DISCARD & MAIN MENU','action danger-action')+
+    '</div></div></section>';
 }
 function shortcuts(){
   if(state.page==='settings-wifi-password')return [
