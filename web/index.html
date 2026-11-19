@@ -1067,6 +1067,10 @@ header{justify-content:space-between;gap:24px}
 .setup-checkout-option.checked{background:#383a40;border-color:#d6d8dc}
 .setup-check{position:absolute;top:4px;right:7px;font-size:clamp(11px,1.8vw,18px);color:#fff}
 @media(max-width:600px){.setup-step{display:none}.setup-player-option{min-height:62px}.setup-card{padding:14px}.setup-player-name{font-size:clamp(14px,3.4vw,22px)}}
+
+/* Guest identity: fixed white outline and exclusive user-plus icon. */
+.guest-profile-badge{--profile-color:#fff!important;color:#fff!important;border-color:#fff!important;background:rgba(255,255,255,.12)!important}
+.guest-profile-badge svg{color:#fff}
 </style>
 </head>
 <body>
@@ -1118,7 +1122,21 @@ const profileIconOptions=[["Ninja","A","M5 10C5 5 8 3 12 3s7 2 7 7v9H5z M5 11h14
 const profileColorOptions=["#F04452","#F26B38","#F39A29","#E6BA24","#B5CE35","#70CE35","#25C97B","#1CCFA9","#22B5C8","#2A94E8","#4568F0","#6854EF","#9148E8","#C348D8","#E44BA6","#ED4779","#DA6337","#B58A1F","#75AD27","#25B88A","#1F8FC3","#5466D8","#A24DB6","#D54C62"];
 function profileAppearance(name){const a=data.profileAppearance?.[name]||{};const i=Number.isInteger(a.icon)?a.icon:Math.max(0,data.profiles.indexOf(name))%profileIconOptions.length;const c=Number.isInteger(a.color)?a.color:Math.max(0,data.profiles.indexOf(name))%profileColorOptions.length;return {icon:Math.max(0,Math.min(23,i)),color:Math.max(0,Math.min(23,c))}}
 function profileIconSvg(index){const entry=profileIconOptions[index]||profileIconOptions[0];return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="'+entry[2]+'"/></svg>'}
-function profileBadge(name,cls='profile-avatar'){const a=profileAppearance(name);return '<span class="'+cls+'" style="--profile-color:'+profileColorOptions[a.color]+'">'+profileIconSvg(a.icon)+'</span>'}
+// Temporary guests have a permanent white badge and an exclusive avatar.
+function isGuestPlayer(name){
+  return /^(?:GAST|GUEST) [1-9][0-9]*$/i.test(String(name||'').trim());
+}
+function guestProfileIconSvg(){
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+
+    '<circle cx="10" cy="8" r="3.4"/><path d="M3.8 19.5c.7-3.7 3-5.4 6.2-5.4s5.5 1.7 6.2 5.4"/>'+
+    '<path d="M19 12v7m-3.5-3.5h7"/></svg>';
+}
+function profileBadge(name,cls='profile-avatar'){
+  if(isGuestPlayer(name))
+    return '<span class="'+cls+' guest-profile-badge" style="--profile-color:#ffffff">'+guestProfileIconSvg()+'</span>';
+  const a=profileAppearance(name);
+  return '<span class="'+cls+'" style="--profile-color:'+profileColorOptions[a.color]+'">'+profileIconSvg(a.icon)+'</span>';
+}
 const defaults=['EMRE','ARBER','ADNAN','ATAKAN','AMIR','ALI'];
 const storage='darts-console-v1';
 let data={profiles:defaults, matches:[], active:null, unfinished:{}, out:'Double Out', display:{reducedMotion:false, highContrast:false}};
@@ -2210,6 +2228,7 @@ function deleteHistoryMatch(){
 function savePlayerProfile(){
   const name=canonicalPlayerName(state.name);
   if(!name)return say('Bitte einen Namen eingeben.');
+  if(isGuestPlayer(name))return say('GAST-Namen sind für temporäre Spieler reserviert.');
   if([...data.profiles,...state.guests].some(n=>n!==state.editOriginal&&n.toLowerCase()===name.toLowerCase()))
     return say('Diesen Spielernamen gibt es schon.');
   data.profileAppearance=data.profileAppearance||{};
