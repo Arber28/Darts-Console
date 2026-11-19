@@ -1071,6 +1071,28 @@ header{justify-content:space-between;gap:24px}
 /* Guest identity: fixed white outline and exclusive user-plus icon. */
 .guest-profile-badge{--profile-color:#fff!important;color:#fff!important;border-color:#fff!important;background:rgba(255,255,255,.12)!important}
 .guest-profile-badge svg{color:#fff}
+
+/* Isolated board experiment: no changes to established navigation/screens. */
+.console[data-view="game"] .score-hero{height:clamp(175px,20dvh,355px);padding:12px 14px}
+.console[data-view="game"] .big-score{font-size:clamp(85px,15vw,200px)}
+.board-panel{min-width:0;width:100%;background:#1b1d20;border:1px solid #34373c;border-radius:9px;padding:8px 12px 10px;box-sizing:border-box;display:flex;align-items:center;flex-direction:column}
+.board-topline{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;color:#b7bac0;font-weight:700;letter-spacing:.055em;font-size:clamp(11px,1.55vw,18px)}
+.board-topline span:last-child{color:#e5c77c;text-align:right;letter-spacing:0;overflow-wrap:anywhere}
+.live-dartboard{display:block;width:min(100%,50dvh,570px);max-height:50dvh;aspect-ratio:1;margin:4px auto}
+.board-number{font:700 16px Arial,sans-serif;fill:#e7e7e7}
+.board-segment.board-aim{stroke:#ffe49a!important;stroke-width:4!important;filter:brightness(1.6)}
+.board-segment.board-secondary{stroke:#c9ab61!important;stroke-width:2!important;filter:brightness(1.18)}
+.board-hit{animation:boardHitPulse 420ms ease-out both}
+@keyframes boardHitPulse{from{opacity:0;transform:scale(1.2);transform-origin:center}to{opacity:1;transform:scale(1)}}
+.match-transition{position:absolute;inset:0;z-index:30;background:#141518;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,2dvh,26px);text-align:center;padding:24px;box-sizing:border-box;color:#f4f4f4}
+.workspace{position:relative}
+.transition-eyebrow{color:#c6c8cd;letter-spacing:.18em;font-size:clamp(16px,2vw,26px);font-weight:700}
+.transition-player{font-size:clamp(32px,5.5vw,70px);font-weight:750;overflow-wrap:anywhere}
+.transition-score{font-size:clamp(120px,27vw,330px);font-variant-numeric:tabular-nums;font-weight:850;line-height:1}
+.transition-caption{color:#c6c8cd;font-size:clamp(15px,2vw,23px);letter-spacing:.12em}
+@media(max-width:600px){.live-dartboard{width:min(100%,43dvh,420px);max-height:43dvh}.board-topline{font-size:11px}.console[data-view="game"] .score-hero{height:clamp(165px,20dvh,245px)}}
+.reduced-motion .board-hit{animation:none}
+
 </style>
 </head>
 <body>
@@ -1228,6 +1250,7 @@ function resetSetupGuests(){
   normalizeSetupPlayers();
 }
 function show(page,withNav=false){
+  if(page!=='game' && typeof clearMatchTransition==='function')clearMatchTransition();
   const changed=state.page!==page;
   if(state.page==='setup'&&page==='play')resetSetupGuests();
   if(page==='setup')normalizeSetupPlayers();
@@ -1928,6 +1951,133 @@ function announceVictory(previousWinner, delay=0){
   else celebrateWinner();
 }
 
+
+/* Match board is a pure SVG rendering: targets are segment-level estimates until
+   the camera pipeline supplies measured x/y coordinates. */
+const boardOrder=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
+function boardXY(radius,angle){
+  const a=(angle-90)*Math.PI/180;
+  return [200+radius*Math.cos(a),200+radius*Math.sin(a)];
+}
+function boardRingPath(start,end,inner,outer){
+  const a=boardXY(outer,start),b=boardXY(outer,end);
+  const c=boardXY(inner,end),d=boardXY(inner,start);
+  return 'M'+a.join(' ')+' A'+outer+' '+outer+' 0 0 1 '+b.join(' ')+
+    ' L'+c.join(' ')+' A'+inner+' '+inner+' 0 0 0 '+d.join(' ')+' Z';
+}
+function boardTarget(hit){
+  if(!hit)return null;
+  const value=String(hit).trim().toUpperCase();
+  if(value==='BULL'||value==='INNER BULL'||value==='D25')return {n:25,m:2};
+  if(value==='25'||value==='OUTER BULL'||value==='S25')return {n:25,m:1};
+  const parts=/^([SDT])?([1-9]|1[0-9]|20)$/.exec(value);
+  if(!parts)return null;
+  return {n:Number(parts[2]),m:({S:1,D:2,T:3})[parts[1]]||1};
+}
+function boardCoordinates(n,m,ordinal=0){
+  if(n===25)return [200+(m===1?13:0),200];
+  const i=boardOrder.indexOf(n);
+  if(i<0)return null;
+  const angle=i*18+(ordinal%3-1)*2.7;
+  const radius=m===2?151:m===3?99:ordinal%2?123:61;
+  return boardXY(radius,angle);
+}
+function boardSuggestedHits(mode,view,match){
+  const tip=finishAdvice(mode,view,match);
+  if(tip&&tip.route!=='NO DIRECT FINISH'){
+    return tip.route.split(' → ').map(boardTarget).filter(Boolean);
+  }
+  let target=null;
+  if(mode==='Baseball'||mode==='Shanghai')target={n:view.round,m:1};
+  else if(mode==='Halve-It')target={n:[20,19,18,17,16,15,25][view.round-1],m:1};
+  else if(mode==='Bermuda Triangle'){
+    const rule=match.options.sequence?.[view.round-1];
+    if(rule&&rule.n)target={n:rule.n,m:rule.m||1};
+  }else if(mode==='Killer')target={n:view.players[view.current].number,m:1};
+  return target?[target]:[];
+}
+function dartboardSvg(mode,view,match){
+  const suggestions=boardSuggestedHits(mode,view,match);
+  const first=suggestions[0];
+  const hitClass=(n,m)=>suggestions.some(t=>t.n===n&&t.m===m)
+    ?(first&&first.n===n&&first.m===m?' board-aim':' board-secondary'):'';
+  let svg='<svg class="live-dartboard" viewBox="0 0 400 400" role="img" aria-label="Dartboard with highlighted suggested targets and recorded darts">';
+  svg+='<circle cx="200" cy="200" r="187" fill="#121416" stroke="#9b9da1" stroke-width="2"/>';
+  boardOrder.forEach((n,i)=>{
+    const a=i*18-9,b=i*18+9,light=i%2===1;
+    [[25,88,1],[88,96,3],[96,141,1],[141,153,2]].forEach(([inner,outer,m],ri)=>{
+      const colored=ri===1||ri===3;
+      const fill=colored?(light?'#28775d':'#a03e44'):(light?'#c5c0ad':'#202223');
+      svg+='<path class="board-segment'+hitClass(n,m)+'" d="'+boardRingPath(a,b,inner,outer)+'" fill="'+fill+'" stroke="#92948e" stroke-width=".8"/>';
+    });
+    const [x,y]=boardXY(173,i*18);
+    svg+='<text x="'+x+'" y="'+y+'" text-anchor="middle" dominant-baseline="middle" class="board-number">'+n+'</text>';
+  });
+  svg+='<circle cx="200" cy="200" r="25" fill="#202223" stroke="#93958f" stroke-width="1"/>';
+  svg+='<circle class="board-segment'+hitClass(25,1)+'" cx="200" cy="200" r="16.5" fill="#28775d"/>';
+  svg+='<circle class="board-segment'+hitClass(25,2)+'" cx="200" cy="200" r="7" fill="#a03e44"/>';
+  view.darts.forEach((dart,i)=>{
+    if(dart.n===0)return;
+    const coords=boardCoordinates(dart.n,dart.m,i);
+    if(!coords)return;
+    svg+='<g class="board-hit"><circle cx="'+coords[0]+'" cy="'+coords[1]+'" r="9" fill="#111215" stroke="#fff" stroke-width="2.5"/>'+
+      '<text x="'+coords[0]+'" y="'+(coords[1]+3.5)+'" text-anchor="middle" fill="#fff" font-size="10" font-weight="800">'+(i+1)+'</text></g>';
+  });
+  svg+='</svg>';
+  const targetText=suggestions.length? suggestions.map(t=>Scoring.label(t.n,t.m)).join(' → '):'';
+  return '<section class="board-panel"><div class="board-topline"><span>LIVE DARTBOARD</span>'+
+    '<span>'+(targetText?'AIM · '+esc(targetText):'THROW YOUR DARTS')+'</span></div>'+
+    svg+'</section>';
+}
+/* A transient overlay never modifies or persists the scoring state. */
+let matchTransitionTimer=null;
+function clearMatchTransition(){
+  if(matchTransitionTimer!==null)clearTimeout(matchTransitionTimer);
+  matchTransitionTimer=null;
+  document.querySelector('.match-transition')?.remove();
+}
+function showMatchTransition(stages){
+  clearMatchTransition();
+  if(!Array.isArray(stages)||!stages.length||state.page!=='game')return;
+  const display=(index)=>{
+    if(state.page!=='game'||!data.active){clearMatchTransition();return;}
+    const item=stages[index];
+    if(!item){clearMatchTransition();return;}
+    document.querySelector('.match-transition')?.remove();
+    const overlay=document.createElement('div');
+    overlay.className='match-transition';
+    overlay.innerHTML='<div class="transition-eyebrow">'+esc(item.heading)+'</div>'+
+      '<div class="transition-player">'+esc(item.name)+'</div>'+
+      '<div class="transition-score">'+esc(item.value)+'</div>'+
+      '<div class="transition-caption">'+esc(item.caption)+'</div>';
+    document.querySelector('.console .workspace').appendChild(overlay);
+    const duration=data.display.reducedMotion?400:item.duration;
+    matchTransitionTimer=setTimeout(()=>display(index+1),duration);
+  };
+  display(0);
+}
+function playerHandover(view,mode){
+  const p=view.players[view.current];
+  const value=['301','501','701'].includes(mode)?p.score:
+    mode==='Around the Clock'?p.target:
+    ['Killer','Knockout'].includes(mode)?p.lives:p.score;
+  const label=['301','501','701'].includes(mode)?'POINTS REMAINING':
+    mode==='Around the Clock'?'NEXT TARGET':['Killer','Knockout'].includes(mode)?'LIVES':'POINTS';
+  return {heading:'NOW THROWING',name:p.name,value:String(value),caption:label,duration:1200};
+}
+function afterRecordedTurn(before,after,mode){
+  if(after.winners!==null||state.page!=='game')return;
+  if(before.current===after.current&&before.round===after.round)return;
+  const previous=before.players[before.current],updated=after.players[before.current];
+  const isCountdown=['301','501','701'].includes(mode);
+  const title=after.notice?.includes('busted')?'BUST':'TURN COMPLETE';
+  const message=isCountdown?String(updated.score):String(updated.score);
+  showMatchTransition([
+    {heading:title,name:previous.name,value:message,caption:isCountdown?'POINTS REMAINING':'CURRENT SCORE',duration:950},
+    playerHandover(after,mode)
+  ]);
+}
+
 function game(){
   const match=data.active, view=derived(), p=view.players[view.current];
   const finished=view.winners!==null;
@@ -1962,6 +2112,7 @@ function game(){
     html+='<div class="score-hero"><div class="throwing-line"><span>NOW THROWING:</span><strong>'+profileBadge(p.name,'match-profile-avatar')+esc(p.name)+
       '</strong></div><div class="big-score'+(typeof value==='string'?' word-score':'')+'">'+esc(value)+
       '</div><div class="caption">'+unit+'</div></div>';
+    html+=dartboardSvg(mode,view,match);
     html+='<div class="turn-header"><span>THIS TURN · '+darts.length+'/3 DARTS</span><span>TOTAL <strong>'+turnTotal+'</strong></span></div>';
     const tip=finishAdvice(mode,view,match);
     const suggested=tip && tip.route!=='NO DIRECT FINISH' ? tip.route.split(' → ') : [];
@@ -2683,6 +2834,7 @@ function begin(){
     grid:[...state.grid], sequence:[...state.sequence], numbers, selfHit:state.selfHit});
   save();
   show('game');
+  showMatchTransition([playerHandover(derived(),data.active.mode)]);
 }
 function showThrowFeedback(n,m){
   // Called after a genuine recorded dart, not when navigating or correcting history.
@@ -2872,30 +3024,41 @@ function clickButton(b){
     case 'segment':state.number=Number(value);return show('segment');
     case 'hit': {
       const [n,m]=value.split(',').map(Number);
-      const previousWinner=derived().winners;
+      const beforeView=derived();
+      const previousWinner=beforeView.winners;
       const newThrow=state.edit===null;
       if(newThrow) Scoring.record(data.active,n,m);
       else Scoring.correct(data.active,state.edit,n,m);
       save();
       show('game');
-      if(newThrow)showThrowFeedback(n,m);
-      announceVictory(previousWinner,newThrow?1700:0);
+      if(newThrow){
+        const afterView=derived();
+        if(afterView.winners===null){
+          if(beforeView.current!==afterView.current||beforeView.round!==afterView.round)
+            afterRecordedTurn(beforeView,afterView,data.active.mode);
+          // Hits now appear directly on the board; skip full-screen hit flashes.
+        }
+      }
+      announceVictory(previousWinner,0);
       return;
     }
     case 'next':{
-      const before=derived().winners;
-      Scoring.next(data.active);save();show('game');announceVictory(before);return;
+      const previous=derived();
+      Scoring.next(data.active);save();show('game');
+      afterRecordedTurn(previous,derived(),data.active.mode);
+      announceVictory(previous.winners);return;
     }
     case 'finished-home':{
       parkMatch();
       save();
-      return show('play');
+      clearMatchTransition();
+      return show('home');
     }
     case 'rematch':{
       const old=data.active;
       parkMatch();
       data.active=Scoring.start(old.mode,[...old.players],{...old.options});
-      save();show('game');return;
+      save();show('game');showMatchTransition([playerHandover(derived(),data.active.mode)]);return;
     }
     default:return show(action,action==='play');
   }
