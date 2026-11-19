@@ -1328,7 +1328,7 @@ function shortcuts(){
   if(state.page==='setup')return [
     ['Escape','Back',()=>show('play')],
     ['F4','Gast',()=>{addSetupGuest();}],
-    ['F2','Alle',()=>{toggleAllSetupPlayers();}],
+    ['F2',([...data.profiles,...state.guests].every(n=>state.players.includes(n))?'Keine':'Alle'),()=>{toggleAllSetupPlayers();}],
     ['F5','Start',begin]
   ];
   if(state.page==='players')return [
@@ -1491,7 +1491,6 @@ function addSetupGuest(){
   const guest='Guest '+number;
   state.guests.push(guest);
   if(!state.players.includes(guest))state.players.push(guest);
-  const prior=controls()[state.cursor]?.dataset.action;
   render(false);
   state.cursor=controls().findIndex(b=>b.dataset.action==='player:'+guest);
   if(state.cursor<0)state.cursor=0;
