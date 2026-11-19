@@ -1428,6 +1428,40 @@ header{justify-content:space-between;gap:24px}
   .console[data-view="game"] .compact-player-name{font-size:clamp(9px,2.6vw,13px)}
 }
 
+
+/* Focused compact player column: no redundant PLAYERS / +0 header. */
+.console[data-view="game"] .game-lower-grid{
+  grid-template-columns:minmax(0,3fr) minmax(0,1fr);
+}
+.console[data-view="game"] .compact-standings-head{display:none}
+.console[data-view="game"] .compact-players-list{padding-top:0;gap:clamp(8px,1dvh,13px)}
+.console[data-view="game"] .compact-player{
+  min-height:clamp(85px,10dvh,145px);
+  padding:clamp(7px,.9dvh,12px) clamp(4px,.65vw,10px);
+  column-gap:clamp(4px,.6vw,8px);
+}
+.console[data-view="game"] .compact-player-badge{
+  width:clamp(24px,3.3vw,42px);
+  height:clamp(24px,3.3vw,42px);
+}
+.console[data-view="game"] .compact-card-label{font-size:clamp(9px,1.1vw,14px)}
+.console[data-view="game"] .compact-player-score{font-size:clamp(21px,3.2vw,39px)}
+.console[data-view="game"] .compact-player-name{font-size:clamp(9px,1.2vw,15px)}
+@media(max-width:600px){
+  .console[data-view="game"] .game-lower-grid{
+    grid-template-columns:minmax(0,3fr) minmax(0,1fr);
+    gap:6px;
+  }
+  .console[data-view="game"] .compact-players-list{padding-top:0;gap:7px}
+  .console[data-view="game"] .compact-player{
+    min-height:88px;padding:7px 3px;column-gap:3px;
+  }
+  .console[data-view="game"] .compact-player-badge{width:23px;height:23px}
+  .console[data-view="game"] .compact-player-score{font-size:clamp(19px,4.7vw,27px)}
+  .console[data-view="game"] .compact-card-label{font-size:clamp(8px,2vw,11px)}
+  .console[data-view="game"] .compact-player-name{font-size:clamp(8px,2.3vw,11px)}
+}
+
 </style>
 </head>
 <body>
@@ -2467,7 +2501,6 @@ function compactMatchPlayers(view,mode,modeScore,review){
   const position=activeIndexes.indexOf(current);
   const nextIndex=activeIndexes.length>1&&position>=0
     ?activeIndexes[(position+1)%activeIndexes.length]:null;
-  const turnTotal=turnPointsForDisplay(view,review,mode);
   const playerCard=(index,label,isCurrent)=>{
     const player=view.players[index];
     const cricket=mode==='Cricket'?
@@ -2487,8 +2520,6 @@ function compactMatchPlayers(view,mode,modeScore,review){
       cricket+killer+'</div>';
   };
   return '<aside class="compact-standings" aria-label="Current and next player">'+
-    '<div class="compact-standings-head"><span>PLAYERS</span>'+
-    '<strong class="compact-turn-total">+'+esc(turnTotal)+'</strong></div>'+
     '<div class="compact-players-list">'+
     playerCard(current,'NOW THROWING',true)+
     (nextIndex!==null?playerCard(nextIndex,'UP NEXT',false):'')+
