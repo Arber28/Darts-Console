@@ -702,6 +702,22 @@ header{justify-content:space-between;gap:24px}
 .console[data-view="stats-match-detail"] footer [data-shortcut="F5"] span,
 .console[data-view="stats-delete-confirm"] footer [data-shortcut="F5"] span{color:#ff6969}
 .stats-empty-softkey{display:block;min-width:0}
+
+/* Keep the rotary encoder indicator at the exact physical centre of the footer,
+   independent of softkey widths and whether labels are present. */
+.console footer{position:relative}
+.console footer .home-encoder{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:clamp(42px,7vw,70px);
+  height:clamp(42px,7vw,70px);
+  display:grid;
+  place-items:center;
+  pointer-events:none;
+}
+.console footer .home-encoder svg{display:block;margin:auto;flex:none}
 </style>
 </head>
 <body>
