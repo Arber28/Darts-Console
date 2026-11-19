@@ -854,7 +854,7 @@ ensureMatchNumbers();
 function show(page,withNav=false){
   const changed=state.page!==page;
   state.page=page;
-  if(changed)state.cursor=0;
+  if(changed)state.cursor=page==='players'?state.selectedProfile:0;
   state.message='';
   // Info pages place their action button at the bottom. Do not let
   // keyboard selection scroll past the heading on initial entry.
@@ -2000,7 +2000,10 @@ function highlight(scroll){
   // No rotary selection exists, so none of its tiles should be highlighted.
   if(state.page==='home'||(state.page.startsWith('stats')&&!['stats-players','stats-history'].includes(state.page)))return;
   if(state.page==='players'){
+    state.selectedProfile=available.length?Math.max(0,Math.min(state.selectedProfile,available.length-1)):0;
+    state.cursor=state.selectedProfile;
     available.forEach((b,i)=>b.classList.toggle('focused',i===state.selectedProfile));
+    if(scroll&&available[state.selectedProfile])available[state.selectedProfile].scrollIntoView({block:'nearest'});
     return;
   }
   available.forEach((b,i)=>b.classList.toggle('focused',i===state.cursor));
@@ -2145,6 +2148,7 @@ function clickButton(b){
     }
     case 'select-profile':
       state.selectedProfile=Number(value);
+      state.cursor=state.selectedProfile;
       return render(false);
     case 'new-profile':return newPlayer();
     case 'letter':if(state.name.length<24) state.name+=value; break;
