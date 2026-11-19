@@ -1849,7 +1849,7 @@ header{justify-content:space-between;gap:24px}
   height:clamp(4px,.55dvh,7px);
   min-height:0;
   border-radius:999px;
-  background:#d1d3d7!important;
+  background:var(--key-color,#d1d3d7)!important;
   box-shadow:none;
 }
 .console[data-view="home"] .home-indicator:focus-visible{
@@ -2414,7 +2414,7 @@ function renderFooter(){
     const colors=['#4c8ded','#47b38d',null,'#e6ad54','#ac81e2'];
     const keys=['Escape','F4',null,'F2','F5'];
     document.querySelector('footer').innerHTML=colors.map((color,i)=>color
-      ?'<button aria-label="'+['Spiel','Spieler','','Statistics','Settings'][i]+'" class="home-indicator" style="background:'+color+'" data-shortcut="'+keys[i]+'"></button>'
+      ?'<button aria-label="'+['Spiel','Spieler','','Statistics','Settings'][i]+'" class="home-indicator" style="--key-color:'+color+'" data-shortcut="'+keys[i]+'"></button>'
       :'<div class="home-encoder" aria-hidden="true"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="23" fill="none" stroke="#fff" stroke-width="2.8"/></svg></div>').join('');
     return;
   }
