@@ -530,6 +530,9 @@ header{justify-content:space-between;gap:24px}
 .mode-info-cta{padding-top:clamp(12px,2dvh,26px)}
 .mode-info-cta .primary{width:100%;min-height:clamp(68px,9dvh,92px);display:flex;align-items:center;justify-content:space-between;padding:18px clamp(20px,3vw,32px);font-weight:700;letter-spacing:.035em;font-size:clamp(17px,2.5vw,24px)}
 .mode-info-cta .primary span{font-size:1.5em;font-weight:400}
+/* Info uses four physical buttons; encoder inactive. */
+.console[data-view="mode-info"] footer{min-height:clamp(76px,10dvh,115px)}
+.console[data-view="mode-info"] .library-key{font-size:clamp(10px,2vw,20px);padding:0 3px}
 </style>
 </head>
 <body>
@@ -683,7 +686,6 @@ function selectedGameInfo(){
           '</span><p>'+esc(sentence)+'</p></div>').join('')+
       '</div>'+
     '</section>'+
-    '<div class="mode-info-cta">'+button('mode:'+mode[0],'SPIEL AUSWÄHLEN <span aria-hidden="true">↗</span>','primary')+'</div>'+
   '</div>';
 }
 function parkMatch(){
@@ -702,7 +704,24 @@ function selectMode(mode){
   }
   show(data.active?.mode===mode && derived().winners===null?'saved':'setup');
 }
+function adjacentInfoMode(direction){
+  const available=state.filter==='quick'?modes.slice(0,6):modes;
+  const index=Math.max(0,available.findIndex(mode=>mode[0]===state.chosen));
+  state.chosen=available[(index+direction+available.length)%available.length][0];
+  state.cursor=0;
+  render(false);
+  // Remain at the top when switching descriptions, even after reading rules.
+  const workspace=document.querySelector('.workspace');
+  if(workspace)workspace.scrollTop=0;
+  if(main)main.scrollTop=0;
+}
 function shortcuts(){
+  if(state.page==='mode-info')return [
+    ['Escape','Back',()=>show('play')],
+    ['F4','Vorheriges',()=>adjacentInfoMode(-1)],
+    ['F2','Nächstes',()=>adjacentInfoMode(1)],
+    ['F5','Spielen',()=>selectMode(state.chosen)]
+  ];
   if(state.page==='play')return [
     ['Escape','Back',()=>show('home')],
     ['F4','Info',()=>show('mode-info')],
@@ -743,6 +762,15 @@ function runShortcut(key){
   shortcuts().find(item=>item[0]===key)?.[2]();
 }
 function renderFooter(){
+  if(state.page==='mode-info'){
+    const keys=shortcuts();
+    const buttons=keys.map(([key,label])=>
+      '<button class="softkey library-key" data-shortcut="'+key+'"><span>'+esc(label.toUpperCase())+'</span></button>');
+    buttons.splice(2,0,'<div class="home-encoder" aria-hidden="true">'+
+      '<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="23" fill="none" stroke="#fff" stroke-width="2.8"/></svg></div>');
+    document.querySelector('footer').innerHTML=buttons.join('');
+    return;
+  }
   if(state.page==='play'){
     const keys=shortcuts();
     const buttons=keys.map(([key,label],i)=>
@@ -1595,7 +1623,7 @@ document.addEventListener('keydown',event=>{
   if(!['ArrowUp','ArrowDown','Enter','Escape','F2','F4','F5'].includes(key))return;
   event.preventDefault();
   if(event.repeat&&key!=='ArrowUp'&&key!=='ArrowDown') return;
-  if(state.page==='home'&&(key==='ArrowUp'||key==='ArrowDown'||key==='Enter'))return;
+  if((state.page==='home'||state.page==='mode-info')&&(key==='ArrowUp'||key==='ArrowDown'||key==='Enter'))return;
   if(key==='ArrowUp'||key==='ArrowDown'){
     const items=controls();
     if(!items.length)return;
