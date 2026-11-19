@@ -2202,14 +2202,14 @@ function settingsWifiPassword(){
     ['GROSSBUCHSTABEN','ABCDEFGHIJKLMNOPQRSTUVWXYZ'],
     ['KLEINBUCHSTABEN','abcdefghijklmnopqrstuvwxyz'],
     ['ZAHLEN','0123456789'],
-    ['ZEICHEN','!@#$%^&*()-_=+[]{}.,:;?/\\']
+    ['ZEICHEN','!@#$%^&*()-_=+[]{}.,:;?/\\ ']
   ];
   const [label,keys]=modes[state.networkKeyboardMode];
   return '<div class="settings-page"><div class="wifi-password-top">'+
     '<span>WLAN · '+esc(state.networkSsid)+'</span><h2>Passwort eingeben</h2>'+
     '<strong class="wifi-masked">'+('●'.repeat(state.networkPassword.length)||'••••••••')+'</strong>'+
     '<small>'+state.networkPassword.length+' Zeichen · '+esc(label)+'</small></div>'+
-    '<div class="profile-keyboard wifi-keyboard">'+[...keys].map(c=>button('wifi-char:'+c,esc(c),'profile-key')).join('')+'</div>'+
+    '<div class="profile-keyboard wifi-keyboard">'+[...keys].map(c=>button('wifi-char:'+encodeURIComponent(c),c===' '?'SPACE':esc(c),'profile-key'+(c===' '?' profile-key-space':''))).join('')+'</div>'+
     '<p class="settings-footnote">Drehregler: Zeichen auswählen und drücken. Taste 2 löscht ein Zeichen, Taste 3 wechselt den Zeichensatz. Taste 4 verbindet.</p></div>';
 }
 function settingsSystem(){
@@ -2236,6 +2236,7 @@ function aboutConsole(){
 function applyDisplaySettings(){
   const root=document.querySelector('.console');
   if(root){
+    if(data.display.reducedMotion)document.querySelector('.darts-intro')?.remove();
     root.classList.toggle('reduced-motion',!!data.display.reducedMotion);
     root.classList.toggle('high-contrast',!!data.display.highContrast);
   }
@@ -2536,7 +2537,7 @@ function clickButton(b){
       if(state.network.networks?.some(n=>n.ssid===state.networkSsid&&!n.security))return connectWifi();
       return show('settings-wifi-password');
     case 'wifi-char':
-      if(state.networkPassword.length<63)state.networkPassword+=value;
+      if(state.networkPassword.length<63)state.networkPassword+=decodeURIComponent(value);
       return render(false);
     case 'wifi-connect':return connectWifi();
     case 'mode-info':return show('mode-info');
