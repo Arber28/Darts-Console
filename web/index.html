@@ -669,7 +669,7 @@ function selectedGameInfo(){
     '<section class="mode-info-rules">'+
       '<div class="mode-info-section-title"><span class="mode-info-number">01</span><h2>Spielregeln</h2></div>'+
       '<div class="mode-info-rule-text">'+
-        descriptions[1].split(/(?<=[.!?])\\s+/).filter(Boolean).map((sentence,i)=>
+        descriptions[1].split(/(?<=[.!?])\s+/).filter(Boolean).map((sentence,i)=>
           '<div class="mode-info-rule"><span class="mode-info-rule-index">'+String(i+1).padStart(2,'0')+
           '</span><p>'+esc(sentence)+'</p></div>').join('')+
       '</div>'+
