@@ -1379,6 +1379,55 @@ header{justify-content:space-between;gap:24px}
   .console[data-view="game"] .compact-player-name{font-size:clamp(9px,2.6vw,13px)}
 }
 
+
+/* Always show only the throwing player and the next active player.
+   Two consistent cards replace the scrolling roster for large matches. */
+.console[data-view="game"] .compact-standings{
+  max-height:none;
+  overflow:visible;
+}
+.console[data-view="game"] .compact-players-list{
+  overflow:visible;max-height:none;
+  padding-top:clamp(8px,1dvh,14px);
+  gap:clamp(12px,1.5dvh,24px);
+}
+.console[data-view="game"] .compact-player{
+  position:relative;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  grid-template-rows:auto auto auto;
+  align-content:center;
+  min-height:clamp(115px,14dvh,190px);
+  padding:clamp(10px,1.4dvh,20px) clamp(7px,1vw,16px);
+  row-gap:clamp(3px,.5dvh,7px);
+}
+.console[data-view="game"] .compact-card-label{
+  grid-column:1/-1;grid-row:1;
+  color:#b8bac0;
+  font-size:clamp(10px,1.3vw,16px);
+  font-weight:700;letter-spacing:.055em;
+}
+.console[data-view="game"] .compact-player-badge{grid-row:2/4}
+.console[data-view="game"] .compact-player-score{grid-row:2}
+.console[data-view="game"] .compact-player-name{grid-row:3}
+.console[data-view="game"] .compact-player-extra{grid-row:auto}
+.console[data-view="game"] .compact-player.is-next{
+  background:#24262a;border-color:#45474d;
+  border-left-color:var(--player-accent);
+}
+.console[data-view="game"] .compact-player.is-next .compact-player-score{color:#e5e5e8}
+@media(max-width:600px){
+  .console[data-view="game"] .compact-standings{max-height:none}
+  .console[data-view="game"] .compact-players-list{gap:10px;padding-top:8px}
+  .console[data-view="game"] .compact-player{
+    min-height:clamp(100px,12dvh,150px);
+    padding:9px 5px;row-gap:3px;
+  }
+  .console[data-view="game"] .compact-card-label{font-size:clamp(9px,2.3vw,12px)}
+  .console[data-view="game"] .compact-player-score{font-size:clamp(20px,5.4vw,31px)}
+  .console[data-view="game"] .compact-player-name{font-size:clamp(9px,2.6vw,13px)}
+}
+
 </style>
 </head>
 <body>
@@ -2413,31 +2462,38 @@ function savedDiscardScreen(){
 /* Compact standings for the portrait split layout. No change to saved profiles
    or the scoring engine: every score comes from replay(). */
 function compactMatchPlayers(view,mode,modeScore,review){
-  const active=review?review.player:view.current;
+  const current=review?review.player:view.current;
+  const activeIndexes=view.players.flatMap((p,i)=>p.active?[i]:[]);
+  const position=activeIndexes.indexOf(current);
+  const nextIndex=activeIndexes.length>1&&position>=0
+    ?activeIndexes[(position+1)%activeIndexes.length]:null;
   const turnTotal=turnPointsForDisplay(view,review,mode);
-  const rows=view.players.map((player,i)=>{
-    const selected=i===active;
-    const score=modeScore(player);
+  const playerCard=(index,label,isCurrent)=>{
+    const player=view.players[index];
     const cricket=mode==='Cricket'?
       '<span class="compact-player-extra">'+[20,19,18,17,16,15,25].map(n=>
         (n===25?'B':n)+':'+(player.marks[n]??0)).join(' ')+'</span>':'';
     const killer=mode==='Killer'?
       '<span class="compact-player-extra">#'+player.number+' · '+
       (player.marks[player.number]??0)+'/3</span>':'';
-    return '<div class="compact-player '+(selected?'is-current ':'')+(!player.active?'is-out':'')+
-      '" style="--player-accent:'+(isGuestPlayer(player.name)?'#ffffff':profileColorOptions[profileAppearance(player.name).color])+'">'+
+    const accent=isGuestPlayer(player.name)?'#ffffff':
+      profileColorOptions[profileAppearance(player.name).color];
+    return '<div class="compact-player '+(isCurrent?'is-current':'is-next')+
+      '" style="--player-accent:'+accent+'">'+
+      '<span class="compact-card-label">'+label+'</span>'+
       profileBadge(player.name,'compact-player-badge')+
-      '<strong class="compact-player-score">'+esc(score)+'</strong>'+
+      '<strong class="compact-player-score">'+esc(modeScore(player))+'</strong>'+
       '<span class="compact-player-name">'+esc(player.name)+'</span>'+
-      (cricket||killer)+
-      '</div>';
-  }).join('');
-  return '<aside class="compact-standings" aria-label="Match players">'+
+      cricket+killer+'</div>';
+  };
+  return '<aside class="compact-standings" aria-label="Current and next player">'+
     '<div class="compact-standings-head"><span>PLAYERS</span>'+
     '<strong class="compact-turn-total">+'+esc(turnTotal)+'</strong></div>'+
-    '<div class="compact-players-list">'+rows+'</div></aside>';
+    '<div class="compact-players-list">'+
+    playerCard(current,'NOW THROWING',true)+
+    (nextIndex!==null?playerCard(nextIndex,'UP NEXT',false):'')+
+    '</div></aside>';
 }
-
 function game(){
   const match=data.active, view=derived(), p=view.players[view.current];
   const finished=view.winners!==null;
