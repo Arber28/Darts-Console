@@ -1041,6 +1041,32 @@ header{justify-content:space-between;gap:24px}
   white-space:nowrap;
   text-align:right;
 }
+
+/* Compact setup: main actions fixed to the 4 real keys; no redundant start button. */
+.console[data-view="setup"] main{padding:clamp(12px,2.5vw,28px);padding-top:clamp(8px,1.4dvh,16px);overflow-y:auto}
+.setup-page{width:100%;max-width:1060px;margin:0 auto;padding-bottom:clamp(10px,2dvh,22px);display:flex;flex-direction:column;gap:clamp(16px,2.5dvh,26px)}
+.setup-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:clamp(76px,10dvh,110px)}
+.setup-kicker{display:block;font-size:clamp(11px,1.6vw,16px);letter-spacing:.12em;color:#a7aab1;font-weight:650;margin-bottom:clamp(5px,1dvh,10px)}
+.setup-heading h1{margin:0;font-size:clamp(39px,7vw,70px);line-height:1.05}
+.setup-step{font-size:clamp(11px,1.6vw,16px);color:#969ba4;letter-spacing:.09em;white-space:nowrap}
+.setup-card{border:1px solid #45474e;background:#202226;border-radius:12px;padding:clamp(15px,2.5vw,27px)}
+.setup-card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 0 clamp(13px,2dvh,24px)}
+.setup-card-head h2{font-size:clamp(22px,3.2vw,33px);font-weight:680;margin:0;line-height:1}
+.setup-count{border:1px solid #575b64;border-radius:999px;padding:7px 11px;color:#c6c9cf;font-size:clamp(10px,1.55vw,15px);font-weight:700;white-space:nowrap;letter-spacing:.035em}
+.setup-players-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(8px,1.3vw,14px)}
+.setup-player-option{min-width:0;min-height:clamp(65px,8.5dvh,95px);padding:clamp(9px,1.5vw,16px);display:flex;align-items:center;gap:clamp(8px,1.4vw,15px);border:1px solid #454850;background:#27292e;border-radius:9px;color:#f4f4f6;text-align:left}
+.setup-player-option.checked{background:#30343b;border-color:#8e949f}
+.setup-player-option .match-profile-mini{width:clamp(30px,5vw,49px);height:clamp(30px,5vw,49px);margin:0}
+.setup-player-name{font-size:clamp(15px,2.5vw,25px);min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:650}
+.setup-player-toggle{display:grid;place-items:center;flex:none;width:clamp(24px,3.5vw,36px);height:clamp(24px,3.5vw,36px);border:1px solid #686e79;border-radius:50%;font-size:clamp(17px,2.5vw,24px);font-weight:650;color:#b9bdc5}
+.setup-player-option.checked .setup-player-toggle{background:#e9ebf0;border-color:#e9ebf0;color:#16191d}
+.setup-player-option.focused,.setup-checkout-option.focused{outline:2px solid #fff;outline-offset:-3px;background:#3a3d44}
+.setup-card-detail{font-size:clamp(12px,1.8vw,19px);color:#b8bac2}
+.setup-checkout-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(6px,1.1vw,12px)}
+.setup-checkout-option{min-height:clamp(57px,7.5dvh,84px);position:relative;background:#282a2f;border:1px solid #44474f;border-radius:9px;padding:clamp(7px,1vw,13px) clamp(5px,1vw,12px);font-size:clamp(12px,2vw,21px);font-weight:600;line-height:1.18;text-align:center}
+.setup-checkout-option.checked{background:#383a40;border-color:#d6d8dc}
+.setup-check{position:absolute;top:4px;right:7px;font-size:clamp(11px,1.8vw,18px);color:#fff}
+@media(max-width:600px){.setup-step{display:none}.setup-player-option{min-height:62px}.setup-card{padding:14px}.setup-player-name{font-size:clamp(14px,3.4vw,22px)}}
 </style>
 </head>
 <body>
@@ -1299,6 +1325,12 @@ function shortcuts(){
     }],
     ['F4','',()=>{}],['F2','',()=>{}],['F5','',()=>{}]
   ];
+  if(state.page==='setup')return [
+    ['Escape','Back',()=>show('play')],
+    ['F4','Gast',()=>{addSetupGuest();}],
+    ['F2','Alle',()=>{toggleAllSetupPlayers();}],
+    ['F5','Start',begin]
+  ];
   if(state.page==='players')return [
     ['Escape','Back',()=>show('home')],
     ['F4','Neu',newPlayer],
@@ -1396,13 +1428,13 @@ function runShortcut(key){
   shortcuts().find(item=>item[0]===key)?.[2]();
 }
 function renderFooter(){
-  if(['players','profile','profile-icons','profile-colors','player-delete','settings','settings-scoring','settings-display','settings-network','settings-system','settings-wifi-password','about'].includes(state.page)){
+  if(['setup','players','profile','profile-icons','profile-colors','player-delete','settings','settings-scoring','settings-display','settings-network','settings-system','settings-wifi-password','about'].includes(state.page)){
     const labels=shortcuts().map(([key,label])=>label
       ?'<button class="softkey library-key" data-shortcut="'+key+'"><span>'+esc(label.toUpperCase())+'</span></button>'
       :'<span class="stats-empty-softkey" aria-hidden="true"></span>');
     labels.splice(2,0,'<div class="home-encoder" aria-hidden="true"><svg viewBox="0 0 60 60">'+
       '<circle cx="30" cy="30" r="23" fill="none" stroke="#fff" stroke-width="2.8"/>'+
-      (['players','profile','profile-icons','profile-colors','settings','settings-scoring','settings-display','settings-network','settings-system'].includes(state.page)?'<circle cx="30" cy="30" r="8" fill="#fff"/>':'')+
+      (['setup','players','profile','profile-icons','profile-colors','settings','settings-scoring','settings-display','settings-network','settings-system'].includes(state.page)?'<circle cx="30" cy="30" r="8" fill="#fff"/>':'')+
       '</svg></div>');
     document.querySelector('footer').innerHTML=labels.join('');
     return;
@@ -1453,33 +1485,61 @@ function renderFooter(){
   buttons.splice(2,0,'<div class="encoder-hint"><span class="encoder-dot"></span><span>Turn to select<small>Press to confirm</small></span></div>');
   document.querySelector('footer').innerHTML=buttons.join('');
 }
+function addSetupGuest(){
+  let number=state.guests.length+1;
+  while([...data.profiles,...state.guests].includes('Guest '+number))number++;
+  const guest='Guest '+number;
+  state.guests.push(guest);
+  if(!state.players.includes(guest))state.players.push(guest);
+  const prior=controls()[state.cursor]?.dataset.action;
+  render(false);
+  state.cursor=controls().findIndex(b=>b.dataset.action==='player:'+guest);
+  if(state.cursor<0)state.cursor=0;
+  highlight(true);
+}
+function toggleAllSetupPlayers(){
+  const all=[...data.profiles,...state.guests];
+  const allSelected=all.length>0&&all.every(p=>state.players.includes(p));
+  state.players=allSelected?[]:[...all];
+  render(false);
+}
 function setup(){
   const mode=currentMode();
   const selected=state.players;
-  let html=title('MATCH SETUP',mode[0],'Player order is randomized at the start.');
-  html+=panel('Players · '+selected.length+' selected','<div class="players">'+
-    [...data.profiles,...state.guests].map(name=>button('player:'+name,profileBadge(name,'match-profile-mini')+esc(name)+'<span>'+
-      (selected.includes(name)?'✓':'+')+'</span>','player '+(selected.includes(name)?'checked':''))).join('')+
-    '</div><br>'+button('guest','Add guest <span>＋</span>'));
-  if(mode[3]) html+=panel('Checkout','<div class="rules">'+Scoring.checkouts.map(out=>
-    button('out:'+out,out,'rule '+(state.out===out?'checked':''))).join('')+'</div>');
-  if(mode[0]==='Around the Clock') html+=button('bull','Final bull <span>'+(state.bull?'On':'Off')+'</span>');
-  if(mode[0]==='High Score') html+=button('rounds','Rounds <span>'+state.rounds+'</span>');
-  if(mode[0]==='Tic-Tac-Toe') html+=button('grid','Choose nine grid targets <span>'+state.grid.length+'/9</span>');
-  if(mode[0]==='Bermuda Triangle') html+=panel('House round sequence',
-    note('No default round sequence is specified. Add the targets and required multipliers in order.')+
+  const all=[...data.profiles,...state.guests];
+  const isCountdown=!!mode[3];
+  let html='<div class="setup-page"><div class="setup-heading"><div><span class="setup-kicker">SPIEL VORBEREITEN</span>'+
+    '<h1>'+esc(mode[0])+'</h1></div><span class="setup-step">MATCH SETUP</span></div>';
+  html+='<section class="setup-card setup-players-card">'+
+    '<div class="setup-card-head"><h2>Spieler</h2><span class="setup-count">'+selected.length+' AUSGEWÄHLT</span></div>'+
+    '<div class="setup-players-grid">'+all.map(name=>{
+      const checked=selected.includes(name);
+      return button('player:'+name,
+        profileBadge(name,'match-profile-mini')+
+        '<strong class="setup-player-name">'+esc(name.toLocaleUpperCase('de-DE'))+'</strong>'+
+        '<span class="setup-player-toggle" aria-hidden="true">'+(checked?'✓':'+')+'</span>',
+        'setup-player-option'+(checked?' checked':''));
+    }).join('')+'</div>'+
+    '</section>';
+  if(isCountdown)html+='<section class="setup-card setup-checkout-card">'+
+    '<div class="setup-card-head"><h2>Checkout</h2><span class="setup-card-detail">'+esc(state.out)+'</span></div>'+
+    '<div class="setup-checkout-options">'+Scoring.checkouts.map(out=>
+      button('out:'+out,esc(out)+(state.out===out?'<span class="setup-check" aria-hidden="true">✓</span>':''),
+        'setup-checkout-option'+(state.out===out?' checked':''))).join('')+'</div></section>';
+  if(mode[0]==='Around the Clock')html+=button('bull','Final bull <span>'+(state.bull?'On':'Off')+'</span>');
+  if(mode[0]==='High Score')html+=button('rounds','Rounds <span>'+state.rounds+'</span>');
+  if(mode[0]==='Tic-Tac-Toe')html+=button('grid','Choose nine grid targets <span>'+state.grid.length+'/9</span>');
+  if(mode[0]==='Bermuda Triangle')html+=panel('House round sequence',
     state.sequence.map((target,i)=>button('remove-round:'+i,'Round '+(i+1)+' · '+roundTarget(target)+' <span>Remove</span>')).join('')+
     button('bermuda-number','Add round','action',state.sequence.length>=30));
-  if(mode[0]==='Killer') {
-    html+=panel('Killer house rules',button('killer-assignment','Number assignment <span>'+
+  if(mode[0]==='Killer')html+=panel('Killer house rules',button('killer-assignment','Number assignment <span>'+
       (state.manualNumbers?'Manual':'Random')+'</span>')+
       button('self-hit','Hit your own number <span>'+esc(state.selfHit??'Choose')+'</span>')+
       (state.manualNumbers?selected.map(name=>button('number:'+name,esc(name)+' <span>'+
-        (state.numbers[name]??'Choose')+'</span>')).join(''):'')+
-      '<p>Hits on eliminated targets are ignored.</p>');
-  }
-  return html+button('begin','Start match','primary');
+        (state.numbers[name]??'Choose')+'</span>')).join(''):''));
+  return html+'</div>';
 }
+
 function picker(){
   const choosingGrid=state.page==='grid';
   const available=Array.from({length:20},(_,i)=>i+1).filter(n=>
@@ -2700,13 +2760,7 @@ function clickButton(b){
     case 'player':
       state.players=state.players.includes(value)?state.players.filter(p=>p!==value):[...state.players,value];
       break;
-    case 'guest': {
-      let number=state.guests.length+1;
-      while([...data.profiles,...state.guests].includes('Guest '+number)) number++;
-      state.guests.push('Guest '+number);
-      state.players.push(state.guests.at(-1));
-      break;
-    }
+    case 'guest':return addSetupGuest();
     case 'select-profile':
       state.selectedProfile=Number(value);
       state.cursor=state.selectedProfile;
