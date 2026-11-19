@@ -826,6 +826,43 @@ header{justify-content:space-between;gap:24px}
 .profile-progress-step strong{font-weight:700}
 .profile-progress-step.current{border-color:#f4f5f6;color:#f4f5f6}
 .profile-progress-step.done{border-color:#47b38d;color:#d1d5db}
+
+/* Color picker: swatches only, without surrounding cards, frames or selection rings. */
+.console[data-view="profile-colors"] .profile-customize-grid.colors{
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  justify-items:center;
+  gap:clamp(14px,3vw,34px) clamp(9px,2vw,23px);
+}
+.console[data-view="profile-colors"] .profile-color-option,
+.console[data-view="profile-colors"] .profile-color-option.chosen,
+.console[data-view="profile-colors"] .profile-color-option.focused{
+  width:100%;
+  height:clamp(70px,10dvh,108px);
+  min-height:0;
+  padding:0;
+  border:0;
+  outline:0;
+  border-radius:50%;
+  background:transparent;
+  box-shadow:none;
+  display:grid;
+  place-items:center;
+}
+.console[data-view="profile-colors"] .profile-color-swatch,
+.console[data-view="profile-colors"] .profile-color-option.chosen .profile-color-swatch{
+  width:clamp(48px,8vw,86px);
+  height:clamp(48px,8vw,86px);
+  max-width:100%;
+  aspect-ratio:1;
+  border-radius:50%;
+  background:var(--swatch);
+  box-shadow:none;
+  display:grid;
+  place-items:center;
+  transition:transform .14s ease;
+}
+.console[data-view="profile-colors"] .profile-color-option.focused .profile-color-swatch{transform:scale(1.09)}
+.profile-color-check{width:43%;height:43%;filter:drop-shadow(0 1px 2px #0006)}
 </style>
 </head>
 <body>
@@ -1951,7 +1988,7 @@ function profileColorsPage(){
   '<div><strong>'+esc(state.name.toLocaleUpperCase('de-DE'))+'</strong><small>FARBE WÄHLEN · 24 FARBEN</small></div></div>'+
   '<div class="profile-customize-grid colors">'+profileColorOptions.map((color,i)=>
     '<button data-nav data-action="choose-color:'+i+'" class="profile-color-option '+(state.editColor===i?'chosen':'')+'" style="--swatch:'+color+'" aria-label="Farbe '+(i+1)+'">'+
-    '<span class="profile-color-swatch"></span></button>').join('')+'</div></div>';
+    '<span class="profile-color-swatch">'+(state.editColor===i?'<svg class="profile-color-check" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>':'')+'</span></button>').join('')+'</div></div>';
 }
 function profileBadgePreview(){
   return '<span class="profile-avatar profile-preview-avatar" style="--profile-color:'+profileColorOptions[state.editColor]+'">'+profileIconSvg(state.editIcon)+'</span>';
