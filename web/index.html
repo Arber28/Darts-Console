@@ -689,7 +689,7 @@ header{justify-content:space-between;gap:24px}
 .stats-delete-screen h1{font-size:clamp(28px,5.5vw,53px);line-height:1.16;max-width:20ch}
 .stats-delete-screen>p{font-size:clamp(17px,2.6vw,26px);color:#c7c9cf;line-height:1.5}
 .stats-delete-warning{max-width:31ch;color:#a8acb5!important}
-.console[data-view="stats-delete-final"] footer .softkey:last-child{color:#f3b6ac}
+.console[data-view="stats-delete-confirm"] footer .softkey:last-child{color:#f3b6ac}
 </style>
 </head>
 <body>
@@ -907,13 +907,7 @@ function shortcuts(){
     ['Escape','Abbrechen',()=>show('stats-match-detail')],
     ['F4','',()=>{}],
     ['F2','',()=>{}],
-    ['F5','Weiter',()=>show('stats-delete-final')]
-  ];
-  if(state.page==='stats-delete-final')return [
-    ['Escape','Abbrechen',()=>show('stats-match-detail')],
-    ['F4','',()=>{}],
-    ['F2','',()=>{}],
-    ['F5','Endgültig löschen',deleteHistoryMatch]
+    ['F5','Löschen',deleteHistoryMatch]
   ];
   if(state.page==='stats')return [
     ['Escape','Back',()=>show('home')],
@@ -979,7 +973,7 @@ function runShortcut(key){
   shortcuts().find(item=>item[0]===key)?.[2]();
 }
 function renderFooter(){
-  if(['stats','stats-players','stats-player-detail','stats-records','stats-history','stats-match-detail','stats-delete-confirm','stats-delete-final'].includes(state.page)){
+  if(['stats','stats-players','stats-player-detail','stats-records','stats-history','stats-match-detail','stats-delete-confirm'].includes(state.page)){
     const keys=shortcuts();
     const buttons=keys.map(([key,label])=>
       '<button class="softkey library-key" data-shortcut="'+key+'"><span>'+esc(label.toUpperCase())+'</span></button>');
@@ -1653,16 +1647,6 @@ function statisticsDeleteConfirm(){
   if(!match)return '<div class="stats-dashboard"><p>Match nicht gefunden.</p></div>';
   return '<div class="stats-dashboard stats-delete-screen">'+
     '<div class="stats-delete-symbol">?</div>'+
-    '<h1>Match löschen?</h1>'+
-    '<p>Match #'+String(match.historyNumber).padStart(2,'0')+' · '+esc(match.mode)+'</p>'+
-    '<p class="stats-delete-warning">Drücke Weiter, um die Löschung zu bestätigen, oder Abbrechen, um zurückzugehen.</p>'+
-    '</div>';
-}
-function statisticsDeleteFinal(){
-  const match=matchForHistory();
-  if(!match)return '<div class="stats-dashboard"><p>Match nicht gefunden.</p></div>';
-  return '<div class="stats-dashboard stats-delete-screen">'+
-    '<div class="stats-delete-symbol">!</div>'+
     '<h1>Möchtest du dieses Match wirklich löschen, du Loser?</h1>'+
     '<p>Match #'+String(match.historyNumber).padStart(2,'0')+' · '+esc(match.mode)+'</p>'+
     '<p class="stats-delete-warning">Das kannste nicht rückgängig machen. Auch Siege, Averages und Rekorde werden neu berechnet.</p>'+
@@ -1786,7 +1770,7 @@ async function startSoftwareUpdate(){
 function render(scroll=false){
   document.querySelector('.console').dataset.view=state.page;
   const matchPage=['game','menu','segment','correction'].includes(state.page);
-  const sectionHeadings={players:'Players',stats:'Statistics','stats-players':'Players','stats-player-detail':'Player','stats-records':'Records','stats-history':'History','stats-match-detail':'Match','stats-delete-confirm':'Löschen','stats-delete-final':'Löschen',settings:'Settings'};
+  const sectionHeadings={players:'Players',stats:'Statistics','stats-players':'Players','stats-player-detail':'Player','stats-records':'Records','stats-history':'History','stats-match-detail':'Match','stats-delete-confirm':'Löschen',settings:'Settings'};
   document.getElementById('match-heading').textContent=sectionHeadings[state.page]||
     (matchPage&&data.active?data.active.mode:'');
   const context=document.getElementById('match-context');
@@ -1794,7 +1778,7 @@ function render(scroll=false){
   context.textContent=currentView?'ROUND '+currentView.round+(Number(data.active.mode)?' · '+data.active.options.out.toUpperCase():''):'';
   const views={home:homeScreen,play:cards,'mode-info':selectedGameInfo,setup,game,segment,correction:history,grid:picker,number:picker,stats:statistics,
     'stats-players':statisticsPlayers,'stats-player-detail':statsPlayerDetails,'stats-records':statisticsRecords,'stats-history':statisticsHistory,
-    'stats-match-detail':statisticsMatchDetail,'stats-delete-confirm':statisticsDeleteConfirm,'stats-delete-final':statisticsDeleteFinal,
+    'stats-match-detail':statisticsMatchDetail,'stats-delete-confirm':statisticsDeleteConfirm,
     profile:profileEditor,
     'bermuda-number':()=>title('MATCH SETUP','Bermuda Triangle','Choose the target for the next round.')+
       '<div class="segments">'+Array.from({length:20},(_,i)=>button('bermuda-target:'+(i+1),i+1,'rule')).join('')+
@@ -2055,7 +2039,7 @@ document.addEventListener('click',event=>{
   const b=event.target.closest('button[data-nav]');
   if(b) clickButton(b);
 });
-const back={'mode-info':'play',play:'home',players:'home',stats:'home','stats-players':'stats','stats-player-detail':'stats-players','stats-records':'stats','stats-history':'stats','stats-match-detail':'stats-history','stats-delete-confirm':'stats-match-detail','stats-delete-final':'stats-delete-confirm',settings:'home',setup:'play',game:'menu',menu:'game',correction:'game',rounds:'setup',grid:'setup',number:'setup',
+const back={'mode-info':'play',play:'home',players:'home',stats:'home','stats-players':'stats','stats-player-detail':'stats-players','stats-records':'stats','stats-history':'stats','stats-match-detail':'stats-history','stats-delete-confirm':'stats-match-detail',settings:'home',setup:'play',game:'menu',menu:'game',correction:'game',rounds:'setup',grid:'setup',number:'setup',
   saved:'play',about:'settings',profile:'players','bermuda-number':'setup','bermuda-multiplier':'bermuda-number'};
 document.addEventListener('keydown',event=>{
   const key=event.key;
