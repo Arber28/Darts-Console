@@ -1120,7 +1120,7 @@ header{justify-content:space-between;gap:24px}
   min-height:clamp(73px,9.6dvh,175px);height:clamp(73px,9.6dvh,175px);
   padding:6px 4px;display:grid;place-items:center;gap:0;
 }
-.console[data-view="game"] .dart-slot span{font-size:clamp(31px,6.8vw,88px)}
+.console[data-view="game"] .dart-slot span{font-size:clamp(44px,9.5vw,120px)}
 .console[data-view="game"] .checkout-inline-label span:last-child{display:none}
 .console[data-view="game"] .standings-head{
   display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -2870,8 +2870,8 @@ function fitMainScore(){
   const heading=card.querySelector('.throwing-line');
   const caption=card.querySelector('.caption');
   const verticalSpace=Math.max(60,card.clientHeight-(heading?.offsetHeight||0)-
-    (caption?.offsetHeight||0)-32);
-  const heightLimit=verticalSpace*.91;
+    (caption?.offsetHeight||0)-16);
+  const heightLimit=verticalSpace*.99;
   const letterSpacing=text.length>3||/[^0-9]/.test(text)?-.045:-.075;
   let low=32,high=1100;
   for(let i=0;i<24;i++){
