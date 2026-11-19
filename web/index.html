@@ -999,6 +999,26 @@ header{justify-content:space-between;gap:24px}
 .settings-checkout-trigger[aria-expanded="true"] .settings-dropdown-chevron svg{
   transform:rotate(180deg);
 }
+
+/* In-place display preferences, with a physical-encoder accessible iOS-style switch. */
+.settings-display-panel{background:#191b1f;border-top:1px solid #454850;padding:clamp(10px,2vw,20px) clamp(15px,2.6vw,28px)}
+.settings-display-row{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:clamp(88px,11dvh,116px);border-bottom:1px solid #3b3e45}
+.settings-display-copy{display:flex;flex-direction:column;gap:6px;min-width:0}
+.settings-display-copy strong,.settings-clarity-group>strong{font-size:clamp(16px,2.5vw,26px);font-weight:650}
+.settings-display-copy small,.settings-clarity-group>small{color:#aaafb8;font-size:clamp(11px,1.65vw,17px);line-height:1.4}
+.settings-ios-switch{position:relative;flex:none;width:clamp(55px,7vw,65px);height:clamp(32px,4vw,38px);padding:0;border:1px solid #616670;border-radius:999px;background:#555960;transition:background-color .2s,border-color .2s}
+.settings-ios-switch.on{background:#36b87f;border-color:#36b87f}
+.settings-switch-knob{position:absolute;top:2px;left:2px;display:block;width:calc(100% - 6px);max-width:clamp(26px,3.5vw,32px);height:calc(100% - 4px);background:#fff;border-radius:50%;box-shadow:0 2px 4px #0004;transition:transform .2s}
+.settings-ios-switch.on .settings-switch-knob{transform:translateX(calc(clamp(55px,7vw,65px) - clamp(26px,3.5vw,32px) - 6px))}
+.settings-ios-switch.focused{outline:2px solid #fff;outline-offset:4px}
+.settings-clarity-group{display:flex;flex-direction:column;gap:9px;padding:clamp(18px,2.6dvh,28px) 0 6px}
+.settings-clarity-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:clamp(10px,1.5dvh,16px)}
+.settings-clarity-choice{border:1px solid #50545d;background:#24262b;padding:clamp(12px,2dvh,20px) 5px;border-radius:8px;font-size:clamp(12px,1.9vw,19px);font-weight:600;min-width:0;text-align:center}
+.settings-clarity-choice.selected{border-color:#e7e9ee;background:#393d44;color:#fff}
+.settings-clarity-choice.focused{outline:2px solid #fff;outline-offset:2px}
+.console.subtle-contrast .settings-section-body,.console.subtle-contrast .panel,.console.subtle-contrast .profile-manager-list{border-color:#292c32}
+.console.subtle-contrast .settings-row,.console.subtle-contrast .settings-display-row{border-bottom-color:#2a2d33}
+.console.high-contrast .settings-row,.console.high-contrast .settings-display-row{border-bottom-color:#686d76}
 </style>
 </head>
 <body>
@@ -1060,10 +1080,12 @@ try {
 } catch (error) {
   console.warn('Unable to load console state',error);
 }
-data.display={reducedMotion:false,highContrast:false,...data.display};
+data.display={reducedMotion:false,highContrast:false,clarity:null,...data.display};
+if(!['Dezent','Standard','Klar'].includes(data.display.clarity))
+  data.display.clarity=data.display.highContrast?'Klar':'Standard';
 const state={page:'home',filter:'quick',chosen:'501',players:['Arber','Emre'],
   guests:[], cursor:0, message:'', out:data.out, rounds:10, bull:false, grid:[], sequence:[], numbers:{}, selfHit:null,
-  selectedProfile:0, editOriginal:null, editIcon:0, editColor:0, settingsCheckoutOpen:false, network:{state:'unknown',networks:[],message:'Status noch nicht geprüft.'}, networkBusy:false, networkSsid:'', networkPassword:'', networkKeyboardMode:0, updateConfirm:false, updateBusy:false, updateInfo:'Bereit zum Prüfen auf Updates.'};
+  selectedProfile:0, editOriginal:null, editIcon:0, editColor:0, settingsCheckoutOpen:false, settingsDisplayOpen:false, network:{state:'unknown',networks:[],message:'Status noch nicht geprüft.'}, networkBusy:false, networkSsid:'', networkPassword:'', networkKeyboardMode:0, updateConfirm:false, updateBusy:false, updateInfo:'Bereit zum Prüfen auf Updates.'};
 const main=document.getElementById('main');
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const currentMode=()=>modes.find(mode=>mode[0]===state.chosen);
@@ -1247,9 +1269,9 @@ function shortcuts(){
     ['F5','Verbinden',connectWifi]
   ];
   if(['settings','settings-scoring','settings-display','settings-network','settings-system','about'].includes(state.page))return [
-    ['Escape',state.page==='settings'&&state.settingsCheckoutOpen?'Schließen':'Back',()=>{
-      if(state.page==='settings'&&state.settingsCheckoutOpen){
-        state.settingsCheckoutOpen=false;return render(false);
+    ['Escape',state.page==='settings'&&(state.settingsCheckoutOpen||state.settingsDisplayOpen)?'Schließen':'Back',()=>{
+      if(state.page==='settings'&&(state.settingsCheckoutOpen||state.settingsDisplayOpen)){
+        state.settingsCheckoutOpen=false;state.settingsDisplayOpen=false;return render(false);
       }
       show(state.page==='settings'?'home':'settings');
     }],
@@ -2214,7 +2236,7 @@ function settingsHome(){
           '<button data-nav data-action="checkout-select:'+encodeURIComponent(option)+'" class="settings-checkout-option '+(data.out===option?'selected':'')+'">'+
           '<span>'+esc(option)+'</span><span class="settings-checkout-check">'+(data.out===option?'✓':'')+'</span></button>'
         ).join('')+'</div>':'')+'</div>')+
-    settingsSection('ANZEIGE',settingsRow('settings-display','settings','Darstellung','Animationen und Kontrast'))+
+    settingsSection('ANZEIGE',settingsDisplayInline())+
     settingsSection('VERBINDUNG',settingsRow('settings-network','arrows','WLAN & Netzwerk','Verbindung und verfügbare Netzwerke'))+
     settingsSection('SYSTEM',settingsRow('settings-system','info','Software & Updates','Version prüfen und aktualisieren')+
       settingsRow('about','info','Über Darts Console','Hardware, Funktionen und Speicher'))+
@@ -2226,11 +2248,23 @@ function settingsScoring(){
     '<p class="settings-footnote">Du kannst den Checkout für jedes neue Match separat ändern. Bereits gespeicherte Spiele bleiben unverändert.</p>'+
     '</div>';
 }
-function settingsDisplay(){
-  return '<div class="settings-page">'+settingsSection('DARSTELLUNG',
-    settingsRow('setting-motion','settings','Animationen','Intro und Übergänge',data.display.reducedMotion?'Reduziert':'Aktiv')+
-    settingsRow('setting-contrast','info','Kontrast','Stärkere Trennlinien und Rahmen',data.display.highContrast?'Hoch':'Normal'))+
-    '<p class="settings-footnote">Diese Einstellungen gelten direkt für die Konsole und werden gespeichert.</p></div>';
+function settingsDisplayInline(){
+  const enabled=!data.display.reducedMotion;
+  const clarity=data.display.clarity;
+  return '<div class="settings-display-accordion">'+
+    '<button data-nav data-action="display-toggle" class="settings-row settings-checkout-trigger" aria-expanded="'+state.settingsDisplayOpen+'">'+
+    '<span class="settings-row-icon">'+icon('settings')+'</span>'+
+    '<span class="settings-row-copy"><strong>Darstellung</strong><small>Animationen und Lesbarkeit</small></span>'+
+    '<span class="settings-chevron settings-dropdown-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></button>'+
+    (state.settingsDisplayOpen?'<div class="settings-display-panel">'+
+      '<div class="settings-display-row"><span class="settings-display-copy"><strong>Animationen</strong><small>Intro und Übergänge</small></span>'+
+      '<button data-nav data-action="setting-motion" class="settings-ios-switch '+(enabled?'on':'')+'" role="switch" aria-checked="'+enabled+'" aria-label="Animationen '+(enabled?'ein':'aus')+'"><span class="settings-switch-knob"></span></button></div>'+
+      '<div class="settings-clarity-group"><strong>Lesbarkeit</strong><small>Wie deutlich sich Flächen und Rahmen abheben</small>'+
+      '<div class="settings-clarity-options">'+['Dezent','Standard','Klar'].map(mode=>
+        '<button data-nav data-action="setting-clarity:'+mode+'" class="settings-clarity-choice '+(mode===clarity?'selected':'')+'" aria-pressed="'+(mode===clarity)+'">'+
+        esc(mode)+'</button>').join('')+'</div></div>'+
+      '</div>':'')+
+    '</div>';
 }
 function settingsNetwork(){
   const n=state.network;
@@ -2288,7 +2322,8 @@ function applyDisplaySettings(){
   if(root){
     if(data.display.reducedMotion)document.querySelector('.darts-intro')?.remove();
     root.classList.toggle('reduced-motion',!!data.display.reducedMotion);
-    root.classList.toggle('high-contrast',!!data.display.highContrast);
+    root.classList.toggle('high-contrast',data.display.clarity==='Klar');
+    root.classList.toggle('subtle-contrast',data.display.clarity==='Dezent');
   }
 }
 async function refreshWifi(){
@@ -2576,6 +2611,7 @@ function clickButton(b){
     case 'settings-scoring':return show('settings'); 
     case 'checkout-toggle':
       state.settingsCheckoutOpen=!state.settingsCheckoutOpen;
+      if(state.settingsCheckoutOpen)state.settingsDisplayOpen=false;
       render(false);
       if(state.settingsCheckoutOpen){
         const active=controls().findIndex(b=>b.dataset.action==='checkout-select:'+encodeURIComponent(data.out));
@@ -2590,11 +2626,21 @@ function clickButton(b){
       save();
       state.cursor=0;
       return render(false);
-    case 'settings-display':return show('settings-display');
+    case 'settings-display':return show('settings'); 
+    case 'display-toggle':
+      state.settingsDisplayOpen=!state.settingsDisplayOpen;
+      if(state.settingsDisplayOpen)state.settingsCheckoutOpen=false;
+      state.cursor=controls().findIndex(b=>b.dataset.action==='display-toggle');
+      return render(false);
+    case 'setting-clarity':
+      if(!['Dezent','Standard','Klar'].includes(value))return;
+      data.display.clarity=value;
+      data.display.highContrast=value==='Klar';
+      save();return render(false);
     case 'settings-network':show('settings-network');return refreshWifi();
     case 'settings-system':return show('settings-system');
     case 'setting-motion':data.display.reducedMotion=!data.display.reducedMotion;save();break;
-    case 'setting-contrast':data.display.highContrast=!data.display.highContrast;save();break;
+    case 'setting-contrast':data.display.clarity=data.display.clarity==='Klar'?'Standard':'Klar';data.display.highContrast=data.display.clarity==='Klar';save();break;
     case 'wifi-refresh':return refreshWifi();
     case 'wifi-select':
       state.networkSsid=decodeURIComponent(value);
