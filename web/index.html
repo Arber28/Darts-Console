@@ -1637,7 +1637,7 @@ function renderFooter(){
     const buttons=keys.map(([key,label])=>label
       ?'<button class="softkey library-key" data-shortcut="'+key+'"><span>'+esc(label.toUpperCase())+'</span></button>'
       :'<span class="stats-empty-softkey" aria-hidden="true"></span>');
-    const clickable=state.page!=='game'||(derived().winners===null&&!turnReview());
+    const clickable=state.page!=='game'||derived().winners!==null||!turnReview();
     buttons.splice(2,0,'<div class="home-encoder" aria-hidden="true">'+
       '<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="23" fill="none" stroke="#fff" stroke-width="2.8"/>'+
       (clickable?'<circle cx="30" cy="30" r="8" fill="#fff"/>':'')+'</svg></div>');
