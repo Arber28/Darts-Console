@@ -1837,6 +1837,29 @@ header{justify-content:space-between;gap:24px}
   }
 }
 
+/* Home hardware keys: four discrete neutral markers instead of long colour bars. */
+.console[data-view="home"] footer{
+  align-items:center;
+  gap:clamp(8px,1.7vw,18px);
+}
+.console[data-view="home"] .home-indicator{
+  justify-self:center;
+  align-self:center;
+  width:clamp(28px,5vw,54px);
+  height:clamp(4px,.55dvh,7px);
+  min-height:0;
+  border-radius:999px;
+  background:#d1d3d7!important;
+  box-shadow:none;
+}
+.console[data-view="home"] .home-indicator:focus-visible{
+  outline:2px solid #fff;
+  outline-offset:6px;
+}
+.console[data-view="home"] .home-encoder{
+  justify-self:center;
+}
+
 </style>
 </head>
 <body>
