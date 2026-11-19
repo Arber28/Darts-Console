@@ -965,6 +965,15 @@ header{justify-content:space-between;gap:24px}
 .wifi-password-top strong{font-size:clamp(26px,4vw,40px);overflow-wrap:anywhere;letter-spacing:.08em}
 .wifi-password-top small{font-size:clamp(11px,1.65vw,17px);color:#a3a8b0}
 .wifi-keyboard{margin-top:clamp(20px,3dvh,34px)}
+
+/* A compact in-place hardware-accessible checkout dropdown, no extra screen. */
+.settings-checkout-trigger .settings-chevron{font-size:clamp(20px,3vw,30px);line-height:1}
+.settings-checkout-menu{background:#191b1f;border-top:1px solid #454850;padding:clamp(5px,1vw,12px)}
+.settings-checkout-option{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;min-height:clamp(54px,7dvh,74px);padding:clamp(12px,2vw,18px) clamp(14px,2.5vw,26px);background:transparent;border:0;border-radius:8px;text-align:left;font-size:clamp(15px,2.3vw,23px)}
+.settings-checkout-option+.settings-checkout-option{border-top:1px solid #33363b}
+.settings-checkout-option.selected{color:#fff;font-weight:700}
+.settings-checkout-check{min-width:22px;text-align:center}
+.settings-checkout-option.focused{background:#34373e;outline:2px solid #eee;outline-offset:-2px}
 </style>
 </head>
 <body>
@@ -1029,7 +1038,7 @@ try {
 data.display={reducedMotion:false,highContrast:false,...data.display};
 const state={page:'home',filter:'quick',chosen:'501',players:['Arber','Emre'],
   guests:[], cursor:0, message:'', out:data.out, rounds:10, bull:false, grid:[], sequence:[], numbers:{}, selfHit:null,
-  selectedProfile:0, editOriginal:null, editIcon:0, editColor:0, network:{state:'unknown',networks:[],message:'Status noch nicht geprüft.'}, networkBusy:false, networkSsid:'', networkPassword:'', networkKeyboardMode:0, updateConfirm:false, updateBusy:false, updateInfo:'Bereit zum Prüfen auf Updates.'};
+  selectedProfile:0, editOriginal:null, editIcon:0, editColor:0, settingsCheckoutOpen:false, network:{state:'unknown',networks:[],message:'Status noch nicht geprüft.'}, networkBusy:false, networkSsid:'', networkPassword:'', networkKeyboardMode:0, updateConfirm:false, updateBusy:false, updateInfo:'Bereit zum Prüfen auf Updates.'};
 const main=document.getElementById('main');
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const currentMode=()=>modes.find(mode=>mode[0]===state.chosen);
@@ -1213,7 +1222,12 @@ function shortcuts(){
     ['F5','Verbinden',connectWifi]
   ];
   if(['settings','settings-scoring','settings-display','settings-network','settings-system','about'].includes(state.page))return [
-    ['Escape','Back',()=>show(state.page==='settings'?'home':'settings')],
+    ['Escape',state.page==='settings'&&state.settingsCheckoutOpen?'Schließen':'Back',()=>{
+      if(state.page==='settings'&&state.settingsCheckoutOpen){
+        state.settingsCheckoutOpen=false;return render(false);
+      }
+      show(state.page==='settings'?'home':'settings');
+    }],
     ['F4','',()=>{}],['F2','',()=>{}],['F5','',()=>{}]
   ];
   if(state.page==='players')return [
@@ -2163,7 +2177,18 @@ function settingsHome(){
   const {matches,profiles}=data;
   return '<div class="settings-page"><div class="settings-overview"><div><span>KONSOLE</span><strong>Darts Console</strong><small>Bereit für die nächste Runde.</small></div>'+
     '<div class="settings-overview-icon">'+icon('target')+'</div></div>'+
-    settingsSection('SPIEL',settingsRow('settings-scoring','target','Scoring','Standardregeln und Checkout',data.out))+
+    settingsSection('SPIEL',
+      '<div class="settings-checkout">'+
+      '<button data-nav data-action="checkout-toggle" class="settings-row settings-checkout-trigger" aria-expanded="'+state.settingsCheckoutOpen+'">'+
+      '<span class="settings-row-icon">'+icon('target')+'</span>'+
+      '<span class="settings-row-copy"><strong>Standard-Checkout</strong><small>Für neue 301-, 501- und 701-Spiele</small></span>'+
+      '<span class="settings-row-value">'+esc(data.out)+'</span>'+
+      '<span class="settings-chevron">'+(state.settingsCheckoutOpen?'⌃':'⌄')+'</span></button>'+
+      (state.settingsCheckoutOpen?'<div class="settings-checkout-menu">'+
+        Scoring.checkouts.map(option=>
+          '<button data-nav data-action="checkout-select:'+encodeURIComponent(option)+'" class="settings-checkout-option '+(data.out===option?'selected':'')+'">'+
+          '<span>'+esc(option)+'</span><span class="settings-checkout-check">'+(data.out===option?'✓':'')+'</span></button>'
+        ).join('')+'</div>':'')+'</div>')+
     settingsSection('ANZEIGE',settingsRow('settings-display','settings','Darstellung','Animationen und Kontrast'))+
     settingsSection('VERBINDUNG',settingsRow('settings-network','arrows','WLAN & Netzwerk','Verbindung und verfügbare Netzwerke'))+
     settingsSection('SYSTEM',settingsRow('settings-system','info','Software & Updates','Version prüfen und aktualisieren')+
@@ -2523,7 +2548,23 @@ function clickButton(b){
   state.message='';
   switch(action){
     case 'home':return show('home');
-    case 'settings-scoring':return show('settings-scoring');
+    case 'settings-scoring':return show('settings'); 
+    case 'checkout-toggle':
+      state.settingsCheckoutOpen=!state.settingsCheckoutOpen;
+      render(false);
+      if(state.settingsCheckoutOpen){
+        const active=controls().findIndex(b=>b.dataset.action==='checkout-select:'+encodeURIComponent(data.out));
+        if(active>=0){state.cursor=active;highlight(true);}
+      }
+      return;
+    case 'checkout-select':
+      if(!Scoring.checkouts.includes(decodeURIComponent(value)))return;
+      data.out=decodeURIComponent(value);
+      state.out=data.out;
+      state.settingsCheckoutOpen=false;
+      save();
+      state.cursor=0;
+      return render(false);
     case 'settings-display':return show('settings-display');
     case 'settings-network':show('settings-network');return refreshWifi();
     case 'settings-system':return show('settings-system');
