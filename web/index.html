@@ -690,6 +690,18 @@ header{justify-content:space-between;gap:24px}
 .stats-delete-screen>p{font-size:clamp(17px,2.6vw,26px);color:#c7c9cf;line-height:1.5}
 .stats-delete-warning{max-width:31ch;color:#a8acb5!important}
 .console[data-view="stats-delete-confirm"] footer .softkey:last-child{color:#f3b6ac}
+
+/* History detail: compact final scores and only Back/Delete as physical actions. */
+.stats-match-player-name{display:flex;flex-direction:column;gap:6px;min-width:0}
+.stats-match-player-name small{color:#d9dce1;font-size:clamp(11px,1.6vw,16px);font-weight:700;letter-spacing:.08em}
+.stats-match-player .match-points{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
+.stats-match-player .match-points strong{font-size:clamp(24px,4vw,39px);font-variant-numeric:tabular-nums;color:#f4f5f7}
+.stats-match-player .match-points small{font-size:clamp(10px,1.6vw,15px);color:#9ca1ab;letter-spacing:.07em}
+.console[data-view="stats-match-detail"] footer [data-shortcut="F5"],
+.console[data-view="stats-delete-confirm"] footer [data-shortcut="F5"]{color:#ff6969}
+.console[data-view="stats-match-detail"] footer [data-shortcut="F5"] span,
+.console[data-view="stats-delete-confirm"] footer [data-shortcut="F5"] span{color:#ff6969}
+.stats-empty-softkey{display:block;min-width:0}
 </style>
 </head>
 <body>
@@ -899,8 +911,8 @@ function adjacentInfoMode(direction){
 function shortcuts(){
   if(state.page==='stats-match-detail')return [
     ['Escape','Back',()=>show('stats-history')],
-    ['F4','Players',()=>show('stats-players')],
-    ['F2','Records',()=>show('stats-records')],
+    ['F4','',()=>{}],
+    ['F2','',()=>{}],
     ['F5','Löschen',()=>show('stats-delete-confirm')]
   ];
   if(state.page==='stats-delete-confirm')return [
@@ -975,8 +987,9 @@ function runShortcut(key){
 function renderFooter(){
   if(['stats','stats-players','stats-player-detail','stats-records','stats-history','stats-match-detail','stats-delete-confirm'].includes(state.page)){
     const keys=shortcuts();
-    const buttons=keys.map(([key,label])=>
-      '<button class="softkey library-key" data-shortcut="'+key+'"><span>'+esc(label.toUpperCase())+'</span></button>');
+    const buttons=keys.map(([key,label])=>label
+      ?'<button class="softkey library-key" data-shortcut="'+key+'"><span>'+esc(label.toUpperCase())+'</span></button>'
+      :'<span class="stats-empty-softkey" aria-hidden="true"></span>');
     buttons.splice(2,0,'<div class="home-encoder" aria-hidden="true">'+
       '<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="23" fill="none" stroke="#fff" stroke-width="2.8"/>'+
       (['stats-players','stats-history'].includes(state.page)?'<circle cx="30" cy="30" r="8" fill="#fff"/>':'')+'</svg></div>');
@@ -1631,16 +1644,21 @@ function statisticsMatchDetail(){
   if(!match)return '<div class="stats-dashboard"><p class="stats-empty">Dieses Match ist nicht mehr vorhanden.</p></div>';
   const view=Scoring.replay(match);
   const date=Number.isFinite(Number(match.started))?new Date(match.started).toLocaleString('de-DE'):'–';
-  const winner=view.winners.map(i=>match.players[i]).join(' & ');
+  const countdown=['301','501','701'].includes(match.mode);
+  const points=(i)=>{
+    const player=view.players[i];
+    if(countdown)return '<span class="match-points"><strong>'+esc(player.score)+'</strong><small>RESTPUNKTE</small></span>';
+    if(Number.isFinite(player.score))return '<span class="match-points"><strong>'+esc(player.score)+'</strong><small>PUNKTE</small></span>';
+    return '';
+  };
   return '<div class="stats-dashboard stats-match-detail">'+
     '<div class="stats-match-title"><span>MATCH #'+String(match.historyNumber).padStart(2,'0')+'</span>'+
     '<h1>'+esc(match.mode)+'</h1><p>'+esc(date)+'</p></div>'+
     '<section class="stats-panel"><div class="stats-section-title"><h2>Ergebnis</h2></div>'+
     match.players.map((name,i)=>'<div class="stats-match-player">'+
-      '<strong>'+esc(name)+'</strong>'+
-      (view.winners.includes(i)?'<span>GEWINNER</span>':'<span>TEILNEHMER</span>')+
-      '</div>').join('')+'</section>'+
-    '<p class="stats-footnote">Gewinner: '+esc(winner)+'</p></div>';
+      '<div class="stats-match-player-name"><strong>'+esc(name)+'</strong>'+
+      (view.winners.includes(i)?'<small>GEWINNER</small>':'')+'</div>'+
+      points(i)+'</div>').join('')+'</section></div>';
 }
 function statisticsDeleteConfirm(){
   const match=matchForHistory();
