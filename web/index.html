@@ -974,6 +974,31 @@ header{justify-content:space-between;gap:24px}
 .settings-checkout-option.selected{color:#fff;font-weight:700}
 .settings-checkout-check{min-width:22px;text-align:center}
 .settings-checkout-option.focused{background:#34373e;outline:2px solid #eee;outline-offset:-2px}
+
+/* Constant arrow geometry: rotate the same SVG without moving its grid cell. */
+.settings-checkout-trigger .settings-dropdown-chevron{
+  width:24px;
+  height:24px;
+  display:grid;
+  place-items:center;
+  justify-self:center;
+  align-self:center;
+}
+.settings-checkout-trigger .settings-dropdown-chevron svg{
+  display:block;
+  width:20px;
+  height:20px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  transform:rotate(0deg);
+  transform-origin:50% 50%;
+}
+.settings-checkout-trigger[aria-expanded="true"] .settings-dropdown-chevron svg{
+  transform:rotate(180deg);
+}
 </style>
 </head>
 <body>
@@ -2183,7 +2208,7 @@ function settingsHome(){
       '<span class="settings-row-icon">'+icon('target')+'</span>'+
       '<span class="settings-row-copy"><strong>Standard-Checkout</strong><small>Für neue 301-, 501- und 701-Spiele</small></span>'+
       '<span class="settings-row-value">'+esc(data.out)+'</span>'+
-      '<span class="settings-chevron">'+(state.settingsCheckoutOpen?'⌃':'⌄')+'</span></button>'+
+      '<span class="settings-chevron settings-dropdown-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></button>'+
       (state.settingsCheckoutOpen?'<div class="settings-checkout-menu">'+
         Scoring.checkouts.map(option=>
           '<button data-nav data-action="checkout-select:'+encodeURIComponent(option)+'" class="settings-checkout-option '+(data.out===option?'selected':'')+'">'+
