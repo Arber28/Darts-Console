@@ -759,6 +759,25 @@ header{justify-content:space-between;gap:24px}
 .profile-editor h1{font-size:clamp(36px,6.5vw,65px);overflow-wrap:anywhere;margin:clamp(12px,2dvh,22px) 0}
 .profile-editor-tip{color:#a9adb5;font-size:clamp(15px,2.3vw,23px)}
 .console[data-view="players"] #match-heading,.console[data-view="profile"] #match-heading,.console[data-view="player-delete"] #match-heading{font-size:clamp(19px,3.3vw,36px)}
+
+/* Compact player-management screen. Remove secondary instructions and form actions. */
+.console[data-view="players"] .profile-manager{padding-top:0}
+.console[data-view="players"] .profile-manager-list{padding:clamp(5px,.8vw,10px)}
+.console[data-view="players"] .profile-row{min-height:clamp(65px,8.2dvh,94px)}
+.console[data-view="players"] .profile-identity strong{text-transform:uppercase}
+.console[data-view="players"] .profile-row-marker{display:none}
+.console[data-view="profile"] main{padding:clamp(10px,2.5vw,26px);padding-top:clamp(8px,1.5dvh,18px);overflow-y:auto}
+.profile-editor-shell{max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:clamp(20px,4dvh,46px);min-height:0}
+.profile-name-preview{display:flex;flex-direction:column;gap:clamp(8px,1.2dvh,15px);padding:clamp(10px,2vw,20px) 0 clamp(17px,3dvh,32px);border-bottom:1px solid #46484f}
+.profile-name-label{font-size:clamp(11px,1.8vw,17px);font-weight:650;letter-spacing:.12em;color:#9297a1}
+.profile-name-preview strong{font-size:clamp(32px,6.6vw,70px);font-weight:700;line-height:1.14;letter-spacing:-.035em;word-break:break-word;overflow-wrap:anywhere}
+.profile-caret{display:inline-block;width:3px;height:.88em;margin-left:5px;background:#d2d4d9;vertical-align:-.08em;animation:profileCaret 1s step-end infinite}
+@keyframes profileCaret{50%{opacity:0}}
+.profile-keyboard{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:clamp(6px,1.3vw,13px)}
+.profile-keyboard .profile-key{min-width:0;min-height:clamp(62px,8.5dvh,94px);padding:4px 0;background:#24262b;border:1px solid #454850;border-radius:clamp(7px,1.2vw,12px);color:#f3f3f5;font-size:clamp(23px,4vw,37px);font-weight:650;display:grid;place-items:center}
+.profile-keyboard .profile-key.focused,.profile-keyboard .profile-key:focus-visible{outline:2px solid #f8f8fb;outline-offset:-2px;border-color:#f8f8fb;background:#35373c}
+.profile-keyboard .profile-key-space{font-size:clamp(10px,1.8vw,17px);letter-spacing:.04em}
+@media(max-width:600px){.profile-editor-shell{gap:24px}.profile-keyboard .profile-key{min-height:65px}}
 </style>
 </head>
 <body>
@@ -1003,8 +1022,8 @@ function shortcuts(){
   ];
   if(state.page==='profile')return [
     ['Escape','Back',()=>show('players')],
-    ['F4','Zeichen weg',()=>{state.name=state.name.slice(0,-1);render()}],
-    ['F2','',()=>{}],
+    ['F4','Löschen',()=>{state.name=state.name.slice(0,-1);render(false)}],
+    ['F2','Leerzeichen',()=>{if(state.name.length<24)state.name+=' ';render(false)}],
     ['F5','Speichern',savePlayerProfile]
   ];
   if(state.page==='stats-match-detail')return [
@@ -1784,7 +1803,7 @@ function deleteHistoryMatch(){
   show('stats-history');
 }
 function savePlayerProfile(){
-  const name=state.name.trim();
+  const name=state.name.trim().toLocaleUpperCase('de-DE');
   if(!name)return say('Bitte einen Namen eingeben.');
   if([...data.profiles,...state.guests].some(n=>n!==state.editOriginal&&n.toLowerCase()===name.toLowerCase()))
     return say('Diesen Spielernamen gibt es schon.');
@@ -1818,15 +1837,13 @@ function playersManager(){
     const initial=name.trim().slice(0,1).toUpperCase();
     return '<button data-nav data-action="select-profile:'+i+'" class="profile-row '+(state.selectedProfile===i?'chosen':'')+'">'+
       '<span class="profile-avatar">'+esc(initial)+'</span>'+
-      '<span class="profile-identity"><strong>'+esc(name)+'</strong><small>'+
+      '<span class="profile-identity"><strong>'+esc(name.toLocaleUpperCase('de-DE'))+'</strong><small>'+
       played+' '+(played===1?'Spiel':'Spiele')+' · '+wins+' '+(wins===1?'Sieg':'Siege')+'</small></span>'+
-      '<span class="profile-row-marker">'+(state.selectedProfile===i?'AUSGEWÄHLT':'')+'</span>'+
+      '<span class="profile-row-marker"></span>'+
       '</button>';
   }).join('');
   return '<div class="profile-manager">'+
-    '<div class="profile-manager-meta"><span>SPIELERVERWALTUNG</span><strong>'+data.profiles.length+' PROFILE</strong></div>'+
     '<div class="profile-manager-list">'+(rows||'<p class="stats-empty">Noch keine Spieler angelegt.</p>')+'</div>'+
-    '<div class="profile-manager-tip">Drehregler: Spieler wählen · Drücken: Auswahl bestätigen</div>'+
     '</div>';
 }
 function playerDeleteScreen(){
@@ -1839,13 +1856,17 @@ function playerDeleteScreen(){
     '</div>';
 }
 function profileEditor(){
-  const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 -';
-  return '<div class="profile-editor"><div class="profile-manager-meta"><span>SPIELERVERWALTUNG</span><strong>'+
-    (state.editOriginal===null?'NEUES PROFIL':'PROFIL BEARBEITEN')+'</strong></div>'+
-    '<h1>'+esc(state.name||'Spielername')+'</h1>'+
-    '<p class="profile-editor-tip">Buchstaben mit dem Drehregler wählen und bestätigen.</p></div>'+
-    '<div class="letters">'+[...chars].map(c=>button('letter:'+c,c===' '?'Space':c,'rule')).join('')+'</div><br>'+
-    button('erase','Erase last character')+button('profile-save','Save player','primary');
+  // Same compact four-row keypad for new names and renaming. No lowercase/number mode.
+  const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const keyboard=[...chars,' ','-'];
+  return '<div class="profile-editor-shell">'+
+    '<div class="profile-name-preview"><span class="profile-name-label">'+
+      (state.editOriginal===null?'NEUER SPIELER':'SPIELER BEARBEITEN')+'</span>'+
+      '<strong>'+esc(state.name.toLocaleUpperCase('de-DE')||'NAME')+
+      '<span class="profile-caret" aria-hidden="true"></span></strong></div>'+
+    '<div class="profile-keyboard">'+keyboard.map(c=>
+      button('letter:'+c,c===' '?'SPACE':esc(c),'profile-key'+(c===' '?' profile-key-space':''))).join('')+
+    '</div></div>';
 }
 function fitMainScore(){
   const number=document.querySelector('.console[data-view="game"] .big-score');
@@ -2151,7 +2172,7 @@ function clickButton(b){
       state.cursor=state.selectedProfile;
       return render(false);
     case 'new-profile':return newPlayer();
-    case 'letter':if(state.name.length<24) state.name+=value; break;
+    case 'letter':if(state.name.length<24) state.name+=value.toLocaleUpperCase('de-DE'); break;
     case 'erase':state.name=state.name.slice(0,-1); break;
     case 'profile-save':return savePlayerProfile();
     case 'out':state.out=value;break;
