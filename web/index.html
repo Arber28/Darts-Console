@@ -1861,6 +1861,7 @@ header{justify-content:space-between;gap:24px}
 }
 
 </style>
+<link rel="stylesheet" href="atelier.css">
 </head>
 <body>
 <div class="darts-intro" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-width="3"><circle cx="50" cy="50" r="39"/><circle cx="50" cy="50" r="25"/><circle cx="50" cy="50" r="10" fill="#fff"/></svg><strong>DARTS</strong><span>CONSOLE</span></div>
@@ -2027,6 +2028,17 @@ function show(page,withNav=false){
   // keyboard selection scroll past the heading on initial entry.
   render(page!=='mode-info'&&page!=='stats-players'&&page!=='stats-history');
   if(changed){
+    const pageSurface=document.getElementById('main');
+    if(pageSurface){
+      pageSurface.classList.remove('atelier-enter');
+      // Animation is for navigation only, not encoder focus or dart scoring.
+      const reduced=!!data.display.reducedMotion ||
+        (typeof matchMedia==='function' && matchMedia('(prefers-reduced-motion: reduce)').matches);
+      if(!reduced){
+        void pageSurface.offsetWidth;
+        pageSurface.classList.add('atelier-enter');
+      }
+    }
     const workspace=document.querySelector('.workspace');
     if(workspace)workspace.scrollTop=0;
     if(main)main.scrollTop=0;
