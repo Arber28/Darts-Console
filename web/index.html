@@ -2048,16 +2048,18 @@ function show(page,withNav=false){
 }
 function homeScreen(){
   const options=[
-    ['play','SPIEL','target','#4c8ded'],
-    ['players','SPIELER','users','#47b38d'],
-    ['stats','STATISTICS','chart','#e6ad54'],
-    ['settings','SETTINGS','settings','#ac81e2']
+    ['play','SPIEL','target','#76a5ed','01','MATCH STARTEN'],
+    ['players','SPIELER','users','#6bd6a9','02','DEINE CREW'],
+    ['stats','STATISTICS','chart','#efc27f','03','DEINE ZAHLEN'],
+    ['settings','SETTINGS','settings','#bc9ae9','04','DEIN SYSTEM']
   ];
   return '<div class="home-screen"><div class="home-brand">'+icon('target')+
-    '<strong>DARTS CONSOLE</strong><small>MAIN MENU</small></div>'+
-    '<div class="home-grid">'+options.map(([page,label,symbol,color])=>
+    '<strong>DARTS CONSOLE</strong><small>READY TO PLAY</small></div>'+
+    '<div class="home-grid">'+options.map(([page,label,symbol,color,index,description])=>
       '<button class="home-option" style="--menu-color:'+color+'" data-nav data-action="'+page+'">'+
-      icon(symbol)+'<span>'+label+'</span></button>').join('')+'</div></div>';
+      '<span class="atelier-tile-index">'+index+'</span>'+
+      '<div class="atelier-tile-content">'+icon(symbol)+
+      '<div class="atelier-tile-copy"><span>'+label+'</span><small>'+description+'</small></div></div></button>').join('')+'</div></div>';
 }
 const gameDescriptions={
   '501':['Das klassische Dartspiel: von 501 Punkten auf genau null.','Alle Spieler beginnen bei 501. Jeder Treffer wird abgezogen. Gewonnen hat, wer exakt null erreicht. Bei Double Out muss der letzte Dart ein Doppelfeld treffen. Überwerfen oder ein unmöglicher Reststand bedeutet Bust: Der Punktestand wird für diese Aufnahme zurückgesetzt.'],
@@ -2184,15 +2186,53 @@ function clearTurnReview(){
 }
 function recordMatchDart(n,m){
   if(!data.active||derived().winners!==null)return false;
-  const previousWinner=derived().winners;
+  const before=derived();
+  const previousWinner=before.winners;
+  const oldPlayer=before.current;
   clearTurnReview(); // migrate matches saved with the old NEXT gate
   Scoring.record(data.active,n,m);
   save();
   show('game');
-  const completed=derived().winners!==null;
+  const after=derived();
+  const completed=after.winners!==null;
   if(completed)announceVictory(previousWinner);
-  else showThrowFeedback(n,m);
+  else {
+    showThrowFeedback(n,m);
+    if(after.current!==oldPlayer)animateTurnChange();
+    else animateScoreArrival();
+  }
   return true;
+}
+function motionAllowed(){
+  return !data.display.reducedMotion &&
+    !(typeof matchMedia==='function' && matchMedia('(prefers-reduced-motion: reduce)').matches);
+}
+function animateScoreArrival(){
+  if(!motionAllowed())return;
+  const score=document.querySelector('.console[data-view="game"] .big-score');
+  if(score && typeof score.animate==='function'){
+    score.animate([
+      {opacity:.67,transform:'translate3d(0,9px,0)'},
+      {opacity:1,transform:'translate3d(0,0,0)'}
+    ],{duration:340,easing:'cubic-bezier(.22,1,.36,1)'});
+  }
+}
+function animateTurnChange(){
+  if(!motionAllowed())return;
+  const header=document.querySelector('.console[data-view="game"] #match-context');
+  const score=document.querySelector('.console[data-view="game"] .score-hero');
+  if(header && typeof header.animate==='function'){
+    header.animate([
+      {opacity:.25,transform:'translate3d(0,12px,0)'},
+      {opacity:1,transform:'translate3d(0,0,0)'}
+    ],{duration:540,easing:'cubic-bezier(.22,1,.36,1)'});
+  }
+  if(score && typeof score.animate==='function'){
+    score.animate([
+      {opacity:.62,transform:'translate3d(0,15px,0) scale(.99)'},
+      {opacity:1,transform:'translate3d(0,0,0) scale(1)'}
+    ],{duration:540,easing:'cubic-bezier(.22,1,.36,1)'});
+  }
 }
 function leaveMatch(saveProgress){
   if(!data.active)return show('home');
@@ -2979,7 +3019,10 @@ function game(){
     const turnTotal=darts.reduce((sum,d)=>sum+d.n*d.m,0);
     const roundHistory=review?review.indices.map(index=>({index})):
       view.history.filter(d=>d.player===view.current&&d.round===view.round);
-    html+='<div class="score-hero" aria-label="'+esc(shown.name)+' · '+esc(unit)+'"><div class="big-score'+(typeof value==='string'?' word-score':'')+'">'+esc(value)+'</div></div>';
+    html+='<div class="score-hero" aria-label="'+esc(shown.name)+' · '+esc(unit)+'">'+
+      '<div class="atelier-score-caption"><span>'+esc(unit)+'</span><span>ROUND '+view.round+'</span></div>'+
+      '<div class="big-score'+(typeof value==='string'?' word-score':'')+'">'+esc(value)+'</div>'+
+      '<div class="atelier-score-player">'+esc(shown.name)+'</div></div>';
     const tip=review?null:finishAdvice(mode,view,match);
     const suggested=tip && tip.route!=='NO DIRECT FINISH' ? tip.route.split(' → ') : [];
     if(suggested.length){
