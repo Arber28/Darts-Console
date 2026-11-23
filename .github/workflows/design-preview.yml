@@ -1,0 +1,35 @@
+name: Design preview
+
+on:
+  push:
+    branches:
+      - design/premium-ui-refinement
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: darts-design-preview
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out design branch
+        uses: actions/checkout@v4
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload static web directory
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./web
+      - name: Deploy Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
