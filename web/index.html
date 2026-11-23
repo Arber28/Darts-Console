@@ -1964,6 +1964,88 @@ footer{background:#131518;border-top:1px solid rgba(255,255,255,.10)}
   .home-option,.console[data-view="game"] .dart-slot{transition:none}
   .home-option:active{transform:none}
 }
+
+/* Premium interaction system v3: deliberate contrast, hierarchy and motion. */
+:root{--premium-ease:cubic-bezier(.22,1,.36,1)}
+.console,.home-screen{background:#0c0d0f}
+.console header{background:#101114;border-bottom:1px solid #25272c}
+.console .brand{color:#f5f5f7;font-weight:580;letter-spacing:-.045em}
+.console footer{background:#111215;border-top:1px solid #292b31}
+.home-brand strong{font-weight:650;font-size:clamp(25px,4.7vw,44px);letter-spacing:-.045em}
+.home-brand small{color:#838893;letter-spacing:.24em}
+.home-option{
+ align-items:flex-start;justify-content:flex-end;text-align:left;
+ padding:clamp(22px,4.3vw,46px);gap:clamp(12px,1.8dvh,22px);
+ border-radius:14px;background:#1b1d21;border:1px solid #32353b;
+ box-shadow:none;overflow:hidden;isolation:isolate;
+}
+.home-option::before{
+ content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+ background:var(--menu-color);opacity:.9;
+ transition:width 280ms var(--premium-ease)
+}
+.home-option::after{
+ content:"";position:absolute;left:clamp(22px,4.3vw,46px);
+ bottom:clamp(14px,2.1dvh,24px);width:clamp(24px,4vw,42px);
+ height:2px;background:var(--menu-color);border-radius:2px
+}
+.home-option svg{
+ width:clamp(48px,9vw,90px);height:clamp(48px,9vw,90px);
+ stroke-width:1.35;opacity:.92;
+ transition:transform 320ms var(--premium-ease)
+}
+.home-option span{
+ font-size:clamp(24px,4.2vw,45px);
+ font-weight:650;letter-spacing:-.055em;line-height:1.06
+}
+.home-option.focused,.home-option:focus-visible{
+ background:#24272c;border-color:var(--menu-color);
+ outline:2px solid var(--menu-color);outline-offset:-2px
+}
+.home-option:focus-visible::before{width:7px}
+.home-option:active{background:#2c3036;transform:scale(.986)}
+.home-option:active svg{transform:scale(.94)}
+.console[data-view="game"] .score-hero{
+ background:#f5f5f4;color:#101114;border-radius:9px;
+ box-shadow:none;border:0
+}
+.console[data-view="game"] .big-score{
+ color:#101114;letter-spacing:-.075em;font-weight:720;
+ font-variant-numeric:tabular-nums lining-nums
+}
+.console[data-view="game"] .dart-slot{
+ background:#1c1e22;border:1px solid #383b42;border-radius:8px;box-shadow:none;
+ transition:background-color 220ms var(--premium-ease),border-color 220ms var(--premium-ease)
+}
+.console[data-view="game"] .dart-slot.ready{background:#30343a;border-color:#f0f0f2}
+.console[data-view="game"] .dart-slot.recorded{background:#24272b;border-color:#666b74}
+.console[data-view="game"] .dart-slot.suggested{background:#28251c;border-color:#b99b61}
+.console[data-view="game"] .dart-slot.focused{outline:2px solid white;outline-offset:-4px}
+.console[data-view="game"] .compact-player{background:#191b1f;border:1px solid #32353a;border-radius:8px}
+.console[data-view="game"] .compact-player.is-next{background:#282b30;border-color:#646971}
+.console[data-view="game"] .compact-player-score{
+ font-variant-numeric:tabular-nums lining-nums;font-weight:680;letter-spacing:-.045em
+}
+.settings-overview{background:#1c1e22;border:1px solid #34373d;border-radius:10px}
+.settings-row{transition:background-color 170ms ease}
+.settings-row.focused,.settings-row:focus-visible{
+ background:#30343a;outline:2px solid #f5f5f7;outline-offset:-2px
+}
+.console .winner-card{background:#f5f5f4;color:#121316;border-radius:10px;box-shadow:none}
+.console .winner-name{font-weight:750;letter-spacing:-.075em}
+.console .library-key:active{background:#2c3035}
+.console:not(.reduced-motion) main.view-enter > *{
+ animation:premiumViewArrive 440ms var(--premium-ease) both
+}
+@keyframes premiumViewArrive{
+ from{opacity:0;transform:translate3d(0,11px,0)}
+ to{opacity:1;transform:translate3d(0,0,0)}
+}
+@media(prefers-reduced-motion:reduce){
+ .console main.view-enter > *{animation:none!important}
+ .home-option svg,.home-option::before{transition:none}
+}
+.console.reduced-motion main.view-enter > *{animation:none!important}
 </style>
 </head>
 <body>
@@ -2131,6 +2213,14 @@ function show(page,withNav=false){
   // keyboard selection scroll past the heading on initial entry.
   render(page!=='mode-info'&&page!=='stats-players'&&page!=='stats-history');
   if(changed){
+    const surface=document.querySelector('main#main');
+    if(surface){
+      surface.classList.remove('view-enter');
+      if(!data.display.reducedMotion && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+        void surface.offsetWidth;
+        surface.classList.add('view-enter');
+      }
+    }
     const workspace=document.querySelector('.workspace');
     if(workspace)workspace.scrollTop=0;
     if(main)main.scrollTop=0;
