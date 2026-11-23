@@ -1860,8 +1860,398 @@ header{justify-content:space-between;gap:24px}
   justify-self:center;
 }
 
+
+/* Embedded visual system for offline kiosk updates. */
+/* ATELIER — Darts Console product interface, 2026.
+   All geometry follows an 8px rhythm; five fixed hardware lanes are invariant.
+   Offline-only assets. The scoring engine and stored data are untouched. */
+:root{
+ color-scheme:dark;
+ --atelier-bg:#090b0f;--atelier-surface:#14181e;
+ --atelier-surface-hover:#202730;--atelier-line:#2e343e;
+ --atelier-fg:#f3f5f7;--atelier-secondary:#9ca6b2;
+ --atelier-tertiary:#717d8b;--atelier-paper:#f2f1ed;
+ --atelier-gold:#e6bb71;--atelier-danger:#f18c8e;
+ --atelier-ease:cubic-bezier(.22,1,.36,1);
+ --atelier-fast:190ms;--atelier-medium:390ms;
+ font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+ font-synthesis:none;text-rendering:optimizeLegibility
+}
+*{-webkit-tap-highlight-color:transparent}
+body,.console,.home-screen{background:var(--atelier-bg);color:var(--atelier-fg)}
+button{font-family:inherit;-webkit-appearance:none;appearance:none}
+button:disabled{opacity:.37}
+.console{isolation:isolate}
+.console header{
+ background:#0d1014;min-height:clamp(78px,10.4dvh,124px);
+ padding:0 clamp(20px,4.3vw,52px);
+ border-bottom:1px solid #242932;gap:14px
+}
+.console .brand{
+ color:#eef1f5;font-weight:660;font-size:clamp(17px,2.75vw,31px);
+ letter-spacing:-.055em
+}
+.console #match-heading{
+ font-size:clamp(16px,2.65vw,29px);
+ color:#b3bcc8;font-weight:530;letter-spacing:-.035em
+}
+.console #match-context{
+ color:#e8edf3;letter-spacing:-.04em
+}
+.console main{padding:clamp(20px,3.5vw,44px);scrollbar-width:none}
+.console h1,.console h2,.console h3{letter-spacing:-.055em}
+.console .eyebrow,.console .setup-kicker,.console .settings-section-title{
+ color:var(--atelier-tertiary);letter-spacing:.15em
+}
+.console footer{
+ background:#0e1116;border-top:1px solid #272d36;
+ min-height:clamp(90px,10.5dvh,135px);
+ grid-template-columns:repeat(5,minmax(0,1fr));
+ padding-inline:clamp(8px,1.8vw,26px)
+}
+.console footer .softkey{
+ min-width:0;color:#dde3eb;font-weight:590;letter-spacing:.015em;
+ transition:color var(--atelier-fast) ease,background var(--atelier-fast) ease
+}
+.console footer .softkey:active{background:#202630;color:white}
+.console footer .home-encoder svg circle:first-child{stroke:#d7e0eb}
+.console footer .home-indicator{box-shadow:none}
+.console .focused{
+ outline:2px solid #ecf3fc;outline-offset:-3px;
+ transition:background-color var(--atelier-fast) ease,border-color var(--atelier-fast) ease
+}
+.console button:focus-visible{outline:2px solid #f2f7fc;outline-offset:-3px}
+.console button:active{filter:brightness(1.13)}
+/* Home: a product launcher rather than a miniature dashboard. */
+.console[data-view=home] header{display:none}
+.console[data-view=home] main{padding:0;overflow:hidden}
+.home-screen{height:100%;min-height:0;display:flex;flex-direction:column}
+.home-brand{
+ height:21%;min-height:110px;gap:clamp(7px,1dvh,16px);
+ padding:clamp(22px,3dvh,42px) 12px 0;
+ align-items:center;justify-content:center
+}
+.home-brand svg{
+ width:clamp(30px,4.8dvh,58px);height:clamp(30px,4.8dvh,58px);
+ opacity:.94;stroke:#f3f5f7;stroke-width:1.25
+}
+.home-brand strong{
+ color:#f5f6f8;letter-spacing:-.06em;
+ font-weight:680;font-size:clamp(27px,5.4vw,58px);line-height:1
+}
+.home-brand small{
+ color:#788696;letter-spacing:.27em;
+ font-size:clamp(10px,1.45vw,17px);font-weight:650
+}
+.home-grid{
+ flex:1;min-height:0;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ grid-template-rows:repeat(2,minmax(0,1fr));
+ gap:clamp(10px,2.1vw,24px);
+ padding:clamp(17px,2.6dvh,34px) clamp(18px,4.2vw,49px) clamp(24px,3.9dvh,54px)
+}
+.home-option{
+ display:flex;align-items:flex-start;justify-content:space-between;
+ flex-direction:column;text-align:left;
+ padding:clamp(20px,3.6vw,44px);
+ border:1px solid #323a44;border-radius:clamp(14px,2.4vw,25px);
+ background:#171c23;min-width:0;min-height:0;gap:10px;overflow:hidden;
+ box-shadow:inset 0 1px 0 #ffffff08;
+ transition:background-color 290ms var(--atelier-ease),border-color 290ms var(--atelier-ease),transform 220ms var(--atelier-ease)
+}
+.home-option::after{display:none}
+.home-option::before{
+ content:"";position:absolute;inset:0 0 auto 0;height:3px;
+ background:var(--menu-color);opacity:.95;pointer-events:none
+}
+.home-option svg{
+ width:clamp(47px,8.6vw,96px);height:clamp(47px,8.6vw,96px);
+ stroke:var(--menu-color);stroke-width:1.35;opacity:1;
+ transition:transform 350ms var(--atelier-ease)
+}
+.home-option span{
+ color:#f4f6f9;line-height:1.02;
+ font-size:clamp(23px,4.55vw,50px);font-weight:670;letter-spacing:-.063em
+}
+.home-option:active{background:#27303b;transform:scale(.987)}
+.home-option:active svg{transform:translateY(-3px) scale(1.04)}
+.console[data-view=home] .home-indicator{
+ border-radius:100px;height:clamp(5px,.6dvh,8px);
+ width:clamp(30px,5.4vw,62px)
+}
+.console[data-view=home] .home-encoder{opacity:.8}
+/* Library: broad editorial rows with sharply readable selection. */
+.console[data-view=play] .game-library{max-width:1040px;margin-inline:auto}
+.console[data-view=play] .library-grid{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:clamp(10px,1.6dvh,22px)
+}
+.console[data-view=play] .library-tile{
+ position:relative;background:#161b22;border:1px solid #303742;
+ border-radius:clamp(11px,1.7vw,19px);
+ padding:clamp(17px,3.2vw,37px);min-height:clamp(110px,13.5dvh,188px);
+ text-align:left;align-items:flex-end;justify-content:flex-start;
+ transition:background-color 220ms ease,border-color 220ms ease,transform 200ms var(--atelier-ease)
+}
+.console[data-view=play] .library-tile strong{
+ font-size:clamp(23px,3.8vw,42px);font-weight:640;letter-spacing:-.052em;
+ line-height:1.08
+}
+.console[data-view=play] .library-tile::before{
+ content:"";display:block;width:clamp(27px,4vw,48px);height:3px;
+ background:#6e7d91;position:absolute;top:clamp(18px,2.6vw,30px);left:clamp(17px,3.2vw,37px);
+ border-radius:4px
+}
+.console[data-view=play] .library-tile.chosen,
+.console[data-view=play] .library-tile.focused{
+ background:#f0f2f4;border-color:#f0f2f4;color:#11151a;outline:none;box-shadow:none
+}
+.console[data-view=play] .library-tile.chosen::before,
+.console[data-view=play] .library-tile.focused::before{background:#252e3a}
+.console[data-view=play] .library-tile:active{transform:scale(.987)}
+/* Player setup: meaningful selection, no generic toggles. */
+.setup-page{max-width:1000px;margin:auto}
+.setup-heading h1{font-size:clamp(43px,7vw,78px);font-weight:675}
+.setup-step{font-weight:600;color:#8f9ba9}
+.setup-card{
+ background:#131820;border:1px solid #2e3640;border-radius:17px;
+ padding:clamp(18px,3.1vw,36px);box-shadow:none
+}
+.setup-card-head h2{font-size:clamp(23px,3.4vw,37px);font-weight:650}
+.setup-card-head span{color:#8996a6}
+.setup-player-option{
+ border:1px solid #343d49;background:#1e252e;
+ border-radius:12px;
+ transition:background-color 190ms ease,border-color 190ms ease
+}
+.setup-player-option.checked{
+ background:#26362f;border-color:#70b99b
+}
+.setup-player-option.focused{
+ background:#e9edf3;border-color:#e9edf3;color:#111821;
+ outline:0
+}
+.setup-player-toggle{
+ background:#2e3945;border-radius:50%;
+}
+.setup-player-option.checked .setup-player-toggle{background:#5aac89;color:#07170f}
+.setup-checkout-option{border-radius:10px;transition:background-color 190ms ease}
+.setup-checkout-option.checked{border-color:#e5e9ee;background:#313b47}
+.setup-checkout-option.focused{background:#e9edf3;color:#10151c}
+/* Game is the flagship: a luminous score against a restrained instrument panel. */
+.console[data-view=game] main{background:#0b0e12}
+.console[data-view=game] .score-hero{
+ background:var(--atelier-paper);color:#12171e;border:0;
+ border-radius:clamp(15px,2.3vw,26px);box-shadow:none;
+ overflow:hidden;position:relative
+}
+.console[data-view=game] .score-hero::before{
+ content:"";position:absolute;inset:0 auto 0 0;width:clamp(4px,.65vw,8px);
+ background:#9da8b7;opacity:.55
+}
+.console[data-view=game] .big-score{
+ font-weight:735;letter-spacing:-.09em;line-height:.96;
+ color:#0e141b;font-variant-numeric:tabular-nums lining-nums
+}
+.console[data-view=game] #match-context strong{font-weight:700;letter-spacing:-.052em}
+.console[data-view=game] .game-meta{
+ color:#aeb9c8;letter-spacing:.035em;font-weight:550
+}
+.console[data-view=game] .checkout-inline-label{
+ color:#dbbf87;font-weight:650;letter-spacing:.095em
+}
+.console[data-view=game] .dart-slots{gap:clamp(7px,1.25vw,16px)}
+.console[data-view=game] .dart-slot{
+ min-width:0;background:#171c23;color:#e7ecf3;
+ border:1px solid #323a45;border-radius:clamp(11px,1.8vw,20px);
+ box-shadow:none;
+ transition:background-color 260ms var(--atelier-ease),border-color 260ms ease,color 260ms ease
+}
+.console[data-view=game] .dart-slot.ready{
+ border-color:#e2e6eb;background:#272f3a;color:#fff
+}
+.console[data-view=game] .dart-slot.recorded{
+ border-color:#536071;background:#222933;color:#f4f6f8
+}
+.console[data-view=game] .dart-slot.suggested{
+ border-color:#a78b58;background:#242117;color:#f0ca85
+}
+.console[data-view=game] .dart-slot.empty{color:#6e7a8a;border-style:solid}
+.console[data-view=game] .dart-slot.focused{
+ outline:2px solid #f4f5f6;outline-offset:-5px
+}
+.console[data-view=game] .game-lower-grid{gap:clamp(8px,1.35vw,18px)}
+.console[data-view=game] .game-lower-grid .match-board-area{
+ background:#141a21;border:1px solid #29323d;border-radius:16px;
+ padding:clamp(8px,1.15vw,15px)
+}
+.console[data-view=game] .compact-player{
+ background:#1a2029;border:1px solid #303945;border-radius:clamp(10px,1.6vw,17px);
+ transition:background-color 260ms ease,border-color 260ms ease
+}
+.console[data-view=game] .compact-player.is-current{
+ background:#25313c;border-color:#7892a7
+}
+.console[data-view=game] .compact-player.is-next{
+ background:#1c2530;border-color:#536275
+}
+.console[data-view=game] .compact-card-label{
+ color:#92a2b4;font-weight:660;letter-spacing:.085em
+}
+.console[data-view=game] .compact-player-score{
+ color:#f0f4f7;font-weight:700;letter-spacing:-.05em;
+ font-variant-numeric:tabular-nums lining-nums
+}
+/* Profile management, statistics, settings share a calm list and typography grammar. */
+.profile-manager,.stats-dashboard,.settings-page{max-width:1030px;margin-inline:auto}
+.profile-row,.stats-list-row,.stats-player-button{
+ background:#171c23;border:1px solid #303944;border-radius:12px;
+ transition:background-color 220ms ease,border-color 220ms ease
+}
+.profile-row.chosen,.profile-row.focused,.stats-player-button.focused,
+.stats-list-row.focused{
+ background:#293441;border-color:#a0b0c2;
+ outline:2px solid #cad5e1;outline-offset:-2px
+}
+.profile-identity strong{font-weight:670;letter-spacing:-.04em}
+.profile-row-stats{font-variant-numeric:tabular-nums}
+.stats-panel,.stats-kpi,.stats-player-hero,.settings-overview{
+ background:#161c24;border:1px solid #303a46;
+ border-radius:clamp(12px,1.75vw,19px);box-shadow:none
+}
+.stats-kpi strong,.stats-profile-stat strong{
+ font-variant-numeric:tabular-nums lining-nums;
+ font-weight:710;letter-spacing:-.055em
+}
+.stats-section-title h2{font-weight:660;letter-spacing:-.045em}
+.settings-page{gap:clamp(16px,2.3dvh,28px)}
+.settings-overview{background:#1b232d}
+.settings-overview strong{font-weight:690;letter-spacing:-.055em}
+.settings-section-body{
+ background:#151b23;border:1px solid #303945;
+ border-radius:14px;overflow:hidden
+}
+.settings-row{
+ border-bottom:1px solid #303843;
+ transition:background-color 200ms ease;
+ background:transparent
+}
+.settings-row.focused,.settings-row:focus-visible{
+ background:#e9eef4;color:#131b25;border-radius:0;
+ outline:0
+}
+.settings-row.focused small,.settings-row:focus-visible small{color:#46515e}
+.settings-row-icon{color:#aebbc9}
+.settings-ios-switch{transition:background-color 230ms ease}
+.settings-switch-knob{transition:transform 270ms var(--atelier-ease)}
+/* Undo, pause, corrections, rules and winners retain functionality. */
+.panel,.mode-info-hero,.mode-info-rules{
+ background:#161c24;border:1px solid #303944;border-radius:15px
+}
+.primary{
+ background:#e9edf2;color:#0f151b;border:1px solid #e9edf2;
+ border-radius:12px;font-weight:690;letter-spacing:-.025em
+}
+.action,.rule,.player{
+ background:#1d242d;color:#e9edf2;border:1px solid #3a4552;
+ border-radius:12px
+}
+.action.focused,.primary.focused,.rule.focused,.player.focused{
+ background:#e9edf2;color:#0f151b;outline:none;border-color:#e9edf2
+}
+.console .winner-card{
+ background:#e9e8e4;border:none;color:#10151b;
+ border-radius:20px
+}
+.console .winner-name{
+ font-weight:750;letter-spacing:-.085em
+}
+.victory-overlay{background:#0c0e12}
+.victory-title{letter-spacing:.22em}
+.victory-name{font-weight:750;letter-spacing:-.08em}
+.throw-flash{background:#0c1015}
+.throw-flash-label{color:#9daab8;letter-spacing:.17em}
+.throw-flash-hit{font-weight:740;letter-spacing:-.08em}
+/* Navigation animation is added only when moving to another view;
+   score updates and encoder rotations render immediately. */
+.console:not(.reduced-motion) #main.atelier-enter > *{
+ animation:atelierEnter 490ms var(--atelier-ease) both
+}
+@keyframes atelierEnter{
+ from{opacity:0;transform:translate3d(0,16px,0) scale(.992)}
+ to{opacity:1;transform:translate3d(0,0,0) scale(1)}
+}
+.console .focused:not(.home-option):not(.library-tile){
+ transition:background-color 190ms ease,border-color 190ms ease,outline-color 190ms ease
+}
+@media(max-width:600px){
+ .console .brand{font-size:clamp(16px,4.5vw,23px)}
+ .home-brand{min-height:90px;height:20%}
+ .home-brand strong{font-size:clamp(25px,6.9vw,38px)}
+ .home-grid{padding:13px 14px 20px;gap:10px}
+ .home-option{padding:17px;border-radius:13px}
+ .home-option span{font-size:clamp(19px,5.9vw,31px)}
+ .home-option svg{width:clamp(36px,10.5vw,61px);height:clamp(36px,10.5vw,61px)}
+ .console[data-view=play] .library-tile{padding:16px;min-height:105px}
+ .console[data-view=play] .library-tile strong{font-size:clamp(17px,5.4vw,27px)}
+ .console[data-view=game] .score-hero{border-radius:13px}
+ .console[data-view=game] .dart-slot{border-radius:10px}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{
+  animation-duration:.01ms!important;animation-iteration-count:1!important;
+  transition-duration:.01ms!important;scroll-behavior:auto!important
+ }
+}
+.console.reduced-motion #main.atelier-enter > *{animation:none!important}
+
+
+/* Editorial home composition; all four hardware destinations are unchanged. */
+.home-option{justify-content:space-between}
+.home-option .atelier-tile-index{
+ color:#81909f;font-weight:610;font-size:clamp(12px,1.8vw,21px);
+ letter-spacing:.12em;line-height:1
+}
+.home-option .atelier-tile-content{
+ display:flex;align-items:flex-start;flex-direction:column;
+ gap:clamp(14px,2.6dvh,31px);width:100%;min-width:0
+}
+.home-option .atelier-tile-copy{display:flex;flex-direction:column;gap:clamp(7px,.9dvh,12px);min-width:0}
+.home-option .atelier-tile-copy > span{
+ color:#f4f6f9;line-height:1.02;display:block;
+ font-size:clamp(23px,4.55vw,50px);font-weight:670;letter-spacing:-.063em
+}
+.home-option .atelier-tile-copy > small{
+ color:#929eac;font-size:clamp(9px,1.35vw,17px);
+ font-weight:580;letter-spacing:.09em;line-height:1.3
+}
+.home-option .atelier-tile-index{color:var(--menu-color)}
+.console[data-view=game] .score-hero{position:relative}
+.console[data-view=game] .atelier-score-caption{
+ position:absolute;z-index:2;top:clamp(16px,2.3dvh,35px);
+ left:clamp(22px,3.2vw,45px);right:clamp(18px,2.7vw,38px);
+ display:flex;align-items:center;justify-content:space-between;gap:10px;
+ color:#566272;font-size:clamp(11px,1.6vw,20px);
+ font-weight:720;letter-spacing:.105em;line-height:1.2
+}
+.console[data-view=game] .atelier-score-player{
+ position:absolute;bottom:clamp(12px,1.5dvh,24px);
+ left:clamp(22px,3.2vw,45px);right:clamp(18px,2.7vw,38px);
+ color:#586576;font-weight:680;letter-spacing:.075em;
+ font-size:clamp(11px,1.7vw,21px);text-align:left;
+ overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+}
+.console[data-view=game] .big-score{position:relative;z-index:1}
+@media(max-width:600px){
+ .home-option .atelier-tile-content{gap:10px}
+ .home-option .atelier-tile-copy > span{font-size:clamp(19px,5.9vw,31px)}
+ .home-option .atelier-tile-copy > small{font-size:clamp(8px,2.3vw,12px)}
+ .console[data-view=game] .atelier-score-caption{top:12px;left:18px;right:14px;font-size:10px}
+ .console[data-view=game] .atelier-score-player{left:18px;bottom:9px;font-size:10px}
+}
+
 </style>
-<link rel="stylesheet" href="atelier.css">
+
 </head>
 <body>
 <div class="darts-intro" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-width="3"><circle cx="50" cy="50" r="39"/><circle cx="50" cy="50" r="25"/><circle cx="50" cy="50" r="10" fill="#fff"/></svg><strong>DARTS</strong><span>CONSOLE</span></div>
@@ -2037,6 +2427,11 @@ function show(page,withNav=false){
       if(!reduced){
         void pageSurface.offsetWidth;
         pageSurface.classList.add('atelier-enter');
+        const motionToken=String((Number(pageSurface.dataset.motionToken)||0)+1);
+        pageSurface.dataset.motionToken=motionToken;
+        setTimeout(()=>{
+          if(pageSurface.dataset.motionToken===motionToken)pageSurface.classList.remove('atelier-enter');
+        },540);
       }
     }
     const workspace=document.querySelector('.workspace');
