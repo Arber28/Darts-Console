@@ -1885,6 +1885,85 @@ button:focus-visible{
     scroll-behavior:auto!important;
   }
 }
+
+/* Visual refinement v2 — visibly differentiated, same navigation and geometry. */
+:root{
+  --surface-base:#0d0e10;
+  --surface-raised:#1a1c20;
+  --surface-highlight:#24262b;
+  --hairline:#303238;
+}
+.console{background:var(--surface-base)}
+header{border-bottom:1px solid rgba(255,255,255,.065)}
+.brand{color:#f0f1f3;font-weight:650;letter-spacing:-.035em}
+#match-heading{color:#b7bbc3;letter-spacing:-.025em}
+footer{background:#131518;border-top:1px solid rgba(255,255,255,.10)}
+.home-brand strong{font-weight:640;letter-spacing:.025em}
+.home-brand small{color:#898e98;letter-spacing:.20em}
+.home-option{
+  background:var(--surface-raised);
+  border:1px solid color-mix(in srgb,var(--menu-color) 50%,#45474c);
+  border-radius:12px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
+  font-weight:620;
+  letter-spacing:-.04em;
+  transition:background-color 180ms ease,border-color 180ms ease,transform 180ms ease;
+}
+.home-option svg{color:var(--menu-color);stroke:currentColor}
+.home-option span{color:#f7f7f8}
+.home-option:focus-visible,.home-option.focused{
+  background:color-mix(in srgb,var(--menu-color) 12%,#1b1d21);
+  border-color:var(--menu-color);
+  outline:2px solid var(--menu-color);
+  outline-offset:-3px;
+}
+.home-option:active{transform:scale(.992)}
+.console[data-view="game"] .score-hero{
+  background:#f3f3f2;
+  color:#0c0d0e;
+  border-radius:12px;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.075);
+}
+.console[data-view="game"] .big-score{
+  font-weight:690;
+  letter-spacing:-.065em;
+  font-variant-numeric:tabular-nums lining-nums;
+}
+.console[data-view="game"] .dart-slot{
+  border-radius:9px;
+  background:#1c1e22;
+  border:1px solid #363941;
+  transition:background-color 170ms ease,border-color 170ms ease;
+}
+.console[data-view="game"] .dart-slot.ready{
+  background:#272a2f;
+  border-color:#d8dadd;
+}
+.console[data-view="game"] .dart-slot.recorded{
+  background:#24272b;
+  border-color:#555a62;
+}
+.console[data-view="game"] .dart-slot.suggested{
+  border-color:#b89a55;
+  background:#262419;
+}
+.console[data-view="game"] .compact-player{
+  border-radius:9px;
+  background:#1c1e22;
+}
+.console[data-view="game"] .compact-player.is-next{
+  background:#27292d;
+  border-color:#5a5e65;
+}
+.settings-row:focus-visible,.settings-row.focused{
+  background:#27292e;
+  outline:2px solid #e9eaed;
+  outline-offset:-2px;
+}
+@media(prefers-reduced-motion:reduce){
+  .home-option,.console[data-view="game"] .dart-slot{transition:none}
+  .home-option:active{transform:none}
+}
 </style>
 </head>
 <body>
