@@ -2250,6 +2250,160 @@ button:disabled{opacity:.37}
  .console[data-view=game] .atelier-score-player{left:18px;bottom:9px;font-size:10px}
 }
 
+
+/* Console editorial library — removes generic mode cards and collision-prone
+   pseudo-lines. Fits six quick modes at small screens, scales to portrait kiosk. */
+.console[data-view="play"] main{
+  background:#0a0d11;
+  padding:clamp(18px,2.6dvh,42px) clamp(20px,3.7vw,54px);
+}
+.console[data-view="play"] .game-library{
+  width:100%;
+  max-width:940px;
+  margin:0 auto;
+}
+.console[data-view="play"] .library-intro{
+  padding:clamp(4px,.8dvh,12px) clamp(3px,.6vw,9px) clamp(15px,2.4dvh,34px);
+}
+.console[data-view="play"] .library-eyebrow{
+  display:block;
+  font-size:clamp(11px,1.4vw,17px);
+  letter-spacing:.18em;font-weight:690;color:#8293a6;
+}
+.console[data-view="play"] .library-intro h1{
+  margin:clamp(8px,1dvh,16px) 0 clamp(6px,.8dvh,12px);
+  color:#f4f6f8;
+  font-size:clamp(35px,5.7vw,68px);
+  line-height:1.04;font-weight:680;letter-spacing:-.065em;
+}
+.console[data-view="play"] .library-intro p{
+  margin:0;color:#96a3b3;
+  font-size:clamp(14px,1.85vw,22px);
+}
+.console[data-view="play"] .library-grid{
+  display:flex;
+  flex-direction:column;
+  gap:clamp(2px,.4dvh,6px);
+  grid-template-columns:none;
+  width:100%;
+}
+.console[data-view="play"] .library-grid .library-tile{
+  counter-increment:none;
+  display:grid;
+  grid-template-columns:clamp(37px,4.3vw,64px) minmax(0,1fr) clamp(19px,2.2vw,30px);
+  align-items:center;
+  justify-content:normal;
+  gap:clamp(10px,1.6vw,24px);
+  width:100%;
+  min-height:clamp(78px,7.8dvh,154px);
+  padding:clamp(14px,1.7dvh,30px) clamp(19px,2.8vw,35px);
+  margin:0;
+  border:1px solid transparent;
+  border-bottom-color:#252c35;
+  background:transparent;
+  border-radius:0;
+  color:#eef1f4;
+  text-align:left;
+  box-shadow:none;
+  font-family:inherit;
+  transform:none;
+  transition:background-color 200ms ease,color 200ms ease,border-color 200ms ease;
+}
+.console[data-view="play"] .library-grid .library-tile::before,
+.console[data-view="play"] .library-grid .library-tile::after{
+  display:none;
+  content:none;
+}
+.console[data-view="play"] .library-grid .library-index{
+  display:block;
+  color:#7e8d9e;
+  font-size:clamp(13px,1.65vw,20px);
+  font-weight:550;
+  font-variant-numeric:tabular-nums;
+}
+.console[data-view="play"] .library-grid .library-tile strong{
+  display:block;
+  width:auto;
+  min-width:0;
+  text-align:left;
+  color:inherit;
+  font-weight:630;
+  letter-spacing:-.05em;
+  font-size:clamp(22px,3.25vw,41px);
+  line-height:1.13;
+  overflow-wrap:normal;
+}
+.console[data-view="play"] .library-grid .library-chevron{
+  display:block;
+  justify-self:end;
+  color:#68788b;
+  font-weight:350;
+  font-size:clamp(25px,3.1vw,37px);
+  line-height:1;
+}
+.console[data-view="play"] .library-grid .library-tile.chosen,
+.console[data-view="play"] .library-grid .library-tile.focused,
+.console[data-view="play"] .library-grid .library-tile:focus-visible{
+  border-color:#eef1f3;
+  border-radius:clamp(11px,1.5vw,17px);
+  background:#eef1f3;
+  color:#141a21;
+  box-shadow:none;
+  outline:0;
+}
+.console[data-view="play"] .library-grid .library-tile.chosen .library-index,
+.console[data-view="play"] .library-grid .library-tile.focused .library-index,
+.console[data-view="play"] .library-grid .library-tile.chosen .library-chevron,
+.console[data-view="play"] .library-grid .library-tile.focused .library-chevron{
+  color:#66717d;
+}
+.console[data-view="play"] .library-grid .library-tile:active{
+  background:#d6dde5;
+  color:#141a21;
+}
+@media(max-width:600px){
+  .console[data-view="play"] main{padding:18px 22px}
+  .console[data-view="play"] .library-intro{padding:0 4px 17px}
+  .console[data-view="play"] .library-intro h1{font-size:36px}
+  .console[data-view="play"] .library-grid .library-tile{
+    min-height:76px;
+    padding:13px 18px;
+    grid-template-columns:36px minmax(0,1fr) 20px;
+    gap:12px;
+  }
+  .console[data-view="play"] .library-grid .library-tile strong{
+    font-size:clamp(20px,5.3vw,25px);
+  }
+}
+@media(min-width:700px) and (min-height:1100px){
+  .console[data-view="play"] .library-grid .library-tile{
+    min-height:clamp(124px,10.5dvh,210px);
+  }
+}
+
+/* Local camera focus preview. Physical keys stay in their fixed five lanes. */
+.console[data-view="settings-cameras"] main{min-height:0;overflow:hidden}
+.camera-focus-screen{height:100%;min-height:0;display:flex;flex-direction:column;gap:clamp(12px,2dvh,24px)}
+.camera-focus-heading{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.camera-focus-heading h1{font-size:clamp(26px,4.2vw,48px);font-weight:650;letter-spacing:-.055em;margin:0}
+.camera-focus-heading span{font-size:clamp(13px,1.9vw,22px);color:#9da9b8;font-variant-numeric:tabular-nums}
+.camera-focus-window{
+ flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;
+ overflow:hidden;background:#080a0d;border:1px solid #333d49;border-radius:14px;position:relative
+}
+.camera-focus-window img{display:block;width:100%;height:100%;object-fit:contain}
+.camera-focus-status{
+ position:absolute;inset:0;display:flex;justify-content:center;align-items:center;
+ text-align:center;padding:25px;color:#aebac9;font-size:clamp(16px,2.5vw,26px);
+ background:#0c1015;line-height:1.45
+}
+.camera-focus-window.has-frame .camera-focus-status{display:none}
+@media(max-width:600px){
+ .camera-focus-screen{gap:12px}
+ .camera-focus-heading h1{font-size:25px}
+ .camera-focus-heading span{font-size:14px}
+}
+
 </style>
 
 </head>
@@ -2474,8 +2628,15 @@ const gameDescriptions={
 };
 function cards(){
   const shown=state.filter==='quick'?modes.slice(0,6):modes;
-  return '<div class="game-library"><div class="library-grid">'+
-    shown.map(m=>button('mode:'+m[0],'<strong>'+esc(m[0])+'</strong>',
+  const count=shown.length;
+  return '<div class="game-library">'+
+    '<div class="library-intro"><span class="library-eyebrow">PLAY / SELECT</span>'+
+    '<h1>Choose a game.</h1><p>'+count+' game modes</p></div>'+
+    '<div class="library-grid">'+
+    shown.map((m,i)=>button('mode:'+m[0],
+      '<span class="library-index" aria-hidden="true">'+String(i+1).padStart(2,'0')+'</span>'+
+      '<strong>'+esc(m[0])+'</strong>'+
+      '<span class="library-chevron" aria-hidden="true">›</span>',
       'library-tile '+(m[0]===state.chosen?'chosen':''))).join('')+'</div></div>';
 }
 function toggleGameFilter(){
@@ -2663,6 +2824,12 @@ function matchLeaveConfirmScreen(){
     '</div></div></section>';
 }
 function shortcuts(){
+  if(state.page==='settings-cameras')return [
+    ['Escape','Back',()=>show('settings')],
+    ['F4','Cam 1',()=>selectFocusCamera(1)],
+    ['F2','Cam 2',()=>selectFocusCamera(2)],
+    ['F5','Cam 3',()=>selectFocusCamera(3)]
+  ];
   if(state.page==='settings-wifi-password')return [
     ['Escape','Back',()=>{state.networkPassword='';show('settings-network')}],
     ['F4','Zeichen weg',()=>{state.networkPassword=state.networkPassword.slice(0,-1);render(false)}],
@@ -2814,7 +2981,7 @@ function runShortcut(key){
   if(item&&item[1])item[2]();
 }
 function renderFooter(){
-  if(['setup','players','profile','profile-icons','profile-colors','player-delete','settings','settings-scoring','settings-display','settings-network','settings-system','settings-wifi-password','about'].includes(state.page)){
+  if(['setup','players','profile','profile-icons','profile-colors','player-delete','settings','settings-scoring','settings-display','settings-network','settings-system','settings-wifi-password','settings-cameras','about'].includes(state.page)){
     const labels=shortcuts().map(([key,label])=>label
       ?'<button class="softkey library-key" data-shortcut="'+key+'"><span>'+esc(label.toUpperCase())+'</span></button>'
       :'<span class="stats-empty-softkey" aria-hidden="true"></span>');
@@ -3839,10 +4006,36 @@ function settingsHome(){
           '<span>'+esc(option)+'</span><span class="settings-checkout-check">'+(data.out===option?'✓':'')+'</span></button>'
         ).join('')+'</div>':'')+'</div>')+
     settingsSection('ANZEIGE',settingsDisplayInline())+
-    settingsSection('VERBINDUNG',settingsRow('settings-network','arrows','WLAN & Netzwerk','Verbindung und verfügbare Netzwerke'))+
+    settingsSection('VERBINDUNG',settingsRow('settings-network','arrows','WLAN & Netzwerk','Verbindung und verfügbare Netzwerke')+
+      settingsRow('settings-cameras','target','Kameras fokussieren','Live-Vorschau von CAM 1, CAM 2 und CAM 3'))+
     settingsSection('SYSTEM',settingsRow('settings-system','info','Software & Updates','Version prüfen und aktualisieren')+
       settingsRow('about','info','Über Darts Console','Hardware, Funktionen und Speicher'))+
     '</div>';
+}
+
+let focusedCamera=1;
+function openCameraFocus(){focusedCamera=1;show('settings-cameras');}
+function selectFocusCamera(index){
+  if(![1,2,3].includes(index))return;
+  focusedCamera=index;
+  render(false);
+}
+function settingsCameraFocus(){
+  return '<div class="camera-focus-screen">'+
+    '<div class="camera-focus-heading"><h1>Kameras fokussieren</h1><span>CAM '+focusedCamera+' / 3</span></div>'+
+    '<div class="camera-focus-window"><div class="camera-focus-status" role="status">Verbinde mit Kamera '+focusedCamera+' …</div>'+
+    '<img alt="Live-Vorschau Kamera '+focusedCamera+'" src="/api/cameras/'+focusedCamera+'/stream" /></div>'+
+    '</div>';
+}
+function attachCameraPreview(){
+  const frame=main.querySelector('.camera-focus-window');
+  const image=frame?.querySelector('img');
+  if(!image)return;
+  image.addEventListener('load',()=>frame.classList.add('has-frame'),{once:true});
+  image.addEventListener('error',()=>{
+    const status=frame.querySelector('.camera-focus-status');
+    if(status)status.textContent='Keine Vorschau verfügbar. USB-Kamera und lokalen Kameradienst prüfen.';
+  },{once:true});
 }
 function settingsScoring(){
   return '<div class="settings-page">'+settingsSection('STANDARDREGELN',
@@ -4044,7 +4237,7 @@ function render(scroll=false){
   document.querySelector('.console').dataset.view=state.page;
   applyDisplaySettings();
   const matchPage=['game','menu','segment','correction','match-leave-confirm'].includes(state.page);
-  const sectionHeadings={players:'Players',stats:'Statistics','stats-players':'Players','stats-player-detail':'Player','stats-records':'Records','stats-history':'History','stats-match-detail':'Match','stats-delete-confirm':'Löschen','player-delete':'Löschen',profile:'Players','profile-icons':'Players','profile-colors':'Players',settings:'Settings','settings-scoring':'Scoring','settings-display':'Darstellung','settings-network':'Netzwerk','settings-wifi-password':'WLAN','settings-system':'Software',about:'About'};
+  const sectionHeadings={players:'Players',stats:'Statistics','stats-players':'Players','stats-player-detail':'Player','stats-records':'Records','stats-history':'History','stats-match-detail':'Match','stats-delete-confirm':'Löschen','player-delete':'Löschen',profile:'Players','profile-icons':'Players','profile-colors':'Players',settings:'Settings','settings-cameras':'Kameras','settings-scoring':'Scoring','settings-display':'Darstellung','settings-network':'Netzwerk','settings-wifi-password':'WLAN','settings-system':'Software',about:'About'};
   document.getElementById('match-heading').textContent=sectionHeadings[state.page]||
     (matchPage&&data.active?data.active.mode:'');
   const context=document.getElementById('match-context');
@@ -4072,12 +4265,13 @@ function render(scroll=false){
     saved:savedMatchScreen,'saved-discard-confirm':savedDiscardScreen,
     players:playersManager,
     settings:settingsHome,
-    'settings-network':settingsNetwork,'settings-wifi-password':settingsWifiPassword,'settings-system':settingsSystem,about:aboutConsole};
+    'settings-network':settingsNetwork,'settings-wifi-password':settingsWifiPassword,'settings-cameras':settingsCameraFocus,'settings-system':settingsSystem,about:aboutConsole};
   // Keep the encoder selection stable across redraws. A score update may
   // disable the previously selected throw slot, so prefer the next free dart.
   const previousAction=controls()[state.cursor]?.dataset.action;
   main.innerHTML=views[state.page]()+ (state.message?note(state.message):'');
   if(state.page==='game')fitMainScore();
+  if(state.page==='settings-cameras')attachCameraPreview();
   renderFooter();
   const available=controls();
   const sameAction=previousAction && available.findIndex(b=>b.dataset.action===previousAction);
@@ -4258,6 +4452,7 @@ function clickButton(b){
       save();return render(false);
     case 'settings-network':show('settings-network');return refreshWifi();
     case 'settings-system':return show('settings-system');
+    case 'settings-cameras':return openCameraFocus();
     case 'setting-motion':data.display.reducedMotion=!data.display.reducedMotion;save();break;
     case 'setting-contrast':data.display.clarity=data.display.clarity==='Klar'?'Standard':'Klar';data.display.highContrast=data.display.clarity==='Klar';save();break;
     case 'wifi-refresh':return refreshWifi();
@@ -4372,7 +4567,7 @@ document.addEventListener('click',event=>{
   const b=event.target.closest('button[data-nav]');
   if(b) clickButton(b);
 });
-const back={'saved-discard-confirm':'saved','match-leave-confirm':'menu','mode-info':'play',play:'home',players:'home',stats:'home','stats-players':'stats','stats-player-detail':'stats-players','stats-records':'stats','stats-history':'stats','stats-match-detail':'stats-history','stats-delete-confirm':'stats-match-detail',settings:'home','settings-scoring':'settings','settings-display':'settings','settings-network':'settings','settings-wifi-password':'settings-network','settings-system':'settings',setup:'play',game:'menu',menu:'game',correction:'game',rounds:'setup',grid:'setup',number:'setup',
+const back={'saved-discard-confirm':'saved','match-leave-confirm':'menu','mode-info':'play',play:'home',players:'home',stats:'home','stats-players':'stats','stats-player-detail':'stats-players','stats-records':'stats','stats-history':'stats','stats-match-detail':'stats-history','stats-delete-confirm':'stats-match-detail',settings:'home','settings-cameras':'settings','settings-scoring':'settings','settings-display':'settings','settings-network':'settings','settings-wifi-password':'settings-network','settings-system':'settings',setup:'play',game:'menu',menu:'game',correction:'game',rounds:'setup',grid:'setup',number:'setup',
   saved:'play',about:'settings',profile:'players','profile-icons':'profile','profile-colors':'profile-icons','player-delete':'players','bermuda-number':'setup','bermuda-multiplier':'bermuda-number'};
 document.addEventListener('keydown',event=>{
   const key=event.key;
