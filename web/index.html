@@ -2597,18 +2597,21 @@ function show(page,withNav=false){
 }
 function homeScreen(){
   const options=[
-    ['play','SPIEL','target','#76a5ed','01','MATCH STARTEN'],
-    ['players','SPIELER','users','#6bd6a9','02','DEINE CREW'],
-    ['stats','STATISTICS','chart','#efc27f','03','DEINE ZAHLEN'],
-    ['settings','SETTINGS','settings','#bc9ae9','04','DEIN SYSTEM']
+    ['play','SPIEL','target','#d9e9fb','01','Neues Match'],
+    ['players','SPIELER','users','#b2dbc8','02','Deine Spieler'],
+    ['stats','STATISTIK','chart','#ecd3a6','03','Ergebnisse'],
+    ['settings','EINSTELLUNGEN','settings','#c9c3e5','04','Deine Konsole']
   ];
-  return '<div class="home-screen"><div class="home-brand">'+icon('target')+
-    '<strong>DARTS CONSOLE</strong><small>READY TO PLAY</small></div>'+
-    '<div class="home-grid">'+options.map(([page,label,symbol,color,index,description])=>
-      '<button class="home-option" style="--menu-color:'+color+'" data-nav data-action="'+page+'">'+
-      '<span class="atelier-tile-index">'+index+'</span>'+
-      '<div class="atelier-tile-content">'+icon(symbol)+
-      '<div class="atelier-tile-copy"><span>'+label+'</span><small>'+description+'</small></div></div></button>').join('')+'</div></div>';
+  return '<div class="home-screen studio-home">'+
+    '<div class="studio-home-heading"><span class="studio-kicker">DARTS / 01</span>'+
+    '<div class="studio-wordmark">DARTS<span>CONSOLE</span></div>'+
+    '<div class="studio-home-rule"></div><p>Ready when you are.</p></div>'+
+    '<div class="home-grid studio-launcher">'+options.map(([page,label,symbol,color,index,caption])=>
+      '<button class="home-option studio-launch" style="--menu-color:'+color+'" data-nav data-action="'+page+'">'+
+      '<span class="studio-launch-index">'+index+'</span>'+
+      '<span class="studio-launch-symbol">'+icon(symbol)+'</span>'+
+      '<span class="studio-launch-content"><strong>'+label+'</strong><small>'+caption+'</small></span>'+
+      '<span class="studio-launch-arrow" aria-hidden="true">↗</span></button>').join('')+'</div></div>';
 }
 const gameDescriptions={
   '501':['Das klassische Dartspiel: von 501 Punkten auf genau null.','Alle Spieler beginnen bei 501. Jeder Treffer wird abgezogen. Gewonnen hat, wer exakt null erreicht. Bei Double Out muss der letzte Dart ein Doppelfeld treffen. Überwerfen oder ein unmöglicher Reststand bedeutet Bust: Der Punktestand wird für diese Aufnahme zurückgesetzt.'],
@@ -2628,16 +2631,16 @@ const gameDescriptions={
 };
 function cards(){
   const shown=state.filter==='quick'?modes.slice(0,6):modes;
-  const count=shown.length;
-  return '<div class="game-library">'+
-    '<div class="library-intro"><span class="library-eyebrow">PLAY / SELECT</span>'+
-    '<h1>Choose a game.</h1><p>'+count+' game modes</p></div>'+
-    '<div class="library-grid">'+
-    shown.map((m,i)=>button('mode:'+m[0],
-      '<span class="library-index" aria-hidden="true">'+String(i+1).padStart(2,'0')+'</span>'+
-      '<strong>'+esc(m[0])+'</strong>'+
-      '<span class="library-chevron" aria-hidden="true">›</span>',
-      'library-tile '+(m[0]===state.chosen?'chosen':''))).join('')+'</div></div>';
+  return '<section class="game-library studio-library">'+
+    '<div class="studio-page-head"><span class="studio-kicker">SPIELMODUS</span>'+
+    '<h1>Was spielen wir?</h1><span class="studio-page-count">'+
+    String(shown.length).padStart(2,'0')+' SPIELE</span></div>'+
+    '<div class="library-grid">'+shown.map((m,i)=>
+      button('mode:'+m[0],
+        '<span class="library-index">'+String(i+1).padStart(2,'0')+'</span>'+
+        '<strong>'+esc(m[0])+'</strong><span class="library-chevron" aria-hidden="true">↗</span>',
+        'library-tile '+(m[0]===state.chosen?'chosen':''))).join('')+
+    '</div></section>';
 }
 function toggleGameFilter(){
   state.filter=state.filter==='quick'?'all':'quick';
@@ -3076,7 +3079,7 @@ function setup(){
   const selected=state.players;
   const all=[...data.profiles,...state.guests];
   const isCountdown=!!mode[3];
-  let html='<div class="setup-page"><div class="setup-heading"><div><span class="setup-kicker">SPIEL VORBEREITEN</span>'+
+  let html='<div class="setup-page"><div class="setup-heading"><div><span class="setup-kicker">NEUES MATCH / SETUP</span>'+
     '<h1>'+esc(mode[0])+'</h1></div><span class="setup-step">MATCH SETUP</span></div>';
   html+='<section class="setup-card setup-players-card">'+
     '<div class="setup-card-head"><h2>Spieler</h2><span class="setup-count">'+selected.length+' AUSGEWÄHLT</span></div>'+
@@ -3581,10 +3584,10 @@ function game(){
     const turnTotal=darts.reduce((sum,d)=>sum+d.n*d.m,0);
     const roundHistory=review?review.indices.map(index=>({index})):
       view.history.filter(d=>d.player===view.current&&d.round===view.round);
-    html+='<div class="score-hero" aria-label="'+esc(shown.name)+' · '+esc(unit)+'">'+
+    html+='<div class="score-hero studio-score-hero" aria-label="'+esc(shown.name)+' · '+esc(unit)+'">'+
       '<div class="atelier-score-caption"><span>'+esc(unit)+'</span><span>ROUND '+view.round+'</span></div>'+
       '<div class="big-score'+(typeof value==='string'?' word-score':'')+'">'+esc(value)+'</div>'+
-      '<div class="atelier-score-player">'+esc(shown.name)+'</div></div>';
+      '<div class="atelier-score-player"><span class="studio-live-dot"></span>'+esc(shown.name)+'</div></div>';
     const tip=review?null:finishAdvice(mode,view,match);
     const suggested=tip && tip.route!=='NO DIRECT FINISH' ? tip.route.split(' → ') : [];
     if(suggested.length){
@@ -3740,7 +3743,7 @@ function statsActivity(games){
 }
 function statistics(){
   const {games,summary}=statsData();
-  return '<div class="stats-dashboard stats-overview">'+statsTopCards(summary)+
+  return '<div class="stats-dashboard stats-overview"><div class="studio-section-heading"><span class="studio-kicker">DEIN VERLAUF</span><h1>In Zahlen.</h1></div>'+statsTopCards(summary)+
     '<section class="stats-panel"><div class="stats-section-title"><h2>Spielmodi</h2><span>GESPIELTE MATCHES</span></div>'+
     statsActivity(games)+'</section>'+
     '<div class="stats-dashboard-note">Statistiken aus gespeicherten Matches · 3-Dart Average nur für 301, 501 und 701</div></div>';
@@ -3892,7 +3895,7 @@ function playersManager(){
       '<small>'+wins+' '+(wins===1?'Sieg':'Siege')+'</small></span>'+
       '</button>';
   }).join('');
-  return '<div class="profile-manager">'+
+  return '<div class="profile-manager"><div class="studio-section-heading"><span class="studio-kicker">DEINE CREW</span><h1>Spieler.</h1></div>'+
     '<div class="profile-manager-list">'+(rows||'<p class="stats-empty">Noch keine Spieler angelegt.</p>')+'</div>'+
     '</div>';
 }
@@ -3991,7 +3994,7 @@ function settingsSection(title,body){
   return '<section class="settings-section"><h2>'+title+'</h2><div class="settings-section-body">'+body+'</div></section>';
 }
 function settingsHome(){
-  return '<div class="settings-page"><div class="settings-overview"><div><span>KONSOLE</span><strong>Darts Console</strong><small>Bereit für die nächste Runde.</small></div>'+
+  return '<div class="settings-page"><div class="settings-overview"><div><span>DEINE KONSOLE</span><strong>Alles an seinem Platz.</strong><small>Spiel, Anzeige und Verbindung.</small></div>'+
     '<div class="settings-overview-icon">'+icon('target')+'</div></div>'+
     settingsSection('SPIEL',
       '<div class="settings-checkout">'+
