@@ -3,6 +3,7 @@
 import json
 import os
 import subprocess
+import glob
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -12,6 +13,33 @@ STATUS = Path("/var/lib/darts-kiosk/update-status.json")
 WIFI_HELPER = "/opt/darts-console/deploy/wifi-helper.py"
 ADDRESS = "127.0.0.1"
 PORT = 8765
+
+
+def camera_devices():
+    """Prefer stable physical USB ports; use only V4L2 video capture node 0."""
+    found = []
+    seen = set()
+    candidates = sorted(glob.glob("/dev/v4l/by-path/*video-index0"))
+    candidates += sorted(glob.glob("/dev/v4l/by-id/*video-index0"))
+    candidates += sorted(glob.glob("/dev/video[0-9]*"),
+                         key=lambda p: int(p.rsplit("video", 1)[-1]))
+    for path in candidates:
+        resolved = os.path.realpath(path)
+        if resolved in seen or not os.path.exists(resolved):
+            continue
+        name = os.path.basename(resolved)
+        if name.startswith("video"):
+            index = Path("/sys/class/video4linux") / name / "index"
+            try:
+                if index.read_text(encoding="utf-8").strip() != "0":
+                    continue
+            except OSError:
+                # A missing sysfs index does not prove this is a capture node.
+                continue
+        seen.add(resolved)
+        found.append(path)
+    return found
+
 
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
@@ -53,10 +81,56 @@ class Handler(SimpleHTTPRequestHandler):
         return self.headers.get("Origin") in (
             f"http://{ADDRESS}:{PORT}", f"http://localhost:{PORT}")
 
+
+    def camera_stream(self, number):
+        devices = camera_devices()
+        if number < 1 or number > 3 or len(devices) < number:
+            return self.json_reply(404, {"error": "Camera not connected"})
+        if not Path("/usr/bin/ffmpeg").is_file():
+            return self.json_reply(503, {"error": "Install ffmpeg for local camera preview"})
+        command = [
+            "/usr/bin/ffmpeg", "-hide_banner", "-loglevel", "error",
+            "-nostdin", "-f", "video4linux2", "-i", devices[number - 1],
+            "-vf", "fps=8", "-q:v", "5", "-f", "mpjpeg",
+            "-boundary_tag", "frame", "pipe:1",
+        ]
+        try:
+            process = subprocess.Popen(command, stdout=subprocess.PIPE,
+                                       stderr=subprocess.DEVNULL)
+        except OSError:
+            return self.json_reply(503, {"error": "Camera capture could not start"})
+        try:
+            self.send_response(200)
+            self.send_header("Content-Type", "multipart/x-mixed-replace; boundary=frame")
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            while True:
+                chunk = process.stdout.read(16384)
+                if not chunk:
+                    break
+                self.wfile.write(chunk)
+        except (BrokenPipeError, ConnectionResetError, OSError):
+            pass
+        finally:
+            process.terminate()
+            try:
+                process.wait(timeout=2)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+            if process.stdout:
+                process.stdout.close()
+
     def do_GET(self):
         if not self.local_request():
             return self.json_reply(403, {"error": "Local requests only"})
-        if urlsplit(self.path).path == "/api/network/scan":
+        path = urlsplit(self.path).path
+        if path.startswith("/api/cameras/") and path.endswith("/stream"):
+            parts = path.strip("/").split("/")
+            if len(parts) == 4 and parts[:2] == ["api", "cameras"] and parts[3] == "stream" and parts[2] in ("1", "2", "3"):
+                return self.camera_stream(int(parts[2]))
+            return self.json_reply(404, {"error": "Unknown camera"})
+        if path == "/api/network/scan":
             return self.network_helper({"action": "scan"})
         if urlsplit(self.path).path == "/api/update/status":
             try:
