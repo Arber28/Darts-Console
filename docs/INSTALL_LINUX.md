@@ -90,3 +90,46 @@ Rettungsweg verfügbar sein.
 ## Pico controls
 
 Flash [CircuitPython](https://circuitpython.org/board/raspberry_pi_pico/), install `adafruit_hid` to `CIRCUITPY/lib/`, then copy [the firmware](../firmware/code.py) to `CIRCUITPY/code.py`. The device maps rotation, OK, Back, Undo, Correct and Next to arrow keys, Enter, Escape, F4, F2 and F5. See [Wiring](WIRING.md) for pins and [Camera detection](DETECTION.md) for the camera bench procedure.
+
+
+## Three USB cameras: manual focus preview
+
+Settings → **Kameras fokussieren** displays the selected USB camera live. The four
+physical buttons are permanently mapped: **BACK · CAM 1 · CAM 2 · CAM 3**;
+the middle encoder is display-only on this screen. Switching cameras closes
+the previous MJPEG connection.
+
+One-time install on the actual Debian kiosk (as root):
+
+```sh
+apt-get update
+apt-get install --no-install-recommends ffmpeg v4l-utils
+# Pull the latest repository source, then run from repository root:
+sh deploy/install-kiosk.sh
+```
+
+The installer grants `darts-kiosk` the `video` group and restarts
+`darts-web.service`. If a camera remains unavailable, check:
+
+```sh
+ls -l /dev/v4l/by-path/ /dev/video*
+id darts-kiosk
+journalctl -u darts-web -n 80 --no-pager
+```
+
+USB camera assignment uses the sorted `/dev/v4l/by-path/*video-index0`
+device nodes (physical USB port order) where available, followed by
+stable by-ID capture nodes. Keep the cameras in their respective USB
+ports to preserve CAM 1/2/3. Not all camera modules expose autofocus;
+this screen only shows the feed to help **manually adjust the lens**.
+
+The local endpoint `/api/cameras/{1,2,3}/stream` sends MJPEG from
+`ffmpeg`/V4L2 on loopback port 8765; it does **not** upload video,
+store frames or depend on internet. The public RawGitHack preview has
+no access to the local USB cameras and will show an unavailable state.
+
+**Important:** The in-app software update currently replaces only
+`web/index.html` and `web/scoring.js`. Camera preview needs the
+updated `deploy/api-server.py` and installer changes, so **run the
+installer once as root**. Do not clear Chromium's saved localStorage.
+
