@@ -19,6 +19,12 @@ if ! id darts-kiosk >/dev/null 2>&1; then
         --shell /opt/darts-console/deploy/kiosk-login darts-kiosk
 fi
 
+# Give the dedicated kiosk service read access to local V4L2 cameras.
+# Supplementary group membership takes effect on the service restart below.
+if getent group video >/dev/null 2>&1; then
+    usermod -aG video darts-kiosk
+fi
+
 if [ ! -e /etc/darts-console/sway.conf ]; then
     install -m 644 deploy/sway.conf /etc/darts-console/sway.conf
 fi
