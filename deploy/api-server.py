@@ -93,7 +93,7 @@ class Handler(SimpleHTTPRequestHandler):
         command = [
             "/usr/bin/ffmpeg", "-hide_banner", "-loglevel", "error",
             "-nostdin", "-f", "video4linux2", "-i", devices[number - 1],
-            "-vf", "fps=8", "-q:v", "5", "-f", "mpjpeg",
+            "-vf", "fps=30", "-q:v", "5", "-f", "mpjpeg",
             "-boundary_tag", "frame", "pipe:1",
         ]
         try:
