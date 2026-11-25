@@ -38,10 +38,11 @@ def split_nmcli(row):
     return out
 
 def scan():
-    result = run_nmcli("--fields", "IN-USE,SSID,SIGNAL,SECURITY",
+    result = run_nmcli("--escape", "yes", "--fields", "IN-USE,SSID,SIGNAL,SECURITY",
                        "device", "wifi", "list", "--rescan", "yes", timeout=25)
     if result.returncode:
-        raise RuntimeError("WLAN-Suche nicht verfügbar. NetworkManager prüfen.")
+        detail = (result.stderr or "").strip()
+        raise RuntimeError("WLAN-Suche fehlgeschlagen: " + (detail[:110] or "NetworkManager prüfen."))
     networks, seen, connected = [], set(), ""
     for row in result.stdout.splitlines():
         parts = split_nmcli(row)
@@ -72,14 +73,29 @@ def connect(ssid, password):
         raise ValueError("Ungültiger WLAN-Name.")
     if not isinstance(password, str) or len(password) > 128 or any(ord(ch) < 32 for ch in password):
         raise ValueError("Ungültiges WLAN-Passwort.")
+    # A previously saved NetworkManager connection can be activated again
+    # without the kiosk asking for a password it does not need to know.
+    # Keep the existing Ethernet connection untouched.
+    if not password:
+        saved = run_nmcli("--escape", "yes", "--fields", "NAME,TYPE",
+                          "connection", "show", timeout=8)
+        if saved.returncode == 0:
+            for row in saved.stdout.splitlines():
+                fields = split_nmcli(row)
+                if len(fields) >= 2 and fields[0] == ssid and fields[1] in ("802-11-wireless", "wifi"):
+                    resumed = run_nmcli("connection", "up", "id", ssid, timeout=30)
+                    if resumed.returncode == 0:
+                        return {"connected": ssid}
+                    break
+
     arguments = ["device", "wifi", "connect", ssid]
     if password:
         arguments += ["password", password]
-    # nmcli receives credentials as process arguments. This is a local,
-    # short-lived operation; credentials are never logged or returned.
+    # Credentials are passed only to nmcli and never included in responses.
     completed = run_nmcli(*arguments, timeout=35)
     if completed.returncode:
-        raise RuntimeError("WLAN-Verbindung fehlgeschlagen. Passwort und Empfang prüfen.")
+        # nmcli may include the passphrase in some diagnostics: do not relay stderr.
+        raise RuntimeError("Verbindung fehlgeschlagen. Passwort, Empfang oder NetworkManager prüfen.")
     return {"connected": ssid}
 
 def main():
