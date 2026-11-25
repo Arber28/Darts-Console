@@ -2562,6 +2562,7 @@ function resetSetupGuests(){
   normalizeSetupPlayers();
 }
 function show(page,withNav=false){
+  if(page!=='settings-wifi-password')state.networkPassword='';
   const changed=state.page!==page;
   if(state.page==='setup'&&page==='play')resetSetupGuests();
   if(page==='setup')normalizeSetupPlayers();
@@ -4074,6 +4075,7 @@ function settingsNetwork(){
       (available.length?available.map(net=>settingsRow('wifi-select:'+encodeURIComponent(net.ssid),'arrows',net.ssid,
         net.security?'Gesichertes Netzwerk':'Offenes Netzwerk',net.active?'Verbunden':net.signal+' %')).join(''):
         '<p class="settings-footnote">'+(n.state==='unsupported'?'Für direkte WLAN-Verbindungen muss der Netzwerkdienst auf dem Laptop installiert sein.':'Noch keine Netzwerke gefunden.')+'</p>'))+
+    settingsSection('GESPEICHERTE VERBINDUNGEN',(n.saved||[]).map(p=>settingsRow('wifi-saved:'+p.uuid,'arrows',p.name,'Mit gespeichertem Passwort verbinden')).join('')||'<p class="settings-footnote">Keine gespeicherten WLANs.</p>')+
     '</div>';
 }
 function settingsWifiPassword(){
@@ -4081,7 +4083,7 @@ function settingsWifiPassword(){
     ['GROSSBUCHSTABEN','ABCDEFGHIJKLMNOPQRSTUVWXYZ'],
     ['KLEINBUCHSTABEN','abcdefghijklmnopqrstuvwxyz'],
     ['ZAHLEN','0123456789'],
-    ['ZEICHEN','!@#$%^&*()-_=+[]{}.,:;?/\\ ']
+    ['ZEICHEN',String.fromCharCode(...Array.from({length:95},(_,i)=>i+32)).replace(/[A-Za-z0-9]/g,'')]
   ];
   const [label,keys]=modes[state.networkKeyboardMode];
   return '<div class="settings-page"><div class="wifi-password-top">'+
@@ -4122,21 +4124,34 @@ function applyDisplaySettings(){
   }
 }
 async function refreshWifi(){
+  if(state.networkBusy)return;
   state.networkBusy=true;
   state.network={state:'unknown',networks:[],message:'Suche läuft …'};
   render(false);
   try{
-    const response=await fetch('/api/network/scan',{cache:'no-store'});
+    const response=await fetch('/api/network/scan',{cache:'no-store',headers:{'X-Darts-Network':'requested'}});
     const json=await response.json();
     if(!response.ok)throw Error(json.error||'WLAN-Dienst nicht verfügbar');
-    state.network={state:json.connected?'connected':'ready',networks:json.networks||[],message:json.connected?'Verbunden mit '+json.connected:'Netzwerke gefunden'};
+    state.network={state:json.connected?'connected':'ready',networks:json.networks||[],saved:json.saved||[],message:(json.connected?'Verbunden mit '+json.connected:'Netzwerke gefunden')+' · '+(json.device||'')};
   }catch(e){
     state.network={state:'unsupported',networks:[],message:'Direkte WLAN-Einrichtung ist in diesem Browser noch nicht verfügbar.'};
   }
   state.networkBusy=false;
   if(state.page==='settings-network')render(false);
 }
+async function activateSavedWifi(uuid){
+  if(state.networkBusy)return;
+  state.networkBusy=true;
+  try{
+    const res=await fetch('/api/network/activate',{method:'POST',headers:{'Content-Type':'application/json','X-Darts-Network':'requested'},body:JSON.stringify({uuid})});
+    const json=await res.json();
+    if(!res.ok)throw Error(json.error||'Verbindung fehlgeschlagen');
+  }catch(e){state.message=e.message;}
+  state.networkBusy=false;
+  return refreshWifi();
+}
 async function connectWifi(){
+  if(state.networkBusy)return;
   const password=state.networkPassword||'';
   if(!state.networkSsid)return;
   if(!password && state.network.networks?.some(n=>n.ssid===state.networkSsid&&n.security)){
@@ -4154,9 +4169,12 @@ async function connectWifi(){
     state.networkSsid='';
     state.networkPassword='';
     state.network={state:'connected',networks:[],message:'Verbindung hergestellt.'};
+    state.networkBusy=false;
     await refreshWifi();
     show('settings-network');
   }catch(e){
+    state.networkPassword='';
+    state.message=e.message;
     state.network={...state.network,state:'error',message:e.message};
   }
   state.networkBusy=false;
@@ -4455,6 +4473,7 @@ function clickButton(b){
     case 'settings-cameras':return openCameraFocus();
     case 'setting-motion':data.display.reducedMotion=!data.display.reducedMotion;save();break;
     case 'setting-contrast':data.display.clarity=data.display.clarity==='Klar'?'Standard':'Klar';data.display.highContrast=data.display.clarity==='Klar';save();break;
+    case 'wifi-saved':return activateSavedWifi(value);
     case 'wifi-refresh':return refreshWifi();
     case 'wifi-select':
       state.networkSsid=decodeURIComponent(value);

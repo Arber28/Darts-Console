@@ -42,6 +42,8 @@ def camera_devices():
 
 
 class Handler(SimpleHTTPRequestHandler):
+    timeout = 50
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(ROOT), **kwargs)
 
@@ -66,7 +68,7 @@ class Handler(SimpleHTTPRequestHandler):
     def network_helper(self, payload):
         try:
             completed = subprocess.run(
-                ["/usr/bin/sudo", "-n", "/usr/bin/python3", WIFI_HELPER],
+                ["/usr/bin/sudo", "-n", "/usr/bin/python3", "-I", WIFI_HELPER],
                 input=json.dumps(payload, ensure_ascii=False), capture_output=True,
                 text=True, timeout=45, check=False)
         except (OSError, subprocess.TimeoutExpired):
@@ -131,6 +133,8 @@ class Handler(SimpleHTTPRequestHandler):
                 return self.camera_stream(int(parts[2]))
             return self.json_reply(404, {"error": "Unknown camera"})
         if path == "/api/network/scan":
+            if self.headers.get("X-Darts-Network") != "requested":
+                return self.json_reply(403, {"error": "Use the local kiosk"})
             return self.network_helper({"action": "scan"})
         if urlsplit(self.path).path == "/api/update/status":
             try:
@@ -143,7 +147,7 @@ class Handler(SimpleHTTPRequestHandler):
     def do_POST(self):
         if not self.local_request():
             return self.json_reply(403, {"error": "Local requests only"})
-        if urlsplit(self.path).path == "/api/network/connect":
+        if urlsplit(self.path).path in ("/api/network/connect", "/api/network/activate"):
             if not self.valid_local_origin() or self.headers.get("X-Darts-Network") != "requested":
                 return self.json_reply(403, {"error": "Use the local kiosk"})
             if self.headers.get("Content-Type", "").split(";")[0].strip() != "application/json":
@@ -161,7 +165,8 @@ class Handler(SimpleHTTPRequestHandler):
             if not isinstance(payload, dict):
                 return self.json_reply(400, {"error": "Invalid request"})
             return self.network_helper({
-                "action": "connect", "ssid": payload.get("ssid"),
+                "action": "activate" if urlsplit(self.path).path.endswith("/activate") else "connect",
+                "uuid": payload.get("uuid"), "ssid": payload.get("ssid"),
                 "password": payload.get("password", "")})
         if urlsplit(self.path).path != "/api/update/start":
             return self.json_reply(404, {"error": "Not found"})

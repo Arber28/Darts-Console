@@ -31,3 +31,5 @@ The kiosk smoke test requires Debian with Chromium and unprivileged user namespa
 - [Reference links](docs/LINKS.md)
 
 The camera bench tool awaits physical validation. Use manual scoring on the kiosk.
+
+Wi-Fi settings and safe interface migration: [Debian Wi-Fi setup](docs/WIFI.md).

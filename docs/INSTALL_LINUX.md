@@ -133,3 +133,7 @@ no access to the local USB cameras and will show an unavailable state.
 updated `deploy/api-server.py` and installer changes, so **run the
 installer once as root**. Do not clear Chromium's saved localStorage.
 
+
+## Wi-Fi management
+
+Follow [the Wi-Fi migration guide](WIFI.md) to move only wlp2s0 to NetworkManager and keep enp1s0 under ifupdown.

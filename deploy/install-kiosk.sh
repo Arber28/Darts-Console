@@ -32,7 +32,7 @@ install -m 644 deploy/darts-web.service /etc/systemd/system/darts-web.service
 install -m 644 deploy/darts-console-update.service /etc/systemd/system/darts-console-update.service
 install -d -m 755 /etc/sudoers.d
 printf '%s\n' 'darts-kiosk ALL=(root) NOPASSWD: /usr/bin/systemctl start --no-block darts-console-update.service' > /etc/sudoers.d/darts-console-update
-printf '%s\n' 'darts-kiosk ALL=(root) NOPASSWD: /usr/bin/python3 /opt/darts-console/deploy/wifi-helper.py' > /etc/sudoers.d/darts-console-network
+printf '%s\n' 'darts-kiosk ALL=(root) NOPASSWD: /usr/bin/python3 -I /opt/darts-console/deploy/wifi-helper.py' > /etc/sudoers.d/darts-console-network
 chmod 440 /etc/sudoers.d/darts-console-network
 visudo -cf /etc/sudoers.d/darts-console-network >/dev/null
 chmod 440 /etc/sudoers.d/darts-console-update

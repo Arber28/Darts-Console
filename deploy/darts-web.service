@@ -8,6 +8,7 @@ ExecStart=/usr/bin/python3 /opt/darts-console/deploy/api-server.py
 Restart=always
 RestartSec=2
 ProtectSystem=strict
+ReadWritePaths=-/etc/NetworkManager/system-connections
 ProtectHome=yes
 
 [Install]
