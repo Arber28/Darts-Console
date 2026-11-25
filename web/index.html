@@ -2860,6 +2860,17 @@ button:disabled{opacity:.33}
  .studio-launch:active .studio-launch-arrow{transform:translate(3px,-3px)}
  .studio-launch:active .studio-launch-symbol svg{transform:scale(.96)}
 }
+
+/* Wi-Fi connection status must remain readable with the physical keyboard. */
+.wifi-connect-error{
+  color:#f0a6a8;background:#291b23;border:1px solid #70434c;
+  border-radius:10px;padding:12px 16px;margin:12px 0 0;
+  font-size:clamp(13px,1.8vw,20px);line-height:1.35;letter-spacing:0
+}
+.wifi-connect-busy{
+  color:#c6d3df;margin:12px 0 0;
+  font-size:clamp(13px,1.8vw,20px)
+}
 </style>
 
 </head>
@@ -4524,12 +4535,12 @@ function settingsNetwork(){
   const n=state.network;
   const available=n.networks||[];
   const ready=n.state==='ready';
-  const status=n.state==='connected'?'Verbunden':n.state==='ready'?'WLAN verfügbar':n.state==='unsupported'?'Nicht eingerichtet':n.state==='error'?'Fehler':'Prüfe Verbindung';
+  const status=n.state==='connected'?'Verbunden':n.state==='ready'?'WLAN verfügbar':n.state==='unsupported'?'Nicht eingerichtet':n.state==='error'?'WLAN-Fehler':'Prüfe Verbindung';
   return '<div class="settings-page"><div class="settings-network-status">'+
     '<span class="network-status-dot '+(n.state==='connected'?'connected':'')+'"></span>'+
     '<div><strong>'+status+'</strong><small>'+esc(n.message||'')+'</small></div></div>'+
     settingsSection('WLAN',
-      '<div class="settings-network-actions">'+settingsRow('wifi-refresh','arrows','Netzwerke suchen','Verfügbare WLANs aktualisieren')+'</div>'+
+      '<div class="settings-network-actions">'+settingsRow('wifi-refresh','arrows',state.networkBusy?'Suche läuft …':'Netzwerke suchen','Verfügbare WLANs aktualisieren')+'</div>'+
       (available.length?available.map(net=>settingsRow('wifi-select:'+encodeURIComponent(net.ssid),'arrows',net.ssid,
         net.security?'Gesichertes Netzwerk':'Offenes Netzwerk',net.active?'Verbunden':net.signal+' %')).join(''):
         '<p class="settings-footnote">'+(n.state==='unsupported'?'Für direkte WLAN-Verbindungen muss der Netzwerkdienst auf dem Laptop installiert sein.':'Noch keine Netzwerke gefunden.')+'</p>'))+
@@ -4546,7 +4557,9 @@ function settingsWifiPassword(){
   return '<div class="settings-page"><div class="wifi-password-top">'+
     '<span>WLAN · '+esc(state.networkSsid)+'</span><h2>Passwort eingeben</h2>'+
     '<strong class="wifi-masked">'+('●'.repeat(state.networkPassword.length)||'••••••••')+'</strong>'+
-    '<small>'+state.networkPassword.length+' Zeichen · '+esc(label)+'</small></div>'+
+    '<small>'+state.networkPassword.length+' Zeichen · '+esc(label)+'</small>'+
+    (state.network.state==='error'?'<p class="wifi-connect-error" role="alert">'+esc(state.network.message)+'</p>':'')+
+    (state.networkBusy?'<p class="wifi-connect-busy" role="status">Verbinde mit WLAN …</p>':'')+'</div>'+
     '<div class="profile-keyboard wifi-keyboard">'+[...keys].map(c=>button('wifi-char:'+encodeURIComponent(c),c===' '?'SPACE':esc(c),'profile-key'+(c===' '?' profile-key-space':''))).join('')+'</div>'+
     '<p class="settings-footnote">Drehregler: Zeichen auswählen und drücken. Taste 2 löscht ein Zeichen, Taste 3 wechselt den Zeichensatz. Taste 4 verbindet.</p></div>';
 }
@@ -4581,45 +4594,63 @@ function applyDisplaySettings(){
   }
 }
 async function refreshWifi(){
+  if(state.networkBusy)return;
   state.networkBusy=true;
-  state.network={state:'unknown',networks:[],message:'Suche läuft …'};
-  render(false);
+  state.network={state:'unknown',networks:[],message:'WLAN-Netzwerke werden gesucht …'};
+  if(state.page==='settings-network')render(false);
   try{
     const response=await fetch('/api/network/scan',{cache:'no-store'});
     const json=await response.json();
-    if(!response.ok)throw Error(json.error||'WLAN-Dienst nicht verfügbar');
-    state.network={state:json.connected?'connected':'ready',networks:json.networks||[],message:json.connected?'Verbunden mit '+json.connected:'Netzwerke gefunden'};
+    if(!response.ok||json.error)throw Error(json.error||'WLAN-Suche fehlgeschlagen');
+    state.network={
+      state:json.connected?'connected':'ready',
+      networks:Array.isArray(json.networks)?json.networks:[],
+      connected:json.connected||'',
+      message:json.connected?'Verbunden mit '+json.connected:'WLAN-Netzwerke verfügbar'
+    };
   }catch(e){
-    state.network={state:'unsupported',networks:[],message:'Direkte WLAN-Einrichtung ist in diesem Browser noch nicht verfügbar.'};
+    state.network={
+      state:'error',networks:[],
+      message:e.message||'Der lokale WLAN-Dienst ist nicht erreichbar.'
+    };
+  }finally{
+    state.networkBusy=false;
+    if(state.page==='settings-network')render(false);
   }
-  state.networkBusy=false;
-  if(state.page==='settings-network')render(false);
 }
 async function connectWifi(){
+  if(state.networkBusy||!state.networkSsid)return;
+  const ssid=state.networkSsid;
   const password=state.networkPassword||'';
-  if(!state.networkSsid)return;
-  if(!password && state.network.networks?.some(n=>n.ssid===state.networkSsid&&n.security)){
-    return say('Bitte das WLAN-Passwort eingeben.');
-  }
   state.networkBusy=true;
+  // Do not leave the password page before the connection has succeeded.
+  if(state.page==='settings-wifi-password')render(false);
   try{
     const res=await fetch('/api/network/connect',{
       method:'POST',
       headers:{'Content-Type':'application/json','X-Darts-Network':'requested'},
-      body:JSON.stringify({ssid:state.networkSsid,password})
+      body:JSON.stringify({ssid,password})
     });
     const json=await res.json();
-    if(!res.ok)throw Error(json.error||'Verbindung fehlgeschlagen');
-    state.networkSsid='';
+    if(!res.ok||json.error)throw Error(json.error||'WLAN-Verbindung fehlgeschlagen');
     state.networkPassword='';
-    state.network={state:'connected',networks:[],message:'Verbindung hergestellt.'};
-    await refreshWifi();
+    state.networkSsid='';
+    state.network={
+      state:'connected',connected:ssid,networks:state.network.networks||[],
+      message:'Verbunden mit '+ssid
+    };
+    state.networkBusy=false;
     show('settings-network');
+    return;
   }catch(e){
-    state.network={...state.network,state:'error',message:e.message};
+    state.network={
+      ...state.network,state:'error',
+      message:e.message||'Verbindung fehlgeschlagen'
+    };
+  }finally{
+    state.networkBusy=false;
+    if(state.page==='settings-network'||state.page==='settings-wifi-password')render(false);
   }
-  state.networkBusy=false;
-  if(state.page==='settings-network'||state.page==='settings-wifi-password')render(false);
 }
 function updatePanel(){
   let html=panel('Software update',
@@ -4916,10 +4947,17 @@ function clickButton(b){
     case 'setting-contrast':data.display.clarity=data.display.clarity==='Klar'?'Standard':'Klar';data.display.highContrast=data.display.clarity==='Klar';save();break;
     case 'wifi-refresh':return refreshWifi();
     case 'wifi-select':
+      if(state.networkBusy)return;
       state.networkSsid=decodeURIComponent(value);
       state.networkPassword='';
       state.networkKeyboardMode=0;
+      if(state.network.networks?.some(n=>n.ssid===state.networkSsid&&n.active)){
+        return render(false);
+      }
+      // A saved secured network can reconnect without a password.
+      // For a new protected network the user enters the password first.
       if(state.network.networks?.some(n=>n.ssid===state.networkSsid&&!n.security))return connectWifi();
+      state.network={...state.network,state:'ready',message:''};
       return show('settings-wifi-password');
     case 'wifi-char':
       if(state.networkPassword.length<63)state.networkPassword+=decodeURIComponent(value);
