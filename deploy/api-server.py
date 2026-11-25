@@ -92,8 +92,9 @@ class Handler(SimpleHTTPRequestHandler):
             return self.json_reply(503, {"error": "Install ffmpeg for local camera preview"})
         command = [
             "/usr/bin/ffmpeg", "-hide_banner", "-loglevel", "error",
-            "-nostdin", "-f", "video4linux2", "-i", devices[number - 1],
-            "-vf", "fps=30", "-q:v", "5", "-f", "mpjpeg",
+            "-nostdin", "-f", "video4linux2", "-input_format", "mjpeg",
+            "-framerate", "30", "-video_size", "1920x1080",
+            "-i", devices[number - 1], "-c:v", "copy", "-f", "mpjpeg",
             "-boundary_tag", "frame", "pipe:1",
         ]
         try:
